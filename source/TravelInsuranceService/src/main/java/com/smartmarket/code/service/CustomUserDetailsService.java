@@ -1,8 +1,8 @@
 package com.smartmarket.code.service;
 
-import com.smartmarket.code.dao.RoleRepository;
+//import com.smartmarket.code.dao.RoleRepository;
 import com.smartmarket.code.dao.UserRepository;
-import com.smartmarket.code.model.Role;
+//import com.smartmarket.code.model.Role;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.model.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +27,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
-    @Autowired
-    RoleRepository roleRepository;
+//    @Autowired
+//    RoleRepository roleRepository;
 
 
     @Override
@@ -40,12 +40,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         //mapping list authority to userdetails
         List grantList = new ArrayList();
-        Set<Role> roleSet = roleRepository.findRoleUserByUserIdActive(appUser.getId());
-        for (Role role : roleSet) {
-            // ROLE_USER, ROLE_ADMIN,..
-            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getName());
-            grantList.add(grantedAuthority);
-        }
+//        Set<Role> roleSet = roleRepository.findRoleUserByUserIdActive(appUser.getId());
+//        for (Role role : roleSet) {
+//            // ROLE_USER, ROLE_ADMIN,..
+//            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(role.getName());
+//            grantList.add(grantedAuthority);
+//        }
 
         //set user detail
         UserDetails user = (UserDetails) new org.springframework.security.core.userdetails.User(appUser.getUsername(), appUser.getPassword(), grantList);

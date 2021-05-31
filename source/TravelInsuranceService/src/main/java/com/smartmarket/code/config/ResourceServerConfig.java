@@ -30,8 +30,8 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Value("${publicKey}")
     private String publicKey;
 
-    @Autowired
-    private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
+//    @Autowired
+//    private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

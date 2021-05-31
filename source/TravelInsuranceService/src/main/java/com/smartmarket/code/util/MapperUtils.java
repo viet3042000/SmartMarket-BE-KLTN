@@ -1,5 +1,6 @@
 package com.smartmarket.code.util;
 
+import com.smartmarket.code.exception.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
@@ -176,8 +177,10 @@ public class MapperUtils {
             createTravelInsuranceBICRequest.setTrv(trv);
             createTravelInsuranceBICRequest.setTrvDetails(trvDetails);
         }
+        else {
+            throw new CustomException("Lỗi xảy ra trong quá trình mapping dữ liệu từ BIC" , HttpStatus.BAD_REQUEST) ;
 
-
+        }
 
         return createTravelInsuranceBICRequest;
     }
