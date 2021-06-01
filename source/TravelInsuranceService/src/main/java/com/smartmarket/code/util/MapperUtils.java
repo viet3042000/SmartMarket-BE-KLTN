@@ -108,11 +108,11 @@ public class MapperUtils {
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 
         if (resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
+
             JSONObject jsonObjectResultBIC = new JSONObject(resultBIC.getBody());
             JSONObject ordersBIC = jsonObjectResultBIC.getJSONObject("Orders");
             JSONObject trvBIC = jsonObjectResultBIC.getJSONObject("TRV");
             JSONArray trvDetailsBIC = jsonObjectResultBIC.getJSONArray("TRVDetail");
-
 
             Orders orders = new Orders();
             TRV trv = new TRV();

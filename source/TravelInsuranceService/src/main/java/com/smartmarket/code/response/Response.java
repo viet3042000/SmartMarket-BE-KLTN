@@ -5,8 +5,7 @@ import com.smartmarket.code.constants.ResponseCode;
 
 public class Response {
     private int code = ResponseCode.UNKNOWN_ERROR;
-        private Object data;
-
+    private Object data;
 	
 	public Response() {
 

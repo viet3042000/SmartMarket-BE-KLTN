@@ -30,8 +30,8 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Value("${publicKey}")
     private String publicKey;
 
-//    @Autowired
-//    private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
+    @Autowired
+    private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,7 +47,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
 
         // Add a filter to validate the tokens with every request
-//        http.addFilterAfter(customAuthorizeRequestFilter, FilterSecurityInterceptor.class);
+        http.addFilterAfter(customAuthorizeRequestFilter, FilterSecurityInterceptor.class);
     }
 
     @Bean

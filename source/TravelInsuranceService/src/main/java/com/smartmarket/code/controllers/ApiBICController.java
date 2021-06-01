@@ -69,25 +69,34 @@ public class ApiBICController {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = MapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail()) ;
         String requestCreate = null;
         requestCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
+
+        //post Data to BIC
         ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(HostConstants.INTERCOMMUNICATION_RESTFUL_API.BIC_HOST_CREATE, null, requestCreate, token);
         JSONObject jsonObjectReponseCreate =  null ;
-        if(jsonResultCreateBIC.getStatusCode() == HttpStatus.OK &&  jsonResultCreateBIC != null ){
+        if(jsonResultCreateBIC.getStatusCode() == HttpStatus.OK &&  jsonResultCreateBIC.getBody() != null ){
+
+//            set reponse data to client
             jsonObjectReponseCreate = new JSONObject(jsonResultCreateBIC.getBody()) ;
+            Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId") ;
+            boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded") ;
+
+            createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
+            createTravelInsuranceBICResponse.setSucceeded(succeeded);
+            JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
+            DataCreateBIC dataCreateBIC = new DataCreateBIC() ;
+            dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
+            dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
+            createTravelInsuranceBICResponse.setData(dataCreateBIC);
+            response.setDetail(createTravelInsuranceBICResponse);
+            response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
+            response.setResultCode("000");
+            response.setResultMessage("Successful");
+            response.setResponseTime(dataResponse.getString("internalMessage"));
+
+        }else {
+
         }
-        Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId") ;
-        boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded") ;
 
-        createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
-        createTravelInsuranceBICResponse.setSucceeded(succeeded);
-        JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-//        Object data1=  new Object();
-//        createTravelInsuranceBICResponse.setData(data1);
-
-        DataCreateBIC dataCreateBIC = new DataCreateBIC() ;
-        dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
-        dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
-        createTravelInsuranceBICResponse.setData(dataCreateBIC);
-        response.setDetail(createTravelInsuranceBICResponse);
 
         return new ResponseEntity<>(response,HttpStatus.OK);
 

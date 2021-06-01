@@ -14,6 +14,14 @@ public class CustomException extends RuntimeException {
     private final String message;
     private final HttpStatus httpStatus;
 
+    private String responseId;
+    private String responseTime;
+    private String resultCode;
+    private String resultMessage;
+    private String detailErrorCode;
+    private String detailErrorMessage;
+
+
 
     public CustomException(String message, HttpStatus httpStatus) {
         this.message = message;
