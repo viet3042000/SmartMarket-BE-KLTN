@@ -1,7 +1,10 @@
 package com.smartmarket.code.request.entityBIC;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigDecimal;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class trvBIC {
     private Long TRVID;
     private Long Orderid;
