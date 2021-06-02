@@ -17,19 +17,17 @@ public class LogServiceImpl  {
 
     private Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
 
+//  Target là lưu log mình giao dịch với BIC
     public void createTargetLog(String TRANSACTIONID,      String MESSAGEID,     String IIBMESSAGEID,
                                    String TARGETSERVICE,      String MESSAGETYPE,   String TRANSACTIONDETAIL,
                                    String LOGTIMESTAMP ,      String MESSAGETIMESTAMP,String TIMEDURATION) throws CustomException {
-
 
 		logger.info(TRANSACTIONID  +"%5" + MESSAGEID  +"%5" + IIBMESSAGEID +"%5"+ TARGETSERVICE +"%5"+
                        MESSAGETYPE    +"%5"+ TRANSACTIONDETAIL  +"%5"+ LOGTIMESTAMP +"%5"+MESSAGETIMESTAMP +"%5"+ TIMEDURATION);
 
 	}
 
-
-
-
+//  SOA là bảng lưu log giao dịch của client với hệ thống
 	public void createSOALog(String MESSAGEID,        String TRANSACTIONID,       String SOURCEID,      String TARGETID,
                                String MESSAGETIMESTAMP, String SERVICENAME,         String OPERATIONNAME, String SERVICEVERSION,
                                String TIMEDURATION,     String STATUS,              String ADDITIONALMSG, String TRANSACTIONDETAIL,
@@ -43,6 +41,8 @@ public class LogServiceImpl  {
                 +"%5"+ ERRORCODE +"%5"+ ERRORMSG +"%5"+ CLIENTIP  ) ;
 
 	}
+	
+	
 	private String getIp() {
         String serverId;
         try {
