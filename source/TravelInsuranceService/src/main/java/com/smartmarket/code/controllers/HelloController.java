@@ -39,40 +39,40 @@ public class HelloController {
     CachingServiceImpl cachingService;
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
-    @PostMapping(value = "/hello", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> hello(@RequestBody User userid) throws JsonProcessingException {
+//    @PostMapping(value = "/hello", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+//    public ResponseEntity<?> hello(@RequestBody User userid) throws JsonProcessingException {
 
-        Response response = new Response();
+//        Response response = new Response();
+//
+//        UserLoginBIC userLoginBIC = new UserLoginBIC();
+//        userLoginBIC.setUsername("bic-dsvn@bic.vn");
+//        userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
+//        userLoginBIC.setDomainname("vetautructuyen.com.vn");
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        String bodyrequest = mapper.writeValueAsString(userLoginBIC);
+//
+//
+//        //post
+//        String path = "https://app.bic.vn/EbizApiTest/api/v1/token/login";
+//        ResponseEntity<String> jsonResult = apiUtils.postDataByApiBody("https://app.bic.vn/EbizApiTest/api/v1/token/login", null, bodyrequest, null);
+//
+//        String token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResult.getBody()));
+//
+//        //get api
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("id", "102295");
+//        ResponseEntity<String> jsonResult2 = apiUtils.getApiWithParam("https://app.bic.vn/EbizApiTest/api/v1/TRV/Get/", map, null, token);
+//        System.out.println(userid);
+//        List<String> data = new ArrayList<>();
+//        data.add("hop");
+//        response.setCode(1);
+//        response.setData(data);
+//        logger.info("dday la log test");
+//        return new ResponseEntity<>(response, HttpStatus.OK);
 
-        UserLoginBIC userLoginBIC = new UserLoginBIC();
-        userLoginBIC.setUsername("bic-dsvn@bic.vn");
-        userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
-        userLoginBIC.setDomainname("vetautructuyen.com.vn");
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        String bodyrequest = mapper.writeValueAsString(userLoginBIC);
-
-
-        //post
-        String path = "https://app.bic.vn/EbizApiTest/api/v1/token/login";
-        ResponseEntity<String> jsonResult = apiUtils.postDataByApiBody("https://app.bic.vn/EbizApiTest/api/v1/token/login", null, bodyrequest, null);
-
-        String token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResult.getBody()));
-
-        //get api
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", "102295");
-        ResponseEntity<String> jsonResult2 = apiUtils.getApiWithParam("https://app.bic.vn/EbizApiTest/api/v1/TRV/Get/", map, null, token);
-        System.out.println(userid);
-        List<String> data = new ArrayList<>();
-        data.add("hop");
-        response.setCode(ResponseCode.SUCCESS);
-        response.setData(data);
-        logger.info("dday la log test");
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
-    }
+//    }
 
 
     @GetMapping(value = "/hello/getcache")
@@ -85,7 +85,7 @@ public class HelloController {
 //            throw new CustomException("This user information is not accessible in this function",HttpStatus.FORBIDDEN) ;
 //        }
         Object set = cachingService.getFromCache("hoptest", 1L);
-        response.setCode(ResponseCode.SUCCESS);
+        response.setCode(1);
         response.setData(set);
         return new ResponseEntity<>(response, HttpStatus.OK);
 

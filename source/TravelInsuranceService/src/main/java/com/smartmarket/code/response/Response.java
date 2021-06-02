@@ -4,9 +4,9 @@ package com.smartmarket.code.response;
 import com.smartmarket.code.constants.ResponseCode;
 
 public class Response {
-    private int code = ResponseCode.UNKNOWN_ERROR;
+    private int code = 1;
     private Object data;
-	
+
 	public Response() {
 
     }
@@ -35,9 +35,6 @@ public class Response {
         this.code = code;
     }
 
-    public String getMessage() {
-        return ResponseCode.getMessage(code);
-    }
 
     public Object getData() {
         return data;
