@@ -1,17 +1,23 @@
 package com.smartmarket.code.service.impl;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.AccessUser;
 import com.smartmarket.code.model.Url;
 import com.smartmarket.code.model.User;
-import com.smartmarket.code.service.AccesUserService;
-import com.smartmarket.code.service.AuthorizationService;
-import com.smartmarket.code.service.UrlService;
-import com.smartmarket.code.service.UserService;
+import com.smartmarket.code.request.entity.UserLoginBIC;
+import com.smartmarket.code.service.*;
+import com.smartmarket.code.util.APIUtils;
+import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,11 +26,17 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
+
+    @Autowired
+    AccessTokenService accessTokenService;
 
     @Autowired
     AccesUserService accesUserService;
@@ -34,6 +46,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Autowired
     UrlService urlService;
+
+    @Autowired
+    APIUtils apiUtils;
+
 
     @Override
     public boolean AuthorUserAccess(Long userId) {
@@ -124,5 +140,50 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return false;
     }
 
+    public String getTokenFromDatabase() throws JsonProcessingException {
+
+        AccessToken accessToken = accessTokenService.findByUsername("bic-dsvn@bic.vn") ;
+        String token = "" ;
+        if(accessToken != null || accessToken.getToken() == null
+                || accessToken.getExpireTime() == null || accessToken.getIssueTime() == null ){
+            long timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+            if (timeRemain < 1000) {
+
+                //post get token
+                UserLoginBIC userLoginBIC = new UserLoginBIC();
+                userLoginBIC.setUsername("bic-dsvn@bic.vn");
+                userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
+                userLoginBIC.setDomainname("vetautructuyen.com.vn");
+
+                ObjectMapper mapper = new ObjectMapper();
+
+                String requestToken = mapper.writeValueAsString(userLoginBIC);
+                ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(HostConstants.INTERCOMMUNICATION_RESTFUL_API.BIC_HOST_LOGIN, null, requestToken, null, null);
+                if(jsonResultGetToken.getBody() != null){
+                    //get token from response
+                    String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
+                    Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
+                    Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
+
+                    //update token in database
+                    accessTokenService.updateTokenByAccessTokenId(timeExpire,timeIssue,tokenUpdate,accessToken.getId()) ;
+                    token = tokenUpdate;
+                }
+            }else {
+                token =  accessToken.getToken() ;
+
+            }
+        }
+        return token ;
+    }
+
+//    public static void main(String[] args) throws ParseException {
+//        Long current  = DateTimeUtils.getCurrenTime() ;
+//        Long test = new Date().getTime() ;
+//        System.out.println(current);
+//        String dateStr=  "03/06/2021 02:29:06 PM" ;
+//        Date date1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aaa").parse(dateStr);
+//        System.out.println("test");
+//    }
 
 }

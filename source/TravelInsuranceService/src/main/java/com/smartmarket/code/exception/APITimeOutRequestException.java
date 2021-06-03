@@ -1,24 +1,19 @@
-package com.smartmarket.code.response;
+package com.smartmarket.code.exception;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+public class APITimeOutRequestException extends RuntimeException {
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class BaseResponse {
+    private static final long serialVersionUID = 1L;
 
     private String responseId;
-    private String responseTime;
     private String resultCode;
     private String resultMessage;
-    private String detailErrorCode;
     private String detailErrorMessage;
-    private Object detail;
 
-    public Object getDetail() {
-        return detail;
-    }
-
-    public void setDetail(Object detail) {
-        this.detail = detail;
+    public APITimeOutRequestException(String responseId, String resultCode, String resultMessage,String detailErrorMessage) {
+        this.responseId = responseId;
+        this.resultCode = resultCode;
+        this.resultMessage = resultMessage;
+        this.detailErrorMessage = detailErrorMessage;
     }
 
     public String getResponseId() {
@@ -27,14 +22,6 @@ public class BaseResponse {
 
     public void setResponseId(String responseId) {
         this.responseId = responseId;
-    }
-
-    public String getResponseTime() {
-        return responseTime;
-    }
-
-    public void setResponseTime(String responseTime) {
-        this.responseTime = responseTime;
     }
 
     public String getResultCode() {
@@ -53,13 +40,6 @@ public class BaseResponse {
         this.resultMessage = resultMessage;
     }
 
-    public String getDetailErrorCode() {
-        return detailErrorCode;
-    }
-
-    public void setDetailErrorCode(String detailErrorCode) {
-        this.detailErrorCode = detailErrorCode;
-    }
 
     public String getDetailErrorMessage() {
         return detailErrorMessage;
@@ -68,4 +48,6 @@ public class BaseResponse {
     public void setDetailErrorMessage(String detailErrorMessage) {
         this.detailErrorMessage = detailErrorMessage;
     }
+
+
 }

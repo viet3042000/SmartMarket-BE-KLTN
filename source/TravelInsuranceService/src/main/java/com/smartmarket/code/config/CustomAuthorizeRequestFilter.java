@@ -1,11 +1,17 @@
 package com.smartmarket.code.config;
 
+import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
+import com.smartmarket.code.model.entitylog.SoaObject;
+import com.smartmarket.code.service.impl.CachingServiceImpl;
+import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.JwtUtils;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -18,7 +24,10 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,11 +41,18 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Autowired
     UrlRepository urlRepository;
 
+    @Autowired
+    LogServiceImpl logService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        long startTime = System.currentTimeMillis();
 
-
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String LOGTIMESTAMP = formatter.format(date);
+        String MESSAGETIMESTAMP = LOGTIMESTAMP;
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -111,6 +127,29 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             return;
         }
 
+        request = new RequestWrapper(request);
+//        ResponseWrapper responseCopier = new ResponseWrapper(response);
+
+        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
+        JSONObject requestBody = new JSONObject(jsonString);
+        String MESSASGEID = requestBody.getString("requestId");
+        String TRANSACTIONDETAIL = requestBody.toString();
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        String TIMEDURATION = Long.toString(elapsed);
+
+        //logRequest vs Client
+        SoaObject soaObject = new SoaObject(MESSASGEID, null, "Client", "BIC",
+                MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
+                "request", TRANSACTIONDETAIL, null, null,
+                null, LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+        logService.createSOALog2(soaObject.getStringObject());
+
         chain.doFilter(request, response);
+
+//        chain.doFilter(request, responseCopier);
+//        byte[] body = responseCopier.getCopy();
+//        String stringBody = new String(body, response.getCharacterEncoding());
+//        JSONObject responseBody = new JSONObject(stringBody);
     }
 }

@@ -1,5 +1,8 @@
 package com.smartmarket.code.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReponseError {
 
     private String responseId;
