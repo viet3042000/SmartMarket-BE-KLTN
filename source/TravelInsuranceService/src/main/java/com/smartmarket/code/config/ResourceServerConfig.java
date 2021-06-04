@@ -40,9 +40,13 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                 c -> c.jwt(
                         j -> j.decoder(jwtDecoder())
                 )
-        );
+        )
+//                .exceptionHandling().accessDeniedHandler(new CustomOAuth2AccessDeniedHandler())
+
+        ;
 
         http.authorizeRequests()
+
 //                .mvcMatchers("/**").access("@webSecurity.checkURL(authentication)")
                 .anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

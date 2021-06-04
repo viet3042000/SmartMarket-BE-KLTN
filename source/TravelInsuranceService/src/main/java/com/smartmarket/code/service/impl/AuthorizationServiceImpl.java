@@ -118,8 +118,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         AccessToken accessToken = accessTokenService.findByUsername("bic-dsvn@bic.vn") ;
         String token = "" ;
-        if(accessToken != null || accessToken.getToken() == null
-                || accessToken.getExpireTime() == null || accessToken.getIssueTime() == null ){
+        if(accessToken != null ){
+            token = accessToken.getToken() ;
             long timeRemain = 0L ;
             if(     accessToken.getToken() != null
                     && accessToken.getExpireTime() != null
@@ -148,10 +148,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     accessTokenService.updateTokenByAccessTokenId(timeExpire,timeIssue,tokenUpdate,accessToken.getId()) ;
                     token = tokenUpdate;
                 }
-            }else {
-                token =  accessToken.getToken() ;
-
             }
+
         }
         return token ;
     }

@@ -46,7 +46,6 @@ public class AccessTokenServiceImp implements AccessTokenService {
         return accessTokenRepository.findById(id).get();
     }
 
-//    @Cacheable(cacheNames = "userAccessToken", key = "#userName")
     @Override
     public AccessToken findByUsername(String userName) {
         AccessToken accessToken = accessTokenRepository.findByUsername(userName) ;
