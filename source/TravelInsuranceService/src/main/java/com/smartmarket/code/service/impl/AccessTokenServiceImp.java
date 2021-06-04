@@ -6,6 +6,7 @@ import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.AccessUser;
 import com.smartmarket.code.service.AccessTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class AccessTokenServiceImp implements AccessTokenService {
         return accessTokenRepository.findById(id).get();
     }
 
-
+//    @Cacheable(cacheNames = "userAccessToken", key = "#userName")
     @Override
     public AccessToken findByUsername(String userName) {
         AccessToken accessToken = accessTokenRepository.findByUsername(userName) ;
