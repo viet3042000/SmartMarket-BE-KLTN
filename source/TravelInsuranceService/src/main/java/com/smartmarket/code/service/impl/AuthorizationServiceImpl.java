@@ -96,32 +96,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             }
 
             // get list accessUser
-//        Set<AccessUser> accessUserSet = null;
-//        if (urlMatched != null && userToken != null) {
-//            accessUserSet = accesUserService.findAccessUserByUserIdAndUserUrlId(userToken.getId(), urlMatched.getId());
-//        } else {
-//            return false;
-//        }
-//
-//        //verify user accessUser
-            //        boolean containAccessUser=  accessUserSet.stream().anyMatch(u -> u.getId().equals(userToken.getId())) ;
-
-//        boolean verifyUserAccess = false;
-//        if (accessUserSet != null) {
-//            for (AccessUser accessUser : accessUserSet) {
-//                Long idUserToken = userToken.getId();
-//                if (accessUser.getUserId().equals(userId) == true) {
-//                    verifyUserAccess = true;
-//                    break;
-//                }
-//            }
-//        }
-
-//        if (verifyUserAccess == true) {
-//            return true;
-//        }
-
-            // get list accessUser
             Set<AccessUser> accessUserSetCheck = null;
             if (urlMatched != null && userToken != null && userId != null ) {
                 accessUserSetCheck = accesUserService.checkAccessUser(userToken.getId(), urlMatched.getId(),userId);
@@ -146,8 +120,13 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String token = "" ;
         if(accessToken != null || accessToken.getToken() == null
                 || accessToken.getExpireTime() == null || accessToken.getIssueTime() == null ){
-            long timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
-            if (timeRemain < 1000) {
+            long timeRemain = 0L ;
+            if(     accessToken.getToken() != null
+                    && accessToken.getExpireTime() != null
+                    && accessToken.getIssueTime() != null ){
+                timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+            }
+            if (timeRemain < (1000*60)) {
 
                 //post get token
                 UserLoginBIC userLoginBIC = new UserLoginBIC();
@@ -184,6 +163,10 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 //        String dateStr=  "03/06/2021 02:29:06 PM" ;
 //        Date date1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aaa").parse(dateStr);
 //        System.out.println("test");
+//
+//        Long dateTimeSystem = DateTimeUtils.getCurrenTime() ;
+//        Long dateTimeZone = DateTimeUtils.getCurrentDateRaw().getTime() ;
+//        System.out.println("end");
 //    }
 
 }

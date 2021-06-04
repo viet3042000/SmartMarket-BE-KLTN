@@ -13,7 +13,7 @@ public class DateTimeUtils {
 
     private static final int JavaDate_StartYear = 1900;
     private static final String ZERO = "0";
-    private static TimeZone tz = TimeZone.getDefault();
+    private static TimeZone tz = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
     public static Long getCurrenTime() {
         return System.currentTimeMillis();
     }

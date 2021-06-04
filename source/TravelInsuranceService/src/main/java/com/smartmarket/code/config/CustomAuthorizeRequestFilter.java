@@ -77,7 +77,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             if (claims != null) {
                 clientId = (String) claims.get("client_id");
             } else {
-                httpServletResponse.sendError(HttpStatus.BAD_REQUEST.value(), "Not found client id in token");
+                httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy client id trong token");
                 return;
             }
 
@@ -88,12 +88,12 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //check url access
                 if (urlSet == null) {
-                    httpServletResponse.sendError(HttpStatus.BAD_REQUEST.value(), "Not found url access for client id");
+                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy api được phép kết nối của client id trong dữ liệu");
                     return;
                 }
 
             } else {
-                httpServletResponse.sendError(HttpStatus.BAD_REQUEST.value(), "Not found client id ");
+                httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy client id trong dữ liệu");
                 return;
             }
 
@@ -118,7 +118,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             }
 
             if (verifyEndpoint == false) {
-                httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not authorized");
+                httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id không có quyền truy cập api");
                 return;
             }
 
