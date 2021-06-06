@@ -21,6 +21,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -113,7 +114,7 @@ public class RestControllerHandleException {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(APITimeOutRequestException.class)
+    @ExceptionHandler(SocketTimeoutException.class)
     public ResponseEntity<?> handleAPITimeOutException(APITimeOutRequestException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");

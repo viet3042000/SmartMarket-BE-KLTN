@@ -124,9 +124,15 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             if(     accessToken.getToken() != null
                     && accessToken.getExpireTime() != null
                     && accessToken.getIssueTime() != null ){
-                timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+
+                //timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+                Long expireTime = accessToken.getExpireTime() ;
+                Long currentTimeSystem = DateTimeUtils.getCurrentTimeRaw() ;
+                timeRemain =  expireTime -  currentTimeSystem;
+
             }
-            if (timeRemain < (1000*60)) {
+            //check time expire access token
+            if (timeRemain < (1000*60*3)) {
 
                 //post get token
                 UserLoginBIC userLoginBIC = new UserLoginBIC();

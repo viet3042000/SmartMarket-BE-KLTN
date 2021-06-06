@@ -23,6 +23,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class APIUtils {
 
 
     public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) {
+
         RestTemplate restTemplate = new RestTemplate();
         String bodyrequest = body;
         ResponseEntity<String> result = null;
@@ -64,9 +66,16 @@ public class APIUtils {
             if (result == null) {
                 throw new CustomException("Not found request body!", HttpStatus.BAD_REQUEST);
             }
+            if(result.getStatusCode() != HttpStatus.OK ){
+                throw new CustomException("",result.getStatusCode());
 
-        }catch (ResourceAccessException e){
-            throw new APITimeOutRequestException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage());
+            }
+
+        }
+        catch (ResourceAccessException e){
+            if(e.getCause() instanceof SocketTimeoutException) {
+                throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
+            }
         }
         catch (HttpClientErrorException e) {
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, e.getStatusCode().toString(), e.getResponseBodyAsString());
@@ -111,8 +120,11 @@ public class APIUtils {
                 throw new CustomException("An error occurred during API call!", result.getStatusCode(),requestId);
             }
 
-        }catch (ResourceAccessException e){
-            throw new APITimeOutRequestException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage());
+        }
+        catch (ResourceAccessException e){
+            if(e.getCause() instanceof SocketTimeoutException) {
+                throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
+            }
         }
         catch (HttpClientErrorException e){
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode().toString(),e.getResponseBodyAsString());
@@ -154,8 +166,11 @@ public class APIUtils {
                 throw new CustomException("Not found request body!", HttpStatus.BAD_REQUEST);
             }
 
-        }catch (ResourceAccessException e){
-            throw new APITimeOutRequestException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage());
+        }
+        catch (ResourceAccessException e){
+            if(e.getCause() instanceof SocketTimeoutException) {
+                throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
+            }
         }
         catch (HttpClientErrorException e){
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode().toString(),e.getResponseBodyAsString());

@@ -47,12 +47,6 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        long startTime = System.currentTimeMillis();
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        Date date = new Date();
-        String LOGTIMESTAMP = formatter.format(date);
-        String MESSAGETIMESTAMP = LOGTIMESTAMP;
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -127,29 +121,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        request = new RequestWrapper(request);
-//        ResponseWrapper responseCopier = new ResponseWrapper(response);
-
-        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
-        JSONObject requestBody = new JSONObject(jsonString);
-        String MESSASGEID = requestBody.getString("requestId");
-        String TRANSACTIONDETAIL = requestBody.toString();
-
-        long elapsed = System.currentTimeMillis() - startTime;
-        String TIMEDURATION = Long.toString(elapsed);
-
-        //logRequest vs Client
-        SoaObject soaObject = new SoaObject(MESSASGEID, null, "Client", "BIC",
-                MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                "request", TRANSACTIONDETAIL, null, null,
-                null, LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
-        logService.createSOALog2(soaObject.getStringObject());
-
         chain.doFilter(request, response);
 
-//        chain.doFilter(request, responseCopier);
-//        byte[] body = responseCopier.getCopy();
-//        String stringBody = new String(body, response.getCharacterEncoding());
-//        JSONObject responseBody = new JSONObject(stringBody);
     }
 }

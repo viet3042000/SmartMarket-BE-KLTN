@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 import java.security.KeyFactory;
@@ -34,6 +35,9 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
 
+    @Autowired
+    private CustomLogFilter customLogFilter;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.oauth2ResourceServer(
@@ -42,16 +46,15 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                 )
         )
 //                .exceptionHandling().accessDeniedHandler(new CustomOAuth2AccessDeniedHandler())
-
         ;
 
         http.authorizeRequests()
-
 //                .mvcMatchers("/**").access("@webSecurity.checkURL(authentication)")
                 .anyRequest().authenticated().and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Add a filter to validate the tokens with every request
+        http.addFilterBefore(customLogFilter, ChannelProcessingFilter.class);
         http.addFilterAfter(customAuthorizeRequestFilter, FilterSecurityInterceptor.class);
     }
 

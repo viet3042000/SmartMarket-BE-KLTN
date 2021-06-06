@@ -4,6 +4,8 @@ import com.smartmarket.code.constants.Format;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -15,8 +17,17 @@ public class DateTimeUtils {
     private static final String ZERO = "0";
     private static TimeZone tz = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
     public static Long getCurrenTime() {
+//        System.out.printf("" + new Date().getTime());
+//        System.out.printf("" + System.currentTimeMillis());
+//        Instant instant = Instant.now();
+
         return System.currentTimeMillis();
     }
+
+    public static Long getCurrentTimeRaw(){
+        return getCurrenTime() + tz.getRawOffset();
+    }
+
     public static Date getCurrentDateRaw() {
         Date d = new Date(getCurrenTime() + tz.getRawOffset()) ;
         return d;
@@ -56,6 +67,12 @@ public class DateTimeUtils {
     public static void main(String[] args) {
         System.out.println("=======>start" + getConvertDateToLongStart(getConvertLongToDate(getCurrenTime())));
         System.out.println("=======>end" + getConvertDateToLongEnd(getConvertLongToDate(getCurrenTime())));
+
+        System.out.printf("" + new Date().getTime());
+        System.out.printf("\n" + System.currentTimeMillis());
+        Instant instant = Instant.now();
+        System.out.println("\n" + Instant.now().toEpochMilli());
+        System.out.println("\n" + getCurrentTimeRaw());
     }
     public static String format_yyyyMMdd(java.util.Date d) {
         if (d == null) {
