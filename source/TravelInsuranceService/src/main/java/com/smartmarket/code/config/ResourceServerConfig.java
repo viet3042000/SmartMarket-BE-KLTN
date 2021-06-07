@@ -38,19 +38,26 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private CustomLogFilter customLogFilter;
 
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.oauth2ResourceServer(
-                c -> c.jwt(
-                        j -> j.decoder(jwtDecoder())
+
+        //congfig Oauth2 resoucre server decode jwt
+        http
+                .oauth2ResourceServer(
+                oauth2ResourceServer -> oauth2ResourceServer.jwt(
+                        jwt -> jwt.decoder(jwtDecoder())
                 )
-        )
-//                .exceptionHandling().accessDeniedHandler(new CustomOAuth2AccessDeniedHandler())
-        ;
+        );
 
         http.authorizeRequests()
 //                .mvcMatchers("/**").access("@webSecurity.checkURL(authentication)")
-                .anyRequest().authenticated().and().sessionManagement()
+                .anyRequest().authenticated().
+//                and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).
+        and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Add a filter to validate the tokens with every request
