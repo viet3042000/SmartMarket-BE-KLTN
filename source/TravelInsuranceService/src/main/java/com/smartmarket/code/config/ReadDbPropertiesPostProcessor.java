@@ -7,6 +7,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,32 +20,6 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
      */
     private static final String PROPERTY_SOURCE_NAME = "databaseProperties";
 
-    private String[] KEYS = {
-            "excel.threads",
-            "cronDelay",
-            "cronDelayEmail",
-            "spring.mail.username",
-            "spring.mail.password",
-            "spring.mail.host",
-            "spring.mail.port",
-            "spring.mail.properties.mail.transport.protocol",
-            "spring.mail.properties.mail.smtp.auth",
-            "spring.mail.properties.mail.smtp.starttls.enabled",
-            "spring.mail.properties.mail.debug",
-            "spring.mail.properties.mail.smtp.starttls.required",
-            "spring.mail.properties.mail.socketFactory.port",
-            "spring.mail.properties.mail.socketFactory.class",
-            "spring.mail.properties.mail.socketFactory.fallback",
-            "white.executor.threads",
-            "white.search.threads",
-            "lot.sync.threads",
-            "lot.async.threads",
-            "lot.soap.threads",
-            "excel.async.threads",
-            "kpi.threads",
-            "upload.threads"
-    };
-
     /**
      * Adds Spring Environment custom logic. This custom logic fetch properties from database and setting highest precedence
      */
@@ -52,6 +27,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 
         Map<String, Object> propertySource = new HashMap<>();
+        Map<String, BigDecimal> propertySourceInt = new HashMap<>();
 
         try {
 
@@ -65,46 +41,32 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
                     .build();
 
             // Fetch all properties
-
             Connection connection = ds.getConnection();
 
-            System.out.println("load config ");
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config ");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config where is_active = 0");
             ResultSet rs = preparedStatement.executeQuery();
 
-
+            //set properties
             while (rs.next()) {
+                if(rs.getString("value") != null ){
                     propertySource.put(rs.getString("key"), rs.getString("value"));
+                    continue;
+                }
             }
             rs.close();
             preparedStatement.clearParameters();
-//            for (int i = 1; i < KEYS.length; i++) {
-//
-//                String key = KEYS[i];
-//
-//                preparedStatement.setString(1, key);
-//
-//                ResultSet rs = preparedStatement.executeQuery();
-//
-//                // Populate all properties into the property source
-//                while (rs.next()) {
-//                    propertySource.put(key, rs.getString("value"));
-//                }
-//
-//                rs.close();
-//                preparedStatement.clearParameters();
-//
-//            }
 
             preparedStatement.close();
             connection.close();
 
             // Create a custom property source with the highest precedence and add it to Spring Environment
             environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, propertySource));
+//            environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, propertySourceInt));
 
         } catch (Throwable e) {
             throw new RuntimeException(e);
+        }finally {
+
         }
     }
 }
