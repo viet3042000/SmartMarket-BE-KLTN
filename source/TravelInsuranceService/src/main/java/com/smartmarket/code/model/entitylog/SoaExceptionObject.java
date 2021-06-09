@@ -5,7 +5,8 @@ import org.json.JSONObject;
 
 @AllArgsConstructor
 public class SoaExceptionObject {
-    String serviceLog;
+    String logName;
+    String logType;
     String messageId ;
     String transactionId;
     String messageTimestamp ;
@@ -21,7 +22,8 @@ public class SoaExceptionObject {
 
     public String getStringObject(){
         JSONObject json = new JSONObject();
-        json.put("serviceLog",serviceLog);
+        json.put("logName",logName);
+        json.put("logType",logType);
         json.put("messageId",messageId);
         json.put("transactionId",transactionId);
         json.put("messageTimestamp",messageTimestamp);

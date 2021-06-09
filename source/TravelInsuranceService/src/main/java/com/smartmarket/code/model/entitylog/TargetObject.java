@@ -5,11 +5,11 @@ import net.minidev.json.JSONObject;
 
 @AllArgsConstructor
 public class TargetObject {
-    String targetLog;
+    String logName;
     String transactionId;
     String messageId;
     String targetService;
-    String status;
+    String logType;
     String transactionDetail;
     String logTimestamp;
     String messageTimestamp;
@@ -17,11 +17,11 @@ public class TargetObject {
 
     public String getStringObject() {
         JSONObject json = new JSONObject();
-        json.put("targetLog", targetLog);
+        json.put("logName", logName);
         json.put("transactionId", transactionId);
         json.put("messageId", messageId);
         json.put("targetService", targetService);
-        json.put("status", status);
+        json.put("logType", logType);
         json.put("transactionDetail", transactionDetail);
         json.put("logTimestamp", logTimestamp);
         json.put("messageTimestamp", messageTimestamp);
