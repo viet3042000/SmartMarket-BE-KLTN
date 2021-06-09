@@ -24,8 +24,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder bcryptEncoder;
+//    @Autowired
+//    private PasswordEncoder bcryptEncoder;
 
 //    @Autowired
 //    RoleRepository roleRepository;
@@ -53,10 +53,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
 
-    public User save(UserDTO user) {
-        User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
-        return userRepository.save(newUser);
-    }
+//    public User save(UserDTO user) {
+//        User newUser = new User();
+//        newUser.setUsername(user.getUsername());
+//        newUser.setPassword(bcryptEncoder.encode(user.getPassword()));
+//        return userRepository.save(newUser);
+//    }
 }

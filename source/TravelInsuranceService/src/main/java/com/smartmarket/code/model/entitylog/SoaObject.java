@@ -5,30 +5,44 @@ import org.json.JSONObject;
 
 @AllArgsConstructor
 public class SoaObject {
-    String MESSAGEID ; String TRANSACTIONID; String SOURCEID;
-    String TARGETID; String MESSAGETIMESTAMP;String SERVICENAME;
-    String SERVICEVERSION; String TIMEDURATION; String STATUS;
-    String TRANSACTIONDETAIL; String RESPONSESTATUS; String ERRORCODE;
-    String ERRORMSG; String LOGTIMESTAMP; String HOSTNAME; String CLIENTIP;
 
-    public String getStringObject(){
+    String serviceLog;
+    String messageId;
+    String transactionId;
+    String sourceId;
+    String targetId;
+    String messageTimestamp;
+    String serviceName;
+    String serviceVersion;
+    String timeDuration;
+    String status;
+    String transactionDetail;
+    String responseStatus;
+    String errorCode;
+    String errorMsg;
+    String logTimestamp;
+    String hostName;
+    String clientIp;
+
+    public String getStringObject() {
         JSONObject json = new JSONObject();
-        json.put("MESSAGEID",MESSAGEID);
-        json.put("TRANSACTIONID",TRANSACTIONID);
-        json.put("SOURCEID",SOURCEID);
-        json.put("TARGETID",TARGETID);
-        json.put("MESSAGETIMESTAMP",MESSAGETIMESTAMP);
-        json.put("SERVICENAME",SERVICENAME);
-        json.put("SERVICEVERSION",SERVICEVERSION);
-        json.put("TIMEDURATION",TIMEDURATION);
-        json.put("STATUS",STATUS);
-        json.put("TRANSACTIONDETAIL",TRANSACTIONDETAIL);
-        json.put("RESPONSESTATUS",RESPONSESTATUS);
-        json.put("ERRORCODE",ERRORCODE);
-        json.put("ERRORMSG",ERRORMSG);
-        json.put("LOGTIMESTAMP",LOGTIMESTAMP);
-        json.put("HOSTNAME",HOSTNAME);
-        json.put("CLIENTIP",CLIENTIP);
+        json.put("serviceLog", serviceLog);
+        json.put("messageId", messageId);
+        json.put("transactionId", transactionId);
+        json.put("sourceId", sourceId);
+        json.put("targetId", targetId);
+        json.put("messageTimestamp", messageTimestamp);
+        json.put("serviceName", serviceName);
+        json.put("serviceVersion", serviceVersion);
+        json.put("timeDuration", timeDuration);
+        json.put("status", status);
+        json.put("transactionDetail", transactionDetail);
+        json.put("responseStatus", responseStatus);
+        json.put("errorCode", errorCode);
+        json.put("errorMsg", errorMsg);
+        json.put("logTimestamp", logTimestamp);
+        json.put("hostName", hostName);
+        json.put("clientIp", clientIp);
 
         return json.toString();
     }

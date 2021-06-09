@@ -32,25 +32,25 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        String LOGTIMESTAMP = formatter.format(date);
-        String MESSAGETIMESTAMP = LOGTIMESTAMP;
+        String logtimeStamp = formatter.format(date);
+        String messageTimestamp = logtimeStamp;
 
         request = new RequestWrapper(request);
 //        ResponseWrapper responseCopier = new ResponseWrapper(response);
 
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
         JSONObject requestBody = new JSONObject(jsonString);
-        String MESSASGEID = requestBody.getString("requestId");
-        String TRANSACTIONDETAIL = requestBody.toString();
+        String messasgeId = requestBody.getString("requestId");
+        String transactionDetail = requestBody.toString();
 
         long elapsed = System.currentTimeMillis() - startTime;
-        String TIMEDURATION = Long.toString(elapsed);
+        String timeDuration = Long.toString(elapsed);
 //
         //logRequest vs Client
-        SoaObject soaObject = new SoaObject(MESSASGEID, null, "Client", "BIC",
-                MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                "request", TRANSACTIONDETAIL, null, null,
-                null, LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+        SoaObject soaObject = new SoaObject("serviceLog",messasgeId, null, "client", "BIC",
+                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                "request", transactionDetail, null, null,
+                null, logtimeStamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
         chain.doFilter(request, response);

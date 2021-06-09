@@ -10,7 +10,6 @@ import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.entity.UserLoginBIC;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
@@ -21,21 +20,18 @@ import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
+//@RefreshScope
 @RestController
 @RequestMapping("/insurance/travel-insurance-service/v1/")
 public class ApiBICController {
@@ -49,12 +45,15 @@ public class ApiBICController {
     @Autowired
     LogServiceImpl logService;
 
-    @Value("${config}")
-    String loadtoken;
+//    @Value("${config.token}")
+//    String configToken;
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
     @PostMapping(value = "/create-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+
+//        System.out.println(configToken);
+
         //get current start time
         long startTime = System.currentTimeMillis();
         ObjectMapper mapper = new ObjectMapper();
@@ -65,8 +64,8 @@ public class ApiBICController {
         //get time log
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        String LOGTIMESTAMP = formatter.format(date);
-        String MESSAGETIMESTAMP = LOGTIMESTAMP;
+        String logTimestamp = formatter.format(date);
+        String messageTimestamp = logTimestamp;
 
         //Create BIC
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = MapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
@@ -74,8 +73,8 @@ public class ApiBICController {
         responseCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
 
 //        //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject(null, createTravelInsuranceBICRequest.getRequestId(),"BIC", "request",
-                mapper2.writeValueAsString(createTravelInsuranceBICRequest), LOGTIMESTAMP, MESSAGETIMESTAMP, null);
+        TargetObject tarObjectRequest = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "request", "request",
+                mapper2.writeValueAsString(createTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
@@ -86,7 +85,7 @@ public class ApiBICController {
         JSONObject jsonObjectReponseCreate = null;
 
         int status = responseSelvet.getStatus();
-        String RESPONSESTATUS = Integer.toString(status);
+        String responseStatus = Integer.toString(status);
         if (jsonResultCreateBIC.getBody() != null) {
             try {
                 //get response data from BIC
@@ -109,21 +108,21 @@ public class ApiBICController {
                 response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
                 response.setResponseTime(dataResponse.getString("internalMessage"));
 
-                String TRANSACTIONDETAIL = mapper.writeValueAsString(response);
+                String transactionDetail = mapper.writeValueAsString(response);
 
                 long elapsed = System.currentTimeMillis() - startTime;
-                String TIMEDURATION = Long.toString(elapsed);
+                String timeDuration = Long.toString(elapsed);
 
                 //logResponse vs BIC
-                TargetObject tarObject = new TargetObject(null, createTravelInsuranceBICRequest.getRequestId(),"BIC", "response",
-                        TRANSACTIONDETAIL, LOGTIMESTAMP, MESSAGETIMESTAMP, TIMEDURATION);
+                TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                        transactionDetail, logTimestamp, messageTimestamp, timeDuration);
                 logService.createTargetLog(tarObject.getStringObject());
 
                 //logResponse vs Client
-                SoaObject soaObject = new SoaObject(createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "Client",
-                        MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                        "response", TRANSACTIONDETAIL, RESPONSESTATUS, response.getResultCode(),
-                        response.getResultMessage(), LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+                SoaObject soaObject = new SoaObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", transactionDetail, responseStatus, response.getResultCode(),
+                        response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
                 logService.createSOALog2(soaObject.getStringObject());
 
             }catch (Exception ex){
@@ -139,20 +138,20 @@ public class ApiBICController {
             responseError.setDetailErrorCode(HttpStatus.OK.toString());
             responseError.setDetailErrorMessage("Không lấy được responseBody khi tạo bảo hiểm!");
 
-            String TRANSACTIONDETAIL = mapper.writeValueAsString(responseError);
+            String transactionDetail = mapper.writeValueAsString(responseError);
             long elapsed = System.currentTimeMillis() - startTime;
-            String TIMEDURATION = Long.toString(elapsed);
+            String timeDuration = Long.toString(elapsed);
 
             //logResponseError vs BIC
-            TargetObject tarObject = new TargetObject(null, createTravelInsuranceBICRequest.getRequestId(),"BIC", "response",
-                    TRANSACTIONDETAIL, LOGTIMESTAMP, MESSAGETIMESTAMP, TIMEDURATION);
+            TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                    transactionDetail, logTimestamp, messageTimestamp, timeDuration);
             logService.createTargetLog(tarObject.toString());
 
             //logResponseError vs Client
-            SoaObject soaObject = new SoaObject(createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "Client",
-                    MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                    "response", TRANSACTIONDETAIL, RESPONSESTATUS, responseError.getResultCode(),
-                    responseError.getResultMessage(), LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+            SoaObject soaObject = new SoaObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                    "response", transactionDetail, responseStatus, responseError.getResultCode(),
+                    responseError.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
             logService.createSOALog2(soaObject.getStringObject());
 
             return new ResponseEntity<>(responseError, HttpStatus.OK);
@@ -171,12 +170,12 @@ public class ApiBICController {
         //get time log
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        String LOGTIMESTAMP = formatter.format(date);
-        String MESSAGETIMESTAMP = LOGTIMESTAMP;
+        String logTimestamp = formatter.format(date);
+        String messageTimestamp = logTimestamp;
 
         //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject(null, queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request",
-                mapper.writeValueAsString(queryTravelInsuranceBICRequest), LOGTIMESTAMP, MESSAGETIMESTAMP, null);
+        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
@@ -189,27 +188,27 @@ public class ApiBICController {
         }
 
         int status = responseSelvet.getStatus();
-        String RESPONSESTATUS = Integer.toString(status);
+        String responseStatus = Integer.toString(status);
 
         response.setDetail(createTravelInsuranceBICResponse);
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
 
-        String TRANSACTIONDETAIL = mapper.writeValueAsString(response);
+        String transactionDetail = mapper.writeValueAsString(response);
 
         long elapsed = System.currentTimeMillis() - startTime;
-        String TIMEDURATION = Long.toString(elapsed);
+        String timeDuration = Long.toString(elapsed);
 
         //logResponse vs BIC
-        TargetObject tarObject = new TargetObject(null, queryTravelInsuranceBICRequest.getRequestId(),"BIC", "response",
-                TRANSACTIONDETAIL, LOGTIMESTAMP, MESSAGETIMESTAMP, TIMEDURATION);
+        TargetObject tarObject = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                transactionDetail, logTimestamp, messageTimestamp, timeDuration);
         logService.createTargetLog(tarObject.getStringObject());
 
         //logResponse vs Client
-        SoaObject soaObject = new SoaObject(queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "Client",
-                MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                "response", TRANSACTIONDETAIL, RESPONSESTATUS, response.getResultCode(),
-                response.getResultMessage(), LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+        SoaObject soaObject = new SoaObject("serviceLog",queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                "response", transactionDetail, responseStatus, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -226,17 +225,17 @@ public class ApiBICController {
         //get log time
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        String LOGTIMESTAMP = formatter.format(date);
-        String MESSAGETIMESTAMP = LOGTIMESTAMP;
+        String logtimeStamp = formatter.format(date);
+        String messageTimestamp = logtimeStamp;
 
         //Update BIC
-        CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = MapperUtils.mapCreateObjectToBIC(updateTravelInsuranceBICRequest.getDetail()) ;
+        CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = MapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail()) ;
         String responseCreate = null;
         responseCreate = mapper2.writeValueAsString(updateTravelInsuranceToBIC);
 
         //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject(null, updateTravelInsuranceBICRequest.getRequestId(),"BIC", "request",
-                mapper2.writeValueAsString(updateTravelInsuranceBICRequest), LOGTIMESTAMP, MESSAGETIMESTAMP, null);
+        TargetObject tarObjectRequest = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+                mapper2.writeValueAsString(updateTravelInsuranceBICRequest), logtimeStamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
@@ -251,7 +250,7 @@ public class ApiBICController {
         //post Data to BIC
 
         int status = responseSelvet.getStatus();
-        String RESPONSESTATUS = Integer.toString(status);
+        String responseStatus = Integer.toString(status);
 
         //response
         JSONObject jsonObjectReponseCreate =  null ;
@@ -276,20 +275,20 @@ public class ApiBICController {
             response.setResponseTime(dataResponse.getString("internalMessage"));
 
             //log properties
-            String TRANSACTIONDETAIL = mapper.writeValueAsString(response);
+            String transactionDetail = mapper.writeValueAsString(response);
             long elapsed = System.currentTimeMillis() - startTime;
-            String TIMEDURATION = Long.toString(elapsed);
+            String timeDuration = Long.toString(elapsed);
 
             //logResponse vs BIC
-            TargetObject tarObject = new TargetObject(null, updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response",
-                    TRANSACTIONDETAIL, LOGTIMESTAMP, MESSAGETIMESTAMP, TIMEDURATION);
+            TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                    transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
             logService.createTargetLog(tarObject.getStringObject());
 
             //logResponse vs Client
-            SoaObject soaObject = new SoaObject(updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "Client",
-                    MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                    "response", TRANSACTIONDETAIL, RESPONSESTATUS, response.getResultCode(),
-                    response.getResultMessage(), LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+            SoaObject soaObject = new SoaObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                    "response", transactionDetail, responseStatus, response.getResultCode(),
+                    response.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());
             logService.createSOALog2(soaObject.getStringObject());
         }else {
             ReponseError responseError = new ReponseError();
@@ -300,20 +299,20 @@ public class ApiBICController {
             responseError.setDetailErrorCode(HttpStatus.OK.toString());
             responseError.setDetailErrorMessage("Không lấy được responseBody khi tạo bảo hiểm!");
 
-            String TRANSACTIONDETAIL = mapper.writeValueAsString(responseError);
+            String transactionDetail = mapper.writeValueAsString(responseError);
             long elapsed = System.currentTimeMillis() - startTime;
-            String TIMEDURATION = Long.toString(elapsed);
+            String timeDuration = Long.toString(elapsed);
 
             //logResponseError vs BIC
-            TargetObject tarObject = new TargetObject(null, updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response",
-                    TRANSACTIONDETAIL, LOGTIMESTAMP, MESSAGETIMESTAMP, TIMEDURATION);
+            TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                    transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
             logService.createTargetLog(tarObject.toString());
 
             //logResponseError vs Client
-            SoaObject soaObject = new SoaObject(updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "Client",
-                    MESSAGETIMESTAMP, request.getRequestURI(), "1", TIMEDURATION,
-                    "response", TRANSACTIONDETAIL, RESPONSESTATUS, responseError.getResultCode(),
-                    responseError.getResultMessage(), LOGTIMESTAMP, request.getRemoteHost(),logService.getIp());
+            SoaObject soaObject = new SoaObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                    "response", transactionDetail, responseStatus, responseError.getResultCode(),
+                    responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());
             logService.createSOALog2(soaObject.getStringObject());
 
             return new ResponseEntity<>(responseError, HttpStatus.OK);

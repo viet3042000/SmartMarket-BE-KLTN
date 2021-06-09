@@ -1,9 +1,12 @@
 package com.smartmarket.code.request.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TRV implements Serializable {
 
     private Long trvId ;

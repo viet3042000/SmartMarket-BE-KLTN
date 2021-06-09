@@ -78,6 +78,7 @@ public class APIUtils {
             }
         }
         catch (HttpClientErrorException e) {
+
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, e.getStatusCode().toString(), e.getResponseBodyAsString());
         }
 

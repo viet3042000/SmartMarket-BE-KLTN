@@ -69,6 +69,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     public JwtDecoder jwtDecoder() {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            System.out.println(publicKey);
             byte[] key = Base64.getDecoder().decode(publicKey);
 
             X509EncodedKeySpec x509 = new X509EncodedKeySpec(key);
@@ -80,10 +81,10 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
 
 }

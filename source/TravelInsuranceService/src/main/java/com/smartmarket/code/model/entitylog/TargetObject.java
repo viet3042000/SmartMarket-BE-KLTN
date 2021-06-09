@@ -5,20 +5,27 @@ import net.minidev.json.JSONObject;
 
 @AllArgsConstructor
 public class TargetObject {
-    String TRANSACTIONID; String MESSAGEID; String TARGETSERVICE;
-    String MESSAGETYPE; String TRANSACTIONDETAIL; String LOGTIMESTAMP ;
-    String MESSAGETIMESTAMP; String TIMEDURATION;
+    String targetLog;
+    String transactionId;
+    String messageId;
+    String targetService;
+    String status;
+    String transactionDetail;
+    String logTimestamp;
+    String messageTimestamp;
+    String timeDuration;
 
     public String getStringObject() {
         JSONObject json = new JSONObject();
-        json.put("TRANSACTIONID",TRANSACTIONID);
-        json.put("MESSAGEID",MESSAGEID);
-        json.put("TARGETSERVICE",TARGETSERVICE);
-        json.put("MESSAGETYPE",MESSAGETYPE);
-        json.put("TRANSACTIONDETAIL",TRANSACTIONDETAIL);
-        json.put("LOGTIMESTAMP",LOGTIMESTAMP);
-        json.put("MESSAGETIMESTAMP",MESSAGETIMESTAMP);
-        json.put("TIMEDURATION",TIMEDURATION);
+        json.put("targetLog", targetLog);
+        json.put("transactionId", transactionId);
+        json.put("messageId", messageId);
+        json.put("targetService", targetService);
+        json.put("status", status);
+        json.put("transactionDetail", transactionDetail);
+        json.put("logTimestamp", logTimestamp);
+        json.put("messageTimestamp", messageTimestamp);
+        json.put("timeDuration", timeDuration);
 
         return json.toString();
     }

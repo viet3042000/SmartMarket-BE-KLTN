@@ -43,7 +43,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
             // Fetch all properties
             Connection connection = ds.getConnection();
 
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config where is_active = 0");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config");
             ResultSet rs = preparedStatement.executeQuery();
 
             //set properties
@@ -61,7 +61,6 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
 
             // Create a custom property source with the highest precedence and add it to Spring Environment
             environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, propertySource));
-//            environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, propertySourceInt));
 
         } catch (Throwable e) {
             throw new RuntimeException(e);

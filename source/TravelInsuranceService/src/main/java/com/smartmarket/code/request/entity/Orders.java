@@ -1,5 +1,6 @@
 package com.smartmarket.code.request.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -7,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Orders implements Serializable {
 
     private String refCode ;

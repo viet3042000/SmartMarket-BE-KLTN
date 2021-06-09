@@ -8,7 +8,7 @@ spring.datasource.platform=mysql
 spring.jpa.hibernate.ddl-auto=none
 
 #cache
-spring.cache.jcache.config=classpath:ehcache.xml
+#spring.cache.jcache.config=classpath:ehcache.xml
 #spring.cache.jcache.provider=org.ehcache.jsr107.EhcacheCachingProvider
 #debug=true
 

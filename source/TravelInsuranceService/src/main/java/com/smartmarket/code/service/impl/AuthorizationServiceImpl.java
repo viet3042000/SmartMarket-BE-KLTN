@@ -114,25 +114,57 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return false;
     }
 
+    //load token from database
+//    public String getTokenFromDatabase() throws JsonProcessingException {
+//
+//        AccessToken accessToken = accessTokenService.findByUsername("bic-dsvn@bic.vn") ;
+//        String token = "" ;
+//        if(accessToken != null ){
+//            token = accessToken.getToken() ;
+//            long timeRemain = 0L ;
+//            if(     accessToken.getToken() != null
+//                    && accessToken.getExpireTime() != null
+//                    && accessToken.getIssueTime() != null ){
+//
+//                //timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+//                Long expireTime = accessToken.getExpireTime() ;
+//                Long currentTimeSystem = DateTimeUtils.getCurrentTimeRaw() ;
+//                timeRemain =  expireTime -  currentTimeSystem;
+//
+//            }
+//            //check time expire access token
+//            if (timeRemain < (1000*60*3)) {
+//
+//                //post get token
+//                UserLoginBIC userLoginBIC = new UserLoginBIC();
+//                userLoginBIC.setUsername("bic-dsvn@bic.vn");
+//                userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
+//                userLoginBIC.setDomainname("vetautructuyen.com.vn");
+//
+//                ObjectMapper mapper = new ObjectMapper();
+//
+//                String requestToken = mapper.writeValueAsString(userLoginBIC);
+//                ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(HostConstants.INTERCOMMUNICATION_RESTFUL_API.BIC_HOST_LOGIN, null, requestToken, null, null);
+//                if(jsonResultGetToken.getBody() != null){
+//                    //get token from response
+//                    String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
+//                    Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
+//                    Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
+//
+//                    //update token in database
+//                    accessTokenService.updateTokenByAccessTokenId(timeExpire,timeIssue,tokenUpdate,accessToken.getId()) ;
+//                    token = tokenUpdate;
+//                }
+//            }
+//
+//        }
+//        return token ;
+//    }
+
+    // load token from BIC
     public String getTokenFromDatabase() throws JsonProcessingException {
 
-        AccessToken accessToken = accessTokenService.findByUsername("bic-dsvn@bic.vn") ;
         String token = "" ;
-        if(accessToken != null ){
-            token = accessToken.getToken() ;
-            long timeRemain = 0L ;
-            if(     accessToken.getToken() != null
-                    && accessToken.getExpireTime() != null
-                    && accessToken.getIssueTime() != null ){
-
-                //timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
-                Long expireTime = accessToken.getExpireTime() ;
-                Long currentTimeSystem = DateTimeUtils.getCurrentTimeRaw() ;
-                timeRemain =  expireTime -  currentTimeSystem;
-
-            }
-            //check time expire access token
-            if (timeRemain < (1000*60*3)) {
 
                 //post get token
                 UserLoginBIC userLoginBIC = new UserLoginBIC();
@@ -146,18 +178,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(HostConstants.INTERCOMMUNICATION_RESTFUL_API.BIC_HOST_LOGIN, null, requestToken, null, null);
                 if(jsonResultGetToken.getBody() != null){
                     //get token from response
-                    String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
-                    Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
-                    Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
+                    token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
 
-                    //update token in database
-                    accessTokenService.updateTokenByAccessTokenId(timeExpire,timeIssue,tokenUpdate,accessToken.getId()) ;
-                    token = tokenUpdate;
                 }
-            }
-
-        }
         return token ;
+        }
+
     }
 
 //    public static void main(String[] args) throws ParseException {
@@ -173,4 +199,4 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 //        System.out.println("end");
 //    }
 
-}
+//}
