@@ -22,6 +22,10 @@ public class LogServiceImpl  {
         logger.info(logBody) ;
     }
 
+    public void createSOALogException(String logBody) throws CustomException {
+        logger.info(logBody) ;
+    }
+
     public String getIp() {
         String serverId;
         try {

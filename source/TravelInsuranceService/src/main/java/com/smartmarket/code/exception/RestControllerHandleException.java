@@ -65,6 +65,7 @@ public class RestControllerHandleException {
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response", "response",
@@ -113,6 +114,7 @@ public class RestControllerHandleException {
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
@@ -159,6 +161,7 @@ public class RestControllerHandleException {
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
@@ -240,6 +243,7 @@ public class RestControllerHandleException {
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog",messasgeId,"BIC", "response","response",
