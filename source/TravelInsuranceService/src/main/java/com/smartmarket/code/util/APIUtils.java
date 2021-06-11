@@ -12,7 +12,6 @@ import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.exception.HandleResponseException;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
