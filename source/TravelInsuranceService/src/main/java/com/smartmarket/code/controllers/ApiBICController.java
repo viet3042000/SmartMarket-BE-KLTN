@@ -104,6 +104,7 @@ public class ApiBICController {
         String responseStatus = Integer.toString(status);
         if (jsonResultCreateBIC.getBody() != null) {
             try {
+
                 //get response data from BIC
                 jsonObjectReponseCreate = new JSONObject(jsonResultCreateBIC.getBody());
                 Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
@@ -129,10 +130,8 @@ public class ApiBICController {
                 long elapsed = System.currentTimeMillis() - startTime;
                 String timeDuration = Long.toString(elapsed);
 
-
                 //create BICTransaction
                 bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest,ResponseCode.CODE.TRANSACTION_SUCCESSFUL,jsonResultCreateBIC.getStatusCode().toString());
-
 
                 //logResponse vs BIC
                 TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
@@ -162,6 +161,10 @@ public class ApiBICController {
             String transactionDetail = mapper.writeValueAsString(responseError);
             long elapsed = System.currentTimeMillis() - startTime;
             String timeDuration = Long.toString(elapsed);
+
+
+            //create BICTransaction
+            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest,ResponseCode.CODE.ERROR_IN_BACKEND,jsonResultCreateBIC.getStatusCode().toString());
 
             //logResponseError vs BIC
             TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
@@ -296,6 +299,9 @@ public class ApiBICController {
             response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
             response.setResponseTime(dataResponse.getString("internalMessage"));
 
+            //create BICTransaction
+            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest,ResponseCode.CODE.TRANSACTION_SUCCESSFUL,jsonResultPutBIC.getStatusCode().toString());
+
             //log properties
             String transactionDetail = mapper.writeValueAsString(response);
             long elapsed = System.currentTimeMillis() - startTime;
@@ -324,6 +330,9 @@ public class ApiBICController {
             String transactionDetail = mapper.writeValueAsString(responseError);
             long elapsed = System.currentTimeMillis() - startTime;
             String timeDuration = Long.toString(elapsed);
+
+            //create BICTransaction
+            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest,ResponseCode.CODE.ERROR_IN_BACKEND,jsonResultPutBIC.getStatusCode().toString());
 
             //logResponseError vs BIC
             TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
