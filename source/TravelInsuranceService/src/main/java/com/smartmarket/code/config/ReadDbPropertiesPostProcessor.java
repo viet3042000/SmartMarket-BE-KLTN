@@ -51,6 +51,9 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
                 if(rs.getString("value") != null ){
                     propertySource.put(rs.getString("key"), rs.getString("value"));
                     continue;
+                }else{
+                    propertySource.put(rs.getString("key"), "");
+                    continue;
                 }
             }
             rs.close();

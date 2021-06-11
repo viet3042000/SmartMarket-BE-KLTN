@@ -11,7 +11,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Orders implements Serializable {
 
-    private String refCode ;
+    private String orderReference ;
     private Long orderId ;
     private Long ordCustId ;
     private String ordCustMessage;
@@ -35,6 +35,14 @@ public class Orders implements Serializable {
     private String ordSource ;
     private Long userId ;
 
+    public String getOrderReference() {
+        return orderReference;
+    }
+
+    public void setOrderReference(String orderReference) {
+        this.orderReference = orderReference;
+    }
+
     public Long getOrderId() {
         return orderId;
     }
@@ -51,14 +59,6 @@ public class Orders implements Serializable {
         this.userId = userId;
     }
 
-
-    public String getRefCode() {
-        return refCode;
-    }
-
-    public void setRefCode(String refCode) {
-        this.refCode = refCode;
-    }
 
     public Long getOrdCustId() {
         return ordCustId;

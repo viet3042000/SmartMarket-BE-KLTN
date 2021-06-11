@@ -24,6 +24,29 @@ public class Client implements Serializable {
 	@Column(name = "is_active")
 	private Long isActive;
 
+	@Column(name = "consumer_id")
+	private String consumerId;
+
+	@Column(name = "ip_access")
+	private String ipAccess;
+
+
+	public String getConsumerId() {
+		return consumerId;
+	}
+
+	public void setConsumerId(String consumerId) {
+		this.consumerId = consumerId;
+	}
+
+	public String getIpAccess() {
+		return ipAccess;
+	}
+
+	public void setIpAccess(String ipAccess) {
+		this.ipAccess = ipAccess;
+	}
+
 	public Long getId() {
 		return id;
 	}

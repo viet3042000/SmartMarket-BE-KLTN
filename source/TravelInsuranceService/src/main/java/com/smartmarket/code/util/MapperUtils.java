@@ -1,9 +1,13 @@
 package com.smartmarket.code.util;
 
+import com.smartmarket.code.constants.FieldsConstants;
+import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.APIResponseException;
 import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.request.BaseDetail;
+import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
@@ -14,8 +18,10 @@ import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.OrdersBIC;
 import com.smartmarket.code.request.entityBIC.trvBIC;
 import com.smartmarket.code.request.entityBIC.trvDetailBIC;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -24,10 +30,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
+public class MapperUtils{
 
-public class MapperUtils {
+    @Autowired
+    FieldsConstants fieldsConstants;
 
-    public static CreateTravelInsuranceToBIC mapCreateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
+    @Autowired
+    HostConstants hostConstants ;
+
+    public CreateTravelInsuranceToBIC mapCreateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
         try{
@@ -39,49 +51,51 @@ public class MapperUtils {
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
-            ordersBIC.setOrderid(-1L);
-            ordersBIC.setOrdcustid(-1L);
-            ordersBIC.setOrdcustmessage("test loi nhan cua khach hang");
+
+            ordersBIC.setOrderReference(orders.getOrderReference());
+            ordersBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
+            ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.createOrderOrdCustId));
+            ordersBIC.setOrdcustmessage(fieldsConstants.createOrderOrdCustMessage);
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
             ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
-            ordersBIC.setProductId("TRV");
+            ordersBIC.setProductId(fieldsConstants.createOrderProductId);
             ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
             ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
-            ordersBIC.setOrdershipmodule("2");
-            ordersBIC.setOrdisdigital(1L);
-            ordersBIC.setOrdtoken("");
+            ordersBIC.setOrdershipmodule(fieldsConstants.createOrderOrderShipModule);
+            ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.createOrderOrdIsDigital));
+            ordersBIC.setOrdtoken(fieldsConstants.createOrderOrdToken);
             ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-            ordersBIC.setOrdtotal(BigDecimal.valueOf(10800.00));
+            ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.createOrderOrdTotal));
             ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
-            ordersBIC.setUserId(-1L);
+            ordersBIC.setUserId(Long.parseLong(fieldsConstants.createOrderUserId));
 
 
-            trvBIC.setTRVID(-1L);
-            trvBIC.setOrderid(-1L);
+            trvBIC.setTRVID(Long.parseLong(fieldsConstants.createTrvTrvId));
+            trvBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
             trvBIC.setAmountPersons(trv.getAmountPersons());
             trvBIC.setAmountDays(trv.getAmountDays());
-            trvBIC.setSI(BigDecimal.valueOf(30000000.00));
-            trvBIC.setPremium(BigDecimal.valueOf(18000.00));
+            trvBIC.setSI(new BigDecimal(fieldsConstants.createTrvSi));
+            trvBIC.setPremium(new BigDecimal(fieldsConstants.createTrvPremium));
             trvBIC.setPromotion(getBool(trv.getPromotion()));
             trvBIC.setPromotionAddress(trv.getPromotionAddress());
-            trvBIC.setPeriodTime(0L);
+            trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.createTrvPeriodTime));
             trvBIC.setFromDate(trv.getFromDate());
             trvBIC.setToDate(trv.getToDate());
             trvBIC.setIssueDate(trv.getIssueDate());
-            trvBIC.setIncludePayer(getBool(0L));
-            trvBIC.setEndorsement("");
-            trvBIC.setUserID(0L);
-            trvBIC.setUserUpproveID(0L);
-            trvBIC.setDestroy(getBool(1L));
-            trvBIC.setStatus(getBool(1L));
-            trvBIC.setWriteByHand(getBool(1L));
-            trvBIC.setPrintedPaperNo("");
-            trvBIC.setCertificateForm("");
-            trvBIC.setModuleid(-1L);
+            trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.createTrvIncludePayer)));
+            trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
+            trvBIC.setUserID(Long.parseLong(fieldsConstants.createTrvUserID));
+            trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.createTrvUserUpproveID));
+            trvBIC.setDestroy(getBool(Long.parseLong(fieldsConstants.createTrvDestroy)));
+            trvBIC.setStatus(getBool(Long.parseLong(fieldsConstants.createTrvStatus)));
+            trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.createTrvWriteByHand)));
+            trvBIC.setPrintedPaperNo(fieldsConstants.createTrvPrintedPaperNo);
+            trvBIC.setCertificateForm(fieldsConstants.createTrvCertificateForm);
+            trvBIC.setModuleid(Long.parseLong(fieldsConstants.createTrvModuleId));
 
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
@@ -89,8 +103,8 @@ public class MapperUtils {
                     trvDetailBIC.setDateofBirth(trvDetail.getDateofBirth());
                     trvDetailBIC.setFullName(trvDetail.getFullName());
                     trvDetailBIC.setGender(trvDetail.getGender());
-                    trvDetailBIC.setID(-1L);
-                    trvDetailBIC.setTRVID(-1L);
+                    trvDetailBIC.setID(Long.parseLong(fieldsConstants.createTrvDetailId));
+                    trvDetailBIC.setTRVID(Long.parseLong(fieldsConstants.createTrvDetailTrvId));
                     trvDetailBIC.setPassportCard(trvDetail.getPassportCard());
                     trvDetailsBICs.add(trvDetailBIC);
                 }
@@ -107,7 +121,7 @@ public class MapperUtils {
     }
 
 
-    public static CreateTravelInsuranceToBIC mapUpdateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
+    public CreateTravelInsuranceToBIC mapUpdateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
         try{
@@ -119,49 +133,50 @@ public class MapperUtils {
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
+            ordersBIC.setOrderReference(orders.getOrderReference());
             ordersBIC.setOrderid(orders.getOrderId());
-            ordersBIC.setOrdcustid(-1L);
-            ordersBIC.setOrdcustmessage("test loi nhan cua khach hang");
+            ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.updateOrderOrdCustId));
+            ordersBIC.setOrdcustmessage(fieldsConstants.updateOrderOrdCustMessage);
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
             ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
-            ordersBIC.setProductId("TRV");
+            ordersBIC.setProductId(fieldsConstants.updateOrderProductId);
             ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
             ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
-            ordersBIC.setOrdershipmodule("2");
-            ordersBIC.setOrdisdigital(1L);
-            ordersBIC.setOrdtoken("");
+            ordersBIC.setOrdershipmodule(fieldsConstants.updateOrderOrderShipModule);
+            ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.updateOrderOrdIsDigital));
+            ordersBIC.setOrdtoken(fieldsConstants.updateOrderOrdToken);
             ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-            ordersBIC.setOrdtotal(BigDecimal.valueOf(10800.00));
+            ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.updateOrderOrdTotal));
             ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
-            ordersBIC.setUserId(-1L);
+            ordersBIC.setUserId(Long.parseLong(fieldsConstants.updateOrderUserId));
 
 
             trvBIC.setTRVID(trv.getTrvId());
             trvBIC.setOrderid(Long.parseLong(trv.getOrderId()));
             trvBIC.setAmountPersons(trv.getAmountPersons());
             trvBIC.setAmountDays(trv.getAmountDays());
-            trvBIC.setSI(BigDecimal.valueOf(30000000.00));
-            trvBIC.setPremium(BigDecimal.valueOf(18000.00));
+            trvBIC.setSI(new BigDecimal(fieldsConstants.updateTrvSi));
+            trvBIC.setPremium(new BigDecimal(fieldsConstants.updateTrvPremium));
             trvBIC.setPromotion(getBool(trv.getPromotion()));
             trvBIC.setPromotionAddress(trv.getPromotionAddress());
-            trvBIC.setPeriodTime(0L);
+            trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.updateTrvPeriodTime));
             trvBIC.setFromDate(trv.getFromDate());
             trvBIC.setToDate(trv.getToDate());
             trvBIC.setIssueDate(trv.getIssueDate());
-            trvBIC.setIncludePayer(getBool(0L));
-            trvBIC.setEndorsement("");
-            trvBIC.setUserID(0L);
-            trvBIC.setUserUpproveID(0L);
+            trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.updateTrvIncludePayer)));
+            trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
+            trvBIC.setUserID(Long.parseLong(fieldsConstants.updateTrvUserID));
+            trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.updateTrvUserUpproveID));
             trvBIC.setDestroy(getBool(trv.getDestroy()));
             trvBIC.setStatus(getBool(trv.getStatus()));
-            trvBIC.setWriteByHand(getBool(1L));
-            trvBIC.setPrintedPaperNo("");
-            trvBIC.setCertificateForm("");
-            trvBIC.setModuleid(-1L);
+            trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.updateTrvWriteByHand)));
+            trvBIC.setPrintedPaperNo(fieldsConstants.updateTrvPrintedPaperNo);
+            trvBIC.setCertificateForm(fieldsConstants.updateTrvCertificateForm);
+            trvBIC.setModuleid(Long.parseLong(fieldsConstants.updateTrvModuleId));
 
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
@@ -187,14 +202,31 @@ public class MapperUtils {
     }
 
 
-    public static CreateTravelInsuranceBICRequest queryCreateObjectToBIC(Long orderId, String token,String requestId) throws APITimeOutRequestException {
+    public  CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String token, String requestId) throws APITimeOutRequestException {
 
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 
         APIUtils apiUtils = new APIUtils();
         Map<String, Object> map = new HashMap<>();
-        map.put("id", orderId);
-        ResponseEntity<String> resultBIC = apiUtils.getApiWithParam("https://app.bic.vn/EbizApiTest/api/v1/TRV/Get/{id}", null, map, token,requestId);
+
+        ResponseEntity<String> resultBIC = null ;
+        if (queryTravelInsuranceBICRequest.getDetail() != null) {
+            if(queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L)){
+                String orderId = queryTravelInsuranceBICRequest.getDetail().getOrderId() ;
+                if(orderId != null ){
+                    map.put("id", orderId);
+                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_ID, null, map, token,requestId);
+                }
+            }
+            if(queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L)){
+                String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference() ;
+                if(orderReference != null ){
+                    map.put("id", orderReference);
+                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_REFERANCE, null, map, token,requestId);
+                }
+
+            }
+        }
 
         try {
 
@@ -210,6 +242,7 @@ public class MapperUtils {
                 ArrayList<TRVDetail> trvDetails = new ArrayList<>();
 
                 orders.setOrderId(ordersBIC.getLong("Orderid"));
+                orders.setOrderReference(ordersBIC.getString("OrderReference") == null ? null : ordersBIC.getString("OrderReference").toString());
 //                orders.setOrdCustId(ordersBIC.getLong("Ordcustid"));
 //                orders.setOrdCustMessage(ordersBIC.getString("Ordcustmessage") == null ? null : ordersBIC.getString("Ordcustmessage").toString());
                 orders.setOrdBillFirstName(ordersBIC.getString("Ordbillfirstname") == null ? null : ordersBIC.getString("Ordbillfirstname").toString());

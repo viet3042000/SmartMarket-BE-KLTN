@@ -6,11 +6,11 @@ import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
-import com.smartmarket.code.model.entitylog.SoaObject;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.JwtUtils;
 
+import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +57,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
         try {
 
             String cururl = request.getRequestURI().toLowerCase();
+            String ipRequest = Utils.getClientIp(request) ;
             String contextPath = request.getContextPath().toLowerCase();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -92,10 +93,28 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             }
 
 
-            AntPathMatcher matcher = new AntPathMatcher();
-            String method = request.getMethod();
+            //verify ip
+            boolean verifyIp = false;
+            String[] ipAccessArr = Utils.getArrayIP(client.get().getIpAccess()) ;
+            for (int i =  0 ; i < ipAccessArr.length ; i++ ){
+                if(ipAccessArr[0].equalsIgnoreCase("ALL")){
+                    verifyIp=  true ;
+                    break;
+                }
+                if(ipRequest.equals(ipAccessArr[i])){
+                    verifyIp=  true ;
+                    break;
+                }
+            }
+
+            if (verifyIp == false) {
+                httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id không có quyền truy cập api với IP hiện đang truy cập");
+                return;
+            }
 
             // verify endpoint
+            AntPathMatcher matcher = new AntPathMatcher();
+            String method = request.getMethod();
             String URLRequest = request.getRequestURI();
             boolean verifyEndpoint = false;
 
@@ -115,6 +134,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id không có quyền truy cập api");
                 return;
             }
+
 
         } catch (CustomException ex) {
             httpServletResponse.sendError(ex.getHttpStatus().value(), ex.getMessage());

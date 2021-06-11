@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class QueryTravelInsuranceBICRequest {
     private Long inquiryType ;
     private String orderId ;
-    private String refCode ;
+    private String orderReference ;
 
     public Long getInquiryType() {
         return inquiryType;
@@ -23,11 +23,11 @@ public class QueryTravelInsuranceBICRequest {
         this.orderId = orderId;
     }
 
-    public String getRefCode() {
-        return refCode;
+    public String getOrderReference() {
+        return orderReference;
     }
 
-    public void setRefCode(String refCode) {
-        this.refCode = refCode;
+    public void setOrderReference(String orderReference) {
+        this.orderReference = orderReference;
     }
 }

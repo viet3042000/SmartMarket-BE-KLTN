@@ -1,10 +1,20 @@
 package com.smartmarket.code.constants;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class HostConstants {
-    public class INTERCOMMUNICATION_RESTFUL_API {
-        public static final String BIC_HOST_LOGIN = "https://app.bic.vn/EbizApiTest/api/v1/token/login";
-        public static final String BIC_HOST_CREATE = "https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Create";
-        public static final String BIC_HOST_UPDATE = "https://app.bic.vn/EbizApiTest/api/v1/TRV/Update";
-//        public static final String ETC_CATEGORY_HOST = "http://localhost:8899";
-    }
+
+    @Value("${api.loginTravelBIC}")
+    public String BIC_HOST_LOGIN;
+    @Value("${api.createTravelBIC}")
+    public String BIC_HOST_CREATE;
+    @Value("${api.updateTravelBIC}")
+    public String BIC_HOST_UPDATE;
+    @Value("${api.getTravelBICByOrderId}")
+    public String BIC_HOST_GET_BY_ORDER_ID;
+    @Value("${api.getTravelBICByOderReference}")
+    public String BIC_HOST_GET_BY_ORDER_REFERANCE;
+
 }

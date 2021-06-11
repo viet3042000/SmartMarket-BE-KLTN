@@ -1,9 +1,13 @@
 package com.smartmarket.code.request.entityBIC;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.math.BigDecimal;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrdersBIC {
 
+    private String OrderReference;
     private Long Orderid;
     private Long Ordcustid;
     private String Ordcustmessage;
@@ -23,6 +27,14 @@ public class OrdersBIC {
     private BigDecimal Ordtotal;
     private BigDecimal Orddiscountamount;
     private Long UserId ;
+
+    public String getOrderReference() {
+        return OrderReference;
+    }
+
+    public void setOrderReference(String orderReference) {
+        OrderReference = orderReference;
+    }
 
     public Long getUserId() {
         return UserId;

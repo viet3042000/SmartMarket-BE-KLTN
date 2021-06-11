@@ -17,6 +17,7 @@ import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -51,6 +52,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Autowired
     APIUtils apiUtils;
 
+    @Autowired
+    HostConstants hostConstants;
 
     @Override
     public boolean AuthorUserAccess(Long userId) {
@@ -167,25 +170,26 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         String token = "" ;
 
-                //post get token
-                UserLoginBIC userLoginBIC = new UserLoginBIC();
-                userLoginBIC.setUsername("bic-dsvn@bic.vn");
-                userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
-                userLoginBIC.setDomainname("vetautructuyen.com.vn");
+        //post get token
+        UserLoginBIC userLoginBIC = new UserLoginBIC();
+        userLoginBIC.setUsername("bic-dsvn@bic.vn");
+        userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
+        userLoginBIC.setDomainname("vetautructuyen.com.vn");
 
-                ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
 
-                String requestToken = mapper.writeValueAsString(userLoginBIC);
-                ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(HostConstants.INTERCOMMUNICATION_RESTFUL_API.BIC_HOST_LOGIN, null, requestToken, null, null);
-                if(jsonResultGetToken.getBody() != null){
-                    //get token from response
-                    token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
+        String requestToken = mapper.writeValueAsString(userLoginBIC);
+        String apilogin =  hostConstants.BIC_HOST_LOGIN;
+        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_LOGIN, null, requestToken, null, null);
+        if(jsonResultGetToken.getBody() != null){
+            //get token from response
+            token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
 
-                }
-        return token ;
         }
-
+        return token ;
     }
+
+}
 
 //    public static void main(String[] args) throws ParseException {
 //        Long current  = DateTimeUtils.getCurrenTime() ;
