@@ -12,17 +12,21 @@ import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.exception.HandleResponseException;
 import org.json.JSONObject;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -38,13 +42,19 @@ import java.util.concurrent.TimeoutException;
 public class APIUtils {
     private Logger LOGGER = LoggerFactory.getLogger(APIUtils.class);
 
-
+//    @Test(timeout = 1)
     public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) {
-
-        RestTemplate restTemplate = new RestTemplate();
-        String bodyrequest = body;
         ResponseEntity<String> result = null;
         try {
+            HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+            httpRequestFactory.setConnectionRequestTimeout(1000);
+            httpRequestFactory.setConnectTimeout(1000);
+            httpRequestFactory.setReadTimeout(1000);
+            RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+
+            String bodyrequest = body;
+//            ResponseEntity<String> result = null;
+
             HttpHeaders headers = new HttpHeaders();
 
             if (!StringUtils.isEmpty(token)) {
@@ -68,20 +78,22 @@ public class APIUtils {
             }
             if(result.getStatusCode() != HttpStatus.OK ){
                 throw new CustomException("",result.getStatusCode());
-
             }
 
+            return result;
         }
+
         catch (ResourceAccessException e){
             if(e.getCause() instanceof SocketTimeoutException) {
                 throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
             }
         }
         catch (HttpClientErrorException e) {
-
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, e.getStatusCode().toString(), e.getResponseBodyAsString());
         }
-
+        catch (Exception e){
+            throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
+        }
         return result;
     }
 

@@ -34,6 +34,7 @@ public class RestControllerHandleException {
     @Autowired
     LogServiceImpl logService;
 
+    //Lỗi do nghiệp vụ: ví dụ: orderID sai/ sai tên trường orders-->order.(đúng format nhưng BIC trả ra lỗi)
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleCustomException(CustomException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -59,6 +60,11 @@ public class RestControllerHandleException {
         long elapsed = System.currentTimeMillis() - startTime;
         String timeDuration = Long.toString(elapsed);
 
+        //logRequest vs BIC
+        TargetObject tarObjectRequest = new TargetObject("TargetLog", messasgeId, "BIC", "request", "request",
+                transactionDetail, logTimestamp, messageTimestamp, null);
+        logService.createTargetLog(tarObjectRequest.getStringObject());
+
         //logException
         SoaExceptionObject soaExceptionObject =
                 new SoaExceptionObject("serviceLog","response",messasgeId,null,
@@ -83,6 +89,7 @@ public class RestControllerHandleException {
 
     }
 
+    //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP
     @ExceptionHandler(APIResponseException.class)
     public ResponseEntity<?> handleAPIException(APIResponseException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -131,6 +138,7 @@ public class RestControllerHandleException {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout
     @ExceptionHandler(SocketTimeoutException.class)
     public ResponseEntity<?> handleAPITimeOutException(APITimeOutRequestException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -157,7 +165,7 @@ public class RestControllerHandleException {
 
         //logException
         SoaExceptionObject soaExceptionObject =
-                new SoaExceptionObject("serviceLog","response",messasgeId,null,
+                new SoaExceptionObject("serviceLog","responseException",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
@@ -179,39 +187,10 @@ public class RestControllerHandleException {
 
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<?> handleException(APIResponseException ex , HttpServletRequest request){
-//
-//        ReponseError response = new ReponseError();
-//        response.setResultCode(ex.getResultCode());
-//        response.setResponseTime(DateTimeUtils.getCurrentDate());
-//        response.setResultMessage(ex.getResultMessage());
-//        response.setResponseId(ex.getResponseId());
-//        response.setDetailErrorCode(ex.getDetailErrorCode());
-//        response.setDetailErrorMessage(ex.getDetailErrorMessage());
-//
-//
-//        if (ex instanceof TimeoutException){
-//
-//        }
-//
-//        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//
-//    }
-
-
-//    @ExceptionHandler(HandleResponseException.class)
-//    public ResponseEntity<?> handleResponseException(HandleResponseException ex){
-//
-//        BaseResponse response = new BaseResponse();
-////        response.setResultCode(Integer.parseInt(ResponseCode. ));
-//        response.setResponseTime(DateTimeUtils.getCurrentDate());
-//
-//
-//        return new ResponseEntity<>(response, ex.getHttpStatus());
-//
-//    }
-
+    //jump into in first step if doesn't match with each exception above
+    // Hiện tại đều chỉ bắt các lỗi do hệ thống.
+    //VD: thừa dấu 1 phẩy ở cuối. (sai format body request)
+    //    không có cả trường ID lẫn refCode khi get
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> globalExceptionHandler(Exception ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
@@ -244,11 +223,6 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
         logService.createSOALogException(soaExceptionObject.getStringObject());
-
-        //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("targetLog",messasgeId,"BIC", "response","response",
-                transactionDetail, logTimestamp, messageTimestamp, timeDuration);
-        logService.createTargetLog(tarObject.getStringObject());
 
         //logResponse vs Client
         SoaObject soaObject = new SoaObject("serviceLog",messasgeId, null, "BIC", "client",

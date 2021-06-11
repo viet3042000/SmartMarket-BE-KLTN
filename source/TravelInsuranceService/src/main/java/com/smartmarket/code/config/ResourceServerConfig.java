@@ -31,13 +31,13 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${publicKey}")
     private String publicKey;
+//    private String publicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA+kzeVOVpVWwkWdVha4s38XM/pa/yr47av7+z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr/Mrm/YtjCZVWgaOYIhwrXwKLqPr/11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e+lf4s4OxQawWD79J9/5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9MwIDAQAB";
 
     @Autowired
     private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
 
     @Autowired
     private CustomLogFilter customLogFilter;
-
 
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -48,20 +48,25 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
         //congfig Oauth2 resoucre server decode jwt
         http
                 .oauth2ResourceServer(
-                oauth2ResourceServer -> oauth2ResourceServer.jwt(
-                        jwt -> jwt.decoder(jwtDecoder())
-                )
-        );
+                        oauth2ResourceServer -> {oauth2ResourceServer.jwt(
+                                jwt -> jwt.decoder(jwtDecoder())
+                        );
+//                      Bản chất của việc này là add thêm một filter ở tầng filter
+//                        oauth2ResourceServer.authenticationEntryPoint(tokenEntryPoint);
+//                    oauth2ResourceServer.authenticationEntryPoint(myAuthenticationEntryPoint);
+                        }
+                );
 
         http.authorizeRequests()
 //                .mvcMatchers("/**").access("@webSecurity.checkURL(authentication)")
                 .anyRequest().authenticated().
+//                and().exceptionHandling().authenticationEntryPoint(tokenEntryPoint).
 //                and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).
         and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Add a filter to validate the tokens with every request
-        http.addFilterBefore(customLogFilter, ChannelProcessingFilter.class);
+//        http.addFilterBefore(customLogFilter, ChannelProcessingFilter.class);
         http.addFilterAfter(customAuthorizeRequestFilter, FilterSecurityInterceptor.class);
     }
 

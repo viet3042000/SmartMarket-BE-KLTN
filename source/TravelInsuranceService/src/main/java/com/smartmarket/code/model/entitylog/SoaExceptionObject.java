@@ -14,9 +14,9 @@ public class SoaExceptionObject {
     String operationName ;
     String serviceVersion ;
     String hostName ;
-    String errorMsg ;
-    String errorCode ;
-    String errorDetail ;
+    String errorMsg ;//result msg
+    String errorCode ;//result code
+    String errorDetail ;// exception chi tiết
     String clientIp ;
     String requestTime;
 

@@ -72,7 +72,7 @@ public class ApiBICController {
         String responseCreate = null;
         responseCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
 
-//        //logRequest vs BIC
+        //logRequest vs BIC
         TargetObject tarObjectRequest = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "request", "request",
                 mapper2.writeValueAsString(createTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
@@ -173,10 +173,6 @@ public class ApiBICController {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
-        //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
-                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
-        logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
         String token = authorizationService.getTokenFromDatabase();
@@ -186,6 +182,11 @@ public class ApiBICController {
             String responseCreate = null;
             responseCreate = mapper2.writeValueAsString(createTravelInsuranceBICResponse);
         }
+
+        //logRequest vs BIC
+        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
+        logService.createTargetLog(tarObjectRequest.getStringObject());
 
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
