@@ -61,18 +61,19 @@ public class RestControllerHandleException {
 
         //logException
         SoaExceptionObject soaExceptionObject =
-                new SoaExceptionObject("ServiceLog",messasgeId,null,
+                new SoaExceptionObject("serviceLog","response",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("TargetLog", messasgeId,"BIC", "response", "response",
+        TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response", "response",
                 transactionDetail, logTimestamp, messageTimestamp, timeDuration);
         logService.createTargetLog(tarObject.getStringObject());
 
         //logResponse vs Client
-        SoaObject soaObject = new SoaObject("ServiceLog",messasgeId, null, "BIC", "Client",
+        SoaObject soaObject = new SoaObject("serviceLog",messasgeId, null, "BIC", "Client",
                 messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
                 "response", response.toString(), null, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
@@ -109,10 +110,11 @@ public class RestControllerHandleException {
 
         //logException
         SoaExceptionObject soaExceptionObject =
-                new SoaExceptionObject("serviceLog",messasgeId,null,
+                new SoaExceptionObject("serviceLog","response",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
@@ -155,10 +157,11 @@ public class RestControllerHandleException {
 
         //logException
         SoaExceptionObject soaExceptionObject =
-                new SoaExceptionObject("serviceLog",messasgeId,null,
+                new SoaExceptionObject("serviceLog","response",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
         TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
@@ -236,13 +239,14 @@ public class RestControllerHandleException {
 
         //logException
         SoaExceptionObject soaExceptionObject =
-                new SoaExceptionObject("serviceLog",messasgeId,null,
+                new SoaExceptionObject("serviceLog","response",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("TargetLog", messasgeId,"BIC", "response","response",
+        TargetObject tarObject = new TargetObject("targetLog",messasgeId,"BIC", "response","response",
                 transactionDetail, logTimestamp, messageTimestamp, timeDuration);
         logService.createTargetLog(tarObject.getStringObject());
 

@@ -6,7 +6,7 @@ import org.json.JSONObject;
 @AllArgsConstructor
 public class SoaObject {
 
-    String serviceLog;
+    String logName;
     String messageId;
     String transactionId;
     String sourceId;
@@ -15,7 +15,7 @@ public class SoaObject {
     String serviceName;
     String serviceVersion;
     String timeDuration;
-    String status;
+    String logType;
     String transactionDetail;
     String responseStatus;
     String errorCode;
@@ -26,7 +26,7 @@ public class SoaObject {
 
     public String getStringObject() {
         JSONObject json = new JSONObject();
-        json.put("serviceLog", serviceLog);
+        json.put("logName", logName);
         json.put("messageId", messageId);
         json.put("transactionId", transactionId);
         json.put("sourceId", sourceId);
@@ -35,7 +35,7 @@ public class SoaObject {
         json.put("serviceName", serviceName);
         json.put("serviceVersion", serviceVersion);
         json.put("timeDuration", timeDuration);
-        json.put("status", status);
+        json.put("logType", logType);
         json.put("transactionDetail", transactionDetail);
         json.put("responseStatus", responseStatus);
         json.put("errorCode", errorCode);

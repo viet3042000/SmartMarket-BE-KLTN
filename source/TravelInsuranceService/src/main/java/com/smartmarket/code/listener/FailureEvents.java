@@ -25,12 +25,6 @@ public class FailureEvents {
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
-    //    @EventListener
-//    public void onFailure(AuthenticationFailureEvent failure) {
-//        if (badCredentials.getAuthentication() instanceof BearerTokenAuthenticationToken) {
-//            // ... handle
-//        }
-//    }
     @EventListener
     public void onSuccess(AuthenticationSuccessEvent success) {
         // ...
@@ -38,14 +32,7 @@ public class FailureEvents {
 
     @EventListener
     public void onFailure(AuthenticationFailureBadCredentialsEvent failures) {
-//        if (badCredentials.getAuthentication() instanceof BearerTokenAuthenticationToken) {
-//            // ... handle
-//        }
-//        HttpServletResponse response;
-//        ReponseError responseError = new ReponseError();
-//        responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-//        responseError.setResponseTime(DateTimeUtils.getCurrentDate());
-//        return new ResponseEntity<>(responseError, HttpStatus.OK);
+
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = ((ServletRequestAttributes)requestAttributes).getResponse();
         response.setHeader("Access-Control-Allow-Origin", "*");
@@ -54,15 +41,6 @@ public class FailureEvents {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
         try {
-//            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unauthorized");
-//            Map<String, Object> data = new HashMap<>();
-//            data.put(
-//                    "timestamp",
-//                    Calendar.getInstance().getTime());
-//            data.put(
-//                    "message",
-//                    failures.getException().getMessage());
-
             ReponseError responseError = new ReponseError();
             responseError.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
             responseError.setResponseTime(DateTimeUtils.getCurrentDate());
