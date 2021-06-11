@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 
 @AllArgsConstructor
-public class SoaObject {
+public class ServiceObject {
 
     String logName;
     String messageId;

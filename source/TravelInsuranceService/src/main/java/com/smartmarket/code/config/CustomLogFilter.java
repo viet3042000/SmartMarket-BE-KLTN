@@ -2,7 +2,7 @@ package com.smartmarket.code.config;
 
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.entitylog.SoaObject;
+import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                 String timeDuration = Long.toString(elapsed);
 //
                 //logRequest vs Client
-                SoaObject soaObject = new SoaObject("serviceLog", messasgeId, null, "client", "BIC",
+                ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "BIC",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "request", transactionDetail, null, null,
                         null, logtimeStamp, request.getRemoteHost(), logService.getIp());

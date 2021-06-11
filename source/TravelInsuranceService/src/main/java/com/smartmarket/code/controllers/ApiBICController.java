@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.entitylog.SoaObject;
+import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
@@ -50,7 +51,7 @@ public class ApiBICController {
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
     @PostMapping(value = "/create-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> createTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
 //        System.out.println(configToken);
 
@@ -119,7 +120,7 @@ public class ApiBICController {
                 logService.createTargetLog(tarObject.getStringObject());
 
                 //logResponse vs Client
-                SoaObject soaObject = new SoaObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                ServiceObject soaObject = new ServiceObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetail, responseStatus, response.getResultCode(),
                         response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
@@ -148,7 +149,7 @@ public class ApiBICController {
             logService.createTargetLog(tarObject.toString());
 
             //logResponseError vs Client
-            SoaObject soaObject = new SoaObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+            ServiceObject soaObject = new ServiceObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                     messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                     "response", transactionDetail, responseStatus, responseError.getResultCode(),
                     responseError.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
@@ -160,7 +161,7 @@ public class ApiBICController {
     }
 
     @PostMapping(value = "/inquire-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getTravelBIC(@RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getTravelBIC(@RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
         long startTime = System.currentTimeMillis();
         BaseResponse response = new BaseResponse();
         CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse = null;
@@ -206,7 +207,7 @@ public class ApiBICController {
         logService.createTargetLog(tarObject.getStringObject());
 
         //logResponse vs Client
-        SoaObject soaObject = new SoaObject("serviceLog",queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+        ServiceObject soaObject = new ServiceObject("serviceLog",queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                 messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                 "response", transactionDetail, responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
@@ -216,7 +217,7 @@ public class ApiBICController {
     }
 
     @PostMapping(value = "/change-bic-travel-insurance" ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE} )
-    public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
         long startTime = System.currentTimeMillis();
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse =  new CreateTravelInsuranceBICResponse();
         ObjectMapper mapper = new ObjectMapper();
@@ -286,7 +287,7 @@ public class ApiBICController {
             logService.createTargetLog(tarObject.getStringObject());
 
             //logResponse vs Client
-            SoaObject soaObject = new SoaObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+            ServiceObject soaObject = new ServiceObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                     messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                     "response", transactionDetail, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());
@@ -310,7 +311,7 @@ public class ApiBICController {
             logService.createTargetLog(tarObject.toString());
 
             //logResponseError vs Client
-            SoaObject soaObject = new SoaObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+            ServiceObject soaObject = new ServiceObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                     messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                     "response", transactionDetail, responseStatus, responseError.getResultCode(),
                     responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());

@@ -4,6 +4,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
+import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.AccessUser;
@@ -162,7 +163,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 //    }
 
     // load token from BIC
-    public String getTokenFromDatabase() throws JsonProcessingException {
+    public String getTokenFromDatabase() throws JsonProcessingException, APITimeOutRequestException {
 
         String token = "" ;
 

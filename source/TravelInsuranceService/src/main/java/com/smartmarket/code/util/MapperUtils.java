@@ -2,6 +2,7 @@ package com.smartmarket.code.util;
 
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.APIResponseException;
+import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -186,7 +187,7 @@ public class MapperUtils {
     }
 
 
-    public static CreateTravelInsuranceBICRequest queryCreateObjectToBIC(Long orderId, String token,String requestId) {
+    public static CreateTravelInsuranceBICRequest queryCreateObjectToBIC(Long orderId, String token,String requestId) throws APITimeOutRequestException {
 
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 

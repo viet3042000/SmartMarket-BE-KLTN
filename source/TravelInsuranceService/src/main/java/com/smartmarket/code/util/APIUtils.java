@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -42,14 +43,24 @@ public class APIUtils {
     private Logger LOGGER = LoggerFactory.getLogger(APIUtils.class);
 
 //    @Test(timeout = 1)
-    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) {
+    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) throws APITimeOutRequestException {
         ResponseEntity<String> result = null;
         try {
-            HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-            httpRequestFactory.setConnectionRequestTimeout(1000);
-            httpRequestFactory.setConnectTimeout(1000);
-            httpRequestFactory.setReadTimeout(1000);
-            RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+//            HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+//            httpRequestFactory.setConnectionRequestTimeout(1000);
+//            httpRequestFactory.setConnectTimeout(1000);
+//            httpRequestFactory.setReadTimeout(1000);
+//            RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+
+            SimpleClientHttpRequestFactory clientHttpRequestFactory
+                    = new SimpleClientHttpRequestFactory();
+            //Connect timeout
+            clientHttpRequestFactory.setConnectTimeout(10000);
+            //Read timeout
+            clientHttpRequestFactory.setReadTimeout(10000);
+
+            RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
+
 
             String bodyrequest = body;
 //            ResponseEntity<String> result = null;
@@ -90,14 +101,11 @@ public class APIUtils {
         catch (HttpClientErrorException e) {
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, e.getStatusCode().toString(), e.getResponseBodyAsString());
         }
-        catch (Exception e){
-            throw new APITimeOutRequestException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage());
-        }
         return result;
     }
 
 
-    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token , String requestId) {
+    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token , String requestId) throws APITimeOutRequestException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<String> result = null ;
@@ -145,7 +153,7 @@ public class APIUtils {
         return result;
     }
 
-    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token,String requestId) {
+    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token,String requestId) throws APITimeOutRequestException {
         RestTemplate restTemplate = new RestTemplate();
 //        ObjectMapper mapper = new ObjectMapper();
         String bodyrequest = body;

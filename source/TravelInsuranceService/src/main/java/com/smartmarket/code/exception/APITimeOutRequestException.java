@@ -1,6 +1,9 @@
 package com.smartmarket.code.exception;
 
-public class APITimeOutRequestException extends RuntimeException {
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+
+public class APITimeOutRequestException extends SocketTimeoutException {
 
     private static final long serialVersionUID = 1L;
 
