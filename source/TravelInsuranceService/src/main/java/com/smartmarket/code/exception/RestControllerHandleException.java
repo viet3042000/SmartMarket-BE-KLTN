@@ -191,6 +191,45 @@ public class RestControllerHandleException {
 
     }
 
+
+    //Lỗi input ko đúng yêu cầu nghiệp vụ
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex , HttpServletRequest request) throws IOException {
+        long startTime = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String logTimestamp = formatter.format(date);
+        String messageTimestamp = logTimestamp;
+
+        ReponseError response = new ReponseError();
+        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
+        response.setResponseId(ex.getRequestId());
+        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
+        response.setDetailErrorMessage(ex.getMessage());
+
+        request = new RequestWrapper(request);
+        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
+        JSONObject requestBody = new JSONObject(jsonString);
+        String messasgeId = requestBody.getString("requestId");
+        String transactionDetail = requestBody.toString();
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        String timeDuration = Long.toString(elapsed);
+
+        //logException
+        ServiceExceptionObject soaExceptionObject =
+                new ServiceExceptionObject("serviceLog","response",messasgeId,null,
+                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+                        request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
+                        ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+
     //jump into in first step if doesn't match with each exception above
     // Hiện tại đều chỉ bắt các lỗi do hệ thống.
     //VD: thừa dấu 1 phẩy ở cuối. (sai format body request)

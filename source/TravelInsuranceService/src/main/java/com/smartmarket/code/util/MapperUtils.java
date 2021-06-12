@@ -51,51 +51,55 @@ public class MapperUtils{
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
+            if(orders != null ){
+                ordersBIC.setOrderReference(orders.getOrderReference());
+                ordersBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
+                ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.createOrderOrdCustId));
+                ordersBIC.setOrdcustmessage(fieldsConstants.createOrderOrdCustMessage);
+                ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
+                ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
+                ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
+                ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
+                ordersBIC.setOrddate(orders.getOrdDate());
+                ordersBIC.setOrdstatus(orders.getOrdStatus());
+                ordersBIC.setProductId(fieldsConstants.createOrderProductId);
+                ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
+                ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
+                ordersBIC.setOrdershipmodule(fieldsConstants.createOrderOrderShipModule);
+                ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.createOrderOrdIsDigital));
+                ordersBIC.setOrdtoken(fieldsConstants.createOrderOrdToken);
+                ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
+                ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.createOrderOrdTotal));
+                ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
+                ordersBIC.setUserId(Long.parseLong(fieldsConstants.createOrderUserId));
+            }
 
-            ordersBIC.setOrderReference(orders.getOrderReference());
-            ordersBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
-            ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.createOrderOrdCustId));
-            ordersBIC.setOrdcustmessage(fieldsConstants.createOrderOrdCustMessage);
-            ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
-            ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
-            ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
-            ordersBIC.setOrddate(orders.getOrdDate());
-            ordersBIC.setOrdstatus(orders.getOrdStatus());
-            ordersBIC.setProductId(fieldsConstants.createOrderProductId);
-            ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
-            ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
-            ordersBIC.setOrdershipmodule(fieldsConstants.createOrderOrderShipModule);
-            ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.createOrderOrdIsDigital));
-            ordersBIC.setOrdtoken(fieldsConstants.createOrderOrdToken);
-            ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-            ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.createOrderOrdTotal));
-            ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
-            ordersBIC.setUserId(Long.parseLong(fieldsConstants.createOrderUserId));
 
+            if(trv != null) {
+                trvBIC.setTRVID(Long.parseLong(fieldsConstants.createTrvTrvId));
+                trvBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
+                trvBIC.setAmountPersons(trv.getAmountPersons());
+                trvBIC.setAmountDays(trv.getAmountDays());
+                trvBIC.setSI(new BigDecimal(fieldsConstants.createTrvSi));
+                trvBIC.setPremium(new BigDecimal(fieldsConstants.createTrvPremium));
+                trvBIC.setPromotion(getBool(trv.getPromotion()));
+                trvBIC.setPromotionAddress(trv.getPromotionAddress());
+                trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.createTrvPeriodTime));
+                trvBIC.setFromDate(trv.getFromDate());
+                trvBIC.setToDate(trv.getToDate());
+                trvBIC.setIssueDate(trv.getIssueDate());
+                trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.createTrvIncludePayer)));
+                trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
+                trvBIC.setUserID(Long.parseLong(fieldsConstants.createTrvUserID));
+                trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.createTrvUserUpproveID));
+                trvBIC.setDestroy(getBool(Long.parseLong(fieldsConstants.createTrvDestroy)));
+                trvBIC.setStatus(getBool(Long.parseLong(fieldsConstants.createTrvStatus)));
+                trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.createTrvWriteByHand)));
+                trvBIC.setPrintedPaperNo(fieldsConstants.createTrvPrintedPaperNo);
+                trvBIC.setCertificateForm(fieldsConstants.createTrvCertificateForm);
+                trvBIC.setModuleid(Long.parseLong(fieldsConstants.createTrvModuleId));
+            }
 
-            trvBIC.setTRVID(Long.parseLong(fieldsConstants.createTrvTrvId));
-            trvBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
-            trvBIC.setAmountPersons(trv.getAmountPersons());
-            trvBIC.setAmountDays(trv.getAmountDays());
-            trvBIC.setSI(new BigDecimal(fieldsConstants.createTrvSi));
-            trvBIC.setPremium(new BigDecimal(fieldsConstants.createTrvPremium));
-            trvBIC.setPromotion(getBool(trv.getPromotion()));
-            trvBIC.setPromotionAddress(trv.getPromotionAddress());
-            trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.createTrvPeriodTime));
-            trvBIC.setFromDate(trv.getFromDate());
-            trvBIC.setToDate(trv.getToDate());
-            trvBIC.setIssueDate(trv.getIssueDate());
-            trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.createTrvIncludePayer)));
-            trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
-            trvBIC.setUserID(Long.parseLong(fieldsConstants.createTrvUserID));
-            trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.createTrvUserUpproveID));
-            trvBIC.setDestroy(getBool(Long.parseLong(fieldsConstants.createTrvDestroy)));
-            trvBIC.setStatus(getBool(Long.parseLong(fieldsConstants.createTrvStatus)));
-            trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.createTrvWriteByHand)));
-            trvBIC.setPrintedPaperNo(fieldsConstants.createTrvPrintedPaperNo);
-            trvBIC.setCertificateForm(fieldsConstants.createTrvCertificateForm);
-            trvBIC.setModuleid(Long.parseLong(fieldsConstants.createTrvModuleId));
 
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
@@ -133,50 +137,55 @@ public class MapperUtils{
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
-            ordersBIC.setOrderReference(orders.getOrderReference());
-            ordersBIC.setOrderid(orders.getOrderId());
-            ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.updateOrderOrdCustId));
-            ordersBIC.setOrdcustmessage(fieldsConstants.updateOrderOrdCustMessage);
-            ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
-            ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
-            ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
-            ordersBIC.setOrddate(orders.getOrdDate());
-            ordersBIC.setOrdstatus(orders.getOrdStatus());
-            ordersBIC.setProductId(fieldsConstants.updateOrderProductId);
-            ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
-            ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
-            ordersBIC.setOrdershipmodule(fieldsConstants.updateOrderOrderShipModule);
-            ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.updateOrderOrdIsDigital));
-            ordersBIC.setOrdtoken(fieldsConstants.updateOrderOrdToken);
-            ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-            ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.updateOrderOrdTotal));
-            ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
-            ordersBIC.setUserId(Long.parseLong(fieldsConstants.updateOrderUserId));
+            if (orders != null ){
+                ordersBIC.setOrderReference(orders.getOrderReference());
+                ordersBIC.setOrderid(orders.getOrderId());
+                ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.updateOrderOrdCustId));
+                ordersBIC.setOrdcustmessage(fieldsConstants.updateOrderOrdCustMessage);
+                ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
+                ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
+                ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
+                ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
+                ordersBIC.setOrddate(orders.getOrdDate());
+                ordersBIC.setOrdstatus(orders.getOrdStatus());
+                ordersBIC.setProductId(fieldsConstants.updateOrderProductId);
+                ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
+                ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
+                ordersBIC.setOrdershipmodule(fieldsConstants.updateOrderOrderShipModule);
+                ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.updateOrderOrdIsDigital));
+                ordersBIC.setOrdtoken(fieldsConstants.updateOrderOrdToken);
+                ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
+                ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.updateOrderOrdTotal));
+                ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
+                ordersBIC.setUserId(Long.parseLong(fieldsConstants.updateOrderUserId));
+            }
 
 
-            trvBIC.setTRVID(trv.getTrvId());
-            trvBIC.setOrderid(Long.parseLong(trv.getOrderId()));
-            trvBIC.setAmountPersons(trv.getAmountPersons());
-            trvBIC.setAmountDays(trv.getAmountDays());
-            trvBIC.setSI(new BigDecimal(fieldsConstants.updateTrvSi));
-            trvBIC.setPremium(new BigDecimal(fieldsConstants.updateTrvPremium));
-            trvBIC.setPromotion(getBool(trv.getPromotion()));
-            trvBIC.setPromotionAddress(trv.getPromotionAddress());
-            trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.updateTrvPeriodTime));
-            trvBIC.setFromDate(trv.getFromDate());
-            trvBIC.setToDate(trv.getToDate());
-            trvBIC.setIssueDate(trv.getIssueDate());
-            trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.updateTrvIncludePayer)));
-            trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
-            trvBIC.setUserID(Long.parseLong(fieldsConstants.updateTrvUserID));
-            trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.updateTrvUserUpproveID));
-            trvBIC.setDestroy(getBool(trv.getDestroy()));
-            trvBIC.setStatus(getBool(trv.getStatus()));
-            trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.updateTrvWriteByHand)));
-            trvBIC.setPrintedPaperNo(fieldsConstants.updateTrvPrintedPaperNo);
-            trvBIC.setCertificateForm(fieldsConstants.updateTrvCertificateForm);
-            trvBIC.setModuleid(Long.parseLong(fieldsConstants.updateTrvModuleId));
+            if (trv != null ){
+                trvBIC.setTRVID(trv.getTrvId());
+                trvBIC.setOrderid(Long.parseLong(trv.getOrderId()));
+                trvBIC.setAmountPersons(trv.getAmountPersons());
+                trvBIC.setAmountDays(trv.getAmountDays());
+                trvBIC.setSI(new BigDecimal(fieldsConstants.updateTrvSi));
+                trvBIC.setPremium(new BigDecimal(fieldsConstants.updateTrvPremium));
+                trvBIC.setPromotion(getBool(trv.getPromotion()));
+                trvBIC.setPromotionAddress(trv.getPromotionAddress());
+                trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.updateTrvPeriodTime));
+                trvBIC.setFromDate(trv.getFromDate());
+                trvBIC.setToDate(trv.getToDate());
+                trvBIC.setIssueDate(trv.getIssueDate());
+                trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.updateTrvIncludePayer)));
+                trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
+                trvBIC.setUserID(Long.parseLong(fieldsConstants.updateTrvUserID));
+                trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.updateTrvUserUpproveID));
+                trvBIC.setDestroy(getBool(trv.getDestroy()));
+                trvBIC.setStatus(getBool(trv.getStatus()));
+                trvBIC.setWriteByHand(getBool(Long.parseLong(fieldsConstants.updateTrvWriteByHand)));
+                trvBIC.setPrintedPaperNo(fieldsConstants.updateTrvPrintedPaperNo);
+                trvBIC.setCertificateForm(fieldsConstants.updateTrvCertificateForm);
+                trvBIC.setModuleid(Long.parseLong(fieldsConstants.updateTrvModuleId));
+
+            }
 
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {

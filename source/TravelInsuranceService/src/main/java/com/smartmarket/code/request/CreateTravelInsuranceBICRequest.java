@@ -3,7 +3,7 @@ package com.smartmarket.code.request;
 import com.smartmarket.code.request.entity.Orders;
 import com.smartmarket.code.request.entity.TRV;
 import com.smartmarket.code.request.entity.TRVDetail;
-
+import lombok.NonNull;
 
 
 import java.io.Serializable;
@@ -12,9 +12,9 @@ import java.util.List;
 
 public class CreateTravelInsuranceBICRequest implements Serializable {
 
-   private Orders orders ;
-   private TRV trv ;
-   private ArrayList<TRVDetail> trvDetails ;
+    private Orders orders;
+    private TRV trv;
+    private ArrayList<TRVDetail> trvDetails;
 
     public Orders getOrders() {
         return orders;

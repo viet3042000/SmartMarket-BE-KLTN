@@ -6,6 +6,7 @@ import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
@@ -63,12 +64,16 @@ public class ApiBICController {
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
     @PostMapping(value = "/create-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    public ResponseEntity<?> createTravelBIC(@RequestBody(required = true) BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //validate
-        if(createTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
-            throw new CustomException("Không tìm thấy trường orderReference trong request", HttpStatus.BAD_REQUEST ,createTravelInsuranceBICRequest.getRequestId() ) ;
+        if (createTravelInsuranceBICRequest.getDetail() != null &&
+                createTravelInsuranceBICRequest.getDetail().getOrders() != null ){
+            if(createTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
+                throw new InvalidInputException("Không tìm thấy trường orderReference trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
+            }
         }
+
 
         //get current start time
         long startTime = System.currentTimeMillis();
@@ -107,9 +112,9 @@ public class ApiBICController {
 
                 //get response data from BIC
                 jsonObjectReponseCreate = new JSONObject(jsonResultCreateBIC.getBody());
+
                 Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
                 boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
-
                 createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
                 createTravelInsuranceBICResponse.setSucceeded(succeeded);
                 JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
@@ -161,7 +166,6 @@ public class ApiBICController {
             String transactionDetail = mapper.writeValueAsString(responseError);
             long elapsed = System.currentTimeMillis() - startTime;
             String timeDuration = Long.toString(elapsed);
-
 
             //create BICTransaction
             bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest,ResponseCode.CODE.ERROR_IN_BACKEND,jsonResultCreateBIC.getStatusCode().toString());
