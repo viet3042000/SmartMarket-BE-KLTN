@@ -94,19 +94,19 @@ public class ApiBICController {
 
         //Create BIC
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
-        String responseCreate = null;
-        responseCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
+        String requestCreate = null;
+        requestCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
 
         //logRequest vs BIC
         TargetObject tarObjectRequest = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "request", "request",
-                mapper2.writeValueAsString(createTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
+                requestCreate, logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
         String token = authorizationService.getTokenFromDatabase();
 
         //post Data to BIC
-        ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_CREATE, null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId());
+        ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_CREATE, null, requestCreate, token, createTravelInsuranceBICRequest.getRequestId());
         JSONObject jsonObjectReponseCreate = null;
 
         int status = responseSelvet.getStatus();
@@ -207,9 +207,14 @@ public class ApiBICController {
         //get token from database
         String token = authorizationService.getTokenFromDatabase();
 
+        String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
+        String orderReference= queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+
+        String requestParameter = "orderId: " + orderID + ", orderRef: "+ orderReference;
+
         //logRequest vs BIC
         TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
-                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
+                requestParameter, logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         if (queryTravelInsuranceBICRequest.getDetail() != null) {
@@ -274,12 +279,12 @@ public class ApiBICController {
 
         //Update BIC
         CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail()) ;
-        String responseCreate = null;
-        responseCreate = mapper2.writeValueAsString(updateTravelInsuranceToBIC);
+        String requestCreate = null;
+        requestCreate = mapper2.writeValueAsString(updateTravelInsuranceToBIC);
 
         //logRequest vs BIC
         TargetObject tarObjectRequest = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
-                mapper2.writeValueAsString(updateTravelInsuranceBICRequest), logtimeStamp, messageTimestamp, null);
+                requestCreate, logtimeStamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
@@ -290,7 +295,7 @@ public class ApiBICController {
             orderID = updateTravelInsuranceToBIC.getOrders().getOrderid().toString();
         }
 
-        ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,hostConstants.BIC_HOST_UPDATE, null, responseCreate, token,updateTravelInsuranceBICRequest.getRequestId());
+        ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,hostConstants.BIC_HOST_UPDATE, null, requestCreate, token,updateTravelInsuranceBICRequest.getRequestId());
         //post Data to BIC
 
         int status = responseSelvet.getStatus();
