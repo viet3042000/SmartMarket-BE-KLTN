@@ -34,7 +34,9 @@ public class RestControllerHandleException {
     @Autowired
     LogServiceImpl logService;
 
-    //Lỗi do nghiệp vụ: ví dụ: orderID sai/ sai tên trường orders-->order.(đúng format nhưng BIC trả ra lỗi)
+    //Lỗi do nghiệp vụ. VD: sai tên trường.VD: OrderId--> Order
+    //                      thiếu trường ID/refCode lúc get.
+    //                      tạo trùng
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleCustomException(CustomException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -60,11 +62,6 @@ public class RestControllerHandleException {
         long elapsed = System.currentTimeMillis() - startTime;
         String timeDuration = Long.toString(elapsed);
 
-        //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("TargetLog", messasgeId, "BIC", "request", "request",
-                transactionDetail, logTimestamp, messageTimestamp, null);
-        logService.createTargetLog(tarObjectRequest.getStringObject());
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject("serviceLog","response",messasgeId,null,
@@ -88,8 +85,8 @@ public class RestControllerHandleException {
         return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
+
     //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP
-//    InvocationTargetException.class
     @ExceptionHandler({APIResponseException.class})
     public ResponseEntity<?> handleAPIException(APIResponseException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -191,7 +188,6 @@ public class RestControllerHandleException {
 
     }
 
-
     //Lỗi input ko đúng yêu cầu nghiệp vụ
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex , HttpServletRequest request) throws IOException {
@@ -213,7 +209,6 @@ public class RestControllerHandleException {
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
         JSONObject requestBody = new JSONObject(jsonString);
         String messasgeId = requestBody.getString("requestId");
-        String transactionDetail = requestBody.toString();
 
         long elapsed = System.currentTimeMillis() - startTime;
         String timeDuration = Long.toString(elapsed);
@@ -226,6 +221,13 @@ public class RestControllerHandleException {
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
         logService.createSOALogException(soaExceptionObject.getStringObject());
 
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                "response", response.toString(), null, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+        logService.createSOALog2(soaObject.getStringObject());
+
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -233,7 +235,6 @@ public class RestControllerHandleException {
     //jump into in first step if doesn't match with each exception above
     // Hiện tại đều chỉ bắt các lỗi do hệ thống.
     //VD: thừa dấu 1 phẩy ở cuối. (sai format body request)
-    //    không có cả trường ID lẫn refCode khi get
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> globalExceptionHandler(Exception ex,HttpServletRequest request, WebRequest webRequest) throws IOException {

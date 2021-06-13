@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.exception.APIResponseException;
 import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.exception.InvalidInputException;
@@ -73,6 +74,9 @@ public class ApiBICController {
                 throw new InvalidInputException("Không tìm thấy trường orderReference trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
             }
         }
+        if(createTravelInsuranceBICRequest.getDetail() != null && createTravelInsuranceBICRequest.getDetail().getOrders() == null){
+            throw new InvalidInputException("Không tìm thấy trường orders trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
+        }
 
 
         //get current start time
@@ -112,7 +116,6 @@ public class ApiBICController {
 
                 //get response data from BIC
                 jsonObjectReponseCreate = new JSONObject(jsonResultCreateBIC.getBody());
-
                 Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
                 boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
                 createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
@@ -201,9 +204,13 @@ public class ApiBICController {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
-
         //get token from database
         String token = authorizationService.getTokenFromDatabase();
+
+        //logRequest vs BIC
+        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
+        logService.createTargetLog(tarObjectRequest.getStringObject());
 
         if (queryTravelInsuranceBICRequest.getDetail() != null) {
             createTravelInsuranceBICResponse = mapperUtils.queryCreateObjectToBIC(queryTravelInsuranceBICRequest, token,queryTravelInsuranceBICRequest.getRequestId());
@@ -211,10 +218,6 @@ public class ApiBICController {
             responseCreate = mapper2.writeValueAsString(createTravelInsuranceBICResponse);
         }
 
-        //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
-                mapper.writeValueAsString(queryTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
-        logService.createTargetLog(tarObjectRequest.getStringObject());
 
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
@@ -245,6 +248,18 @@ public class ApiBICController {
 
     @PostMapping(value = "/change-bic-travel-insurance" ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE} )
     public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+
+        //validate
+        if (updateTravelInsuranceBICRequest.getDetail() != null &&
+                updateTravelInsuranceBICRequest.getDetail().getOrders() != null ){
+            if(updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
+                throw new InvalidInputException("Không tìm thấy trường orderReference trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
+            }
+        }
+        if(updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null){
+            throw new InvalidInputException("Không tìm thấy trường orders trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
+        }
+
         long startTime = System.currentTimeMillis();
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse =  new CreateTravelInsuranceBICResponse();
         ObjectMapper mapper = new ObjectMapper();
