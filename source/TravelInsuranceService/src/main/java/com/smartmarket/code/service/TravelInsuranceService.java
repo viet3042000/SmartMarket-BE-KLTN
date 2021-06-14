@@ -1,5 +1,31 @@
 package com.smartmarket.code.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.smartmarket.code.exception.APITimeOutRequestException;
+import com.smartmarket.code.request.BaseDetail;
+import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
+import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public interface TravelInsuranceService {
+    public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
+                                             HttpServletRequest request,
+                                             HttpServletResponse responseSelvet)
+            throws JsonProcessingException, APITimeOutRequestException;
+
+    public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
+                                          HttpServletRequest request,
+                                          HttpServletResponse responseSelvet)
+            throws JsonProcessingException, APITimeOutRequestException;
+
+    public ResponseEntity<?> updateTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
+                                             HttpServletRequest request,
+                                             HttpServletResponse responseSelvet)
+            throws JsonProcessingException, APITimeOutRequestException;
 
 }
+
+

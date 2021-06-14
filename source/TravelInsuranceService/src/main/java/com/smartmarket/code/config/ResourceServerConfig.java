@@ -42,6 +42,9 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    @Autowired
+    private CustomEntryPoint customEntryPoint;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -52,8 +55,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                                 jwt -> jwt.decoder(jwtDecoder())
                         );
 //                      Bản chất của việc này là add thêm một filter ở tầng filter
-//                        oauth2ResourceServer.authenticationEntryPoint(tokenEntryPoint);
-//                    oauth2ResourceServer.authenticationEntryPoint(myAuthenticationEntryPoint);
+                            oauth2ResourceServer.authenticationEntryPoint(customEntryPoint);
                         }
                 );
 

@@ -115,4 +115,10 @@ public class DateTimeUtils {
         return date ;
     }
 
+    public static String getElapsedTimeStr(long startTime){
+        long endTime = System.currentTimeMillis() ;
+        long elapsed = endTime - startTime;
+        return Long.toString(elapsed) ;
+    }
+
 }

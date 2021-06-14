@@ -52,8 +52,11 @@ public class BICTransactionServiceImp implements BICTransactionService {
         //check
         if (object != null && object.getDetail() != null) {
             Long orderIdResponse = null;
-            if (jsonObjectReponseCreate != null) {
+            JSONObject jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
+            if (jsonObjectReponseCreate != null && jsonObjectData.getString("type").equalsIgnoreCase("200") ) {
                 orderIdResponse = jsonObjectReponseCreate.getLong("orderId");
+            }else {
+                orderIdResponse = -1L ;
             }
             bicTransaction.setBicResultCode(bicResultCode);
             bicTransaction.setConsumerId("DSVN");

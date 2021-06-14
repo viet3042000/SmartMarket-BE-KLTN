@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -390,6 +391,44 @@ public class RestControllerHandleException {
         return errors;
     }
 
+    //Trường hợp sai format json request
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> globalHttpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
+        long startTime = System.currentTimeMillis();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        String logTimestamp = formatter.format(date);
+        String messageTimestamp = logTimestamp;
+
+        ReponseError response = new ReponseError();
+        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
+        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
+        response.setDetailErrorMessage("Body request sai format json!");
+
+        request = new RequestWrapper(request);
+        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
+        long elapsed = System.currentTimeMillis() - startTime;
+        String timeDuration = Long.toString(elapsed);
+
+        //logException
+        ServiceExceptionObject soaExceptionObject =
+                new ServiceExceptionObject("serviceLog","response",null,null,
+                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+                        request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
+                        ex.getMessage(),logService.getIp(),messageTimestamp);
+        logService.createSOALogException(soaExceptionObject.getStringObject());
+
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                "response", response.toString(), null, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+        logService.createSOALog2(soaObject.getStringObject());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     //jump into in first step if doesn't match with each exception above
     // Hiện tại đều chỉ bắt các lỗi do hệ thống.
@@ -472,6 +511,7 @@ public class RestControllerHandleException {
                     fromDate,toDate,new Date(),resultCode,bicResultCode,
                     ordDate,productId,customerAddress) ;
         }
+
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
