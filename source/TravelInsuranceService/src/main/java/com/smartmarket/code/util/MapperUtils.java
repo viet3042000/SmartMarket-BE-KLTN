@@ -69,7 +69,7 @@ public class MapperUtils{
                 ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.createOrderOrdIsDigital));
                 ordersBIC.setOrdtoken(fieldsConstants.createOrderOrdToken);
                 ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-                ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.createOrderOrdTotal));
+                ordersBIC.setOrdtotal(orders.getOrdPaidMoney());
                 ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
                 ordersBIC.setUserId(Long.parseLong(fieldsConstants.createOrderUserId));
             }
@@ -81,7 +81,7 @@ public class MapperUtils{
                 trvBIC.setAmountPersons(trv.getAmountPersons());
                 trvBIC.setAmountDays(trv.getAmountDays());
                 trvBIC.setSI(new BigDecimal(fieldsConstants.createTrvSi));
-                trvBIC.setPremium(new BigDecimal(fieldsConstants.createTrvPremium));
+                trvBIC.setPremium(orders.getOrdPaidMoney());
                 trvBIC.setPromotion(getBool(trv.getPromotion()));
                 trvBIC.setPromotionAddress(trv.getPromotionAddress());
                 trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.createTrvPeriodTime));
@@ -155,7 +155,7 @@ public class MapperUtils{
                 ordersBIC.setOrdisdigital(Long.parseLong(fieldsConstants.updateOrderOrdIsDigital));
                 ordersBIC.setOrdtoken(fieldsConstants.updateOrderOrdToken);
                 ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-                ordersBIC.setOrdtotal(new BigDecimal(fieldsConstants.updateOrderOrdTotal));
+                ordersBIC.setOrdtotal(orders.getOrdPaidMoney());
                 ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
                 ordersBIC.setUserId(Long.parseLong(fieldsConstants.updateOrderUserId));
             }
@@ -167,7 +167,7 @@ public class MapperUtils{
                 trvBIC.setAmountPersons(trv.getAmountPersons());
                 trvBIC.setAmountDays(trv.getAmountDays());
                 trvBIC.setSI(new BigDecimal(fieldsConstants.updateTrvSi));
-                trvBIC.setPremium(new BigDecimal(fieldsConstants.updateTrvPremium));
+                trvBIC.setPremium(orders.getOrdPaidMoney());
                 trvBIC.setPromotion(getBool(trv.getPromotion()));
                 trvBIC.setPromotionAddress(trv.getPromotionAddress());
                 trvBIC.setPeriodTime(Long.parseLong(fieldsConstants.updateTrvPeriodTime));
