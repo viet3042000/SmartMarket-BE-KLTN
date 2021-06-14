@@ -175,7 +175,7 @@ public class MapperUtils{
                 trvBIC.setToDate(trv.getToDate());
                 trvBIC.setIssueDate(trv.getIssueDate());
                 trvBIC.setIncludePayer(getBool(Long.parseLong(fieldsConstants.updateTrvIncludePayer)));
-                trvBIC.setEndorsement(fieldsConstants.createTrvEndorsement);
+                trvBIC.setEndorsement(fieldsConstants.updateTrvEndorsement);
                 trvBIC.setUserID(Long.parseLong(fieldsConstants.updateTrvUserID));
                 trvBIC.setUserUpproveID(Long.parseLong(fieldsConstants.updateTrvUserUpproveID));
                 trvBIC.setDestroy(getBool(trv.getDestroy()));

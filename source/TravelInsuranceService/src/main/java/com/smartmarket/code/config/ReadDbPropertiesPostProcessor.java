@@ -28,9 +28,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
 
         Map<String, Object> propertySource = new HashMap<>();
         Map<String, BigDecimal> propertySourceInt = new HashMap<>();
-
         try {
-
             // Build manually datasource to ServiceConfig
             DataSource ds = DataSourceBuilder
                     .create()

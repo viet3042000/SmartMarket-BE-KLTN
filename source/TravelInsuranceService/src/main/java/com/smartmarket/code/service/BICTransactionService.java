@@ -5,10 +5,19 @@ import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Date;
 
 public interface BICTransactionService extends BaseService<BICTransaction> {
     public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
-                                                                       ResponseEntity<String> jsonResultCreateBIC,
+                                                                       JSONObject jsonObjectReponseCreate,
                                                                        String resultCode , String bicResultCode) ;
+    public BICTransaction createBICTransactionParameter(String requestId, String orderReference, String orderId,
+                                                        String customerName, String phoneNumber, String email,
+                                                        String ordPaidMoney, String consumerId, String fromDate,
+                                                        String toDate, Date logTimestamp, String resultCode,
+                                                        String bicResultCode, String ordDate, String productId,
+                                                        String customerAddress) ;
 }

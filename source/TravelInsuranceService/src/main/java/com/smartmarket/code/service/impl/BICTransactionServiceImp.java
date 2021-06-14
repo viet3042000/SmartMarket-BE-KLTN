@@ -1,17 +1,13 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.constants.FieldsConstants;
-import com.smartmarket.code.dao.AccessTokenRepository;
 import com.smartmarket.code.dao.BICTransactionRepository;
-import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.service.AccessTokenService;
 import com.smartmarket.code.service.BICTransactionService;
-import net.bytebuddy.implementation.bytecode.constant.FieldConstant;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -49,12 +45,16 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
     @Override
     public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
-                                                                       ResponseEntity<String> jsonResultCreateBIC,
-                                                                       String resultCode , String bicResultCode) {
-        BICTransaction bicTransaction=  new BICTransaction() ;
+                                                                       JSONObject jsonObjectReponseCreate,
+                                                                       String resultCode, String bicResultCode) {
+        BICTransaction bicTransaction = new BICTransaction();
 
         //check
-        if (object !=  null && object.getDetail() != null ){
+        if (object != null && object.getDetail() != null) {
+            Long orderIdResponse = null;
+            if (jsonObjectReponseCreate != null) {
+                orderIdResponse = jsonObjectReponseCreate.getLong("orderId");
+            }
             bicTransaction.setBicResultCode(bicResultCode);
             bicTransaction.setConsumerId("DSVN");
             bicTransaction.setCustomerName("DSVN");
@@ -63,7 +63,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setFromDate(object.getDetail().getTrv().getFromDate());
             bicTransaction.setResultCode(resultCode);
             bicTransaction.setLogTimestamp(new Date());
-            bicTransaction.setOrderId(String.valueOf(object.getDetail().getOrders().getOrderId()));
+            bicTransaction.setOrderId(orderIdResponse == null ? "-1" : String.valueOf(orderIdResponse));
             bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
             bicTransaction.setOrdPaidMoney(String.valueOf(object.getDetail().getOrders().getOrdPaidMoney()));
             bicTransaction.setPhoneNumber(object.getDetail().getOrders().getOrdBillMobile());
@@ -75,4 +75,37 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
         return bicTransactionRepository.save(bicTransaction);
     }
+
+    @Override
+    public BICTransaction createBICTransactionParameter(String requestId,   String orderReference, String orderId,
+                                                        String customerName, String phoneNumber, String email,
+                                                        String ordPaidMoney, String consumerId, String fromDate,
+                                                        String toDate, Date logTimestamp, String resultCode,
+                                                        String bicResultCode, String ordDate, String productId,
+                                                        String customerAddress) {
+        BICTransaction bicTransaction = new BICTransaction();
+
+        bicTransaction.setOrderId(orderId);
+        bicTransaction.setBicResultCode(bicResultCode);
+        bicTransaction.setConsumerId("DSVN");
+        bicTransaction.setCustomerName("DSVN");
+        bicTransaction.setCustomerAddress("default");
+        bicTransaction.setEmail(email);
+        bicTransaction.setFromDate(fromDate);
+        bicTransaction.setResultCode(resultCode);
+        bicTransaction.setLogTimestamp(new Date());
+        bicTransaction.setOrderReference(orderReference);
+        bicTransaction.setOrdPaidMoney(ordPaidMoney);
+        bicTransaction.setPhoneNumber(phoneNumber);
+        bicTransaction.setRequestId(requestId);
+        bicTransaction.setToDate(toDate);
+        bicTransaction.setOrdDate(ordDate);
+        bicTransaction.setProductId(fieldsConstants.createOrderProductId);
+
+
+        return bicTransactionRepository.save(bicTransaction);
+    }
+
+
+
 }

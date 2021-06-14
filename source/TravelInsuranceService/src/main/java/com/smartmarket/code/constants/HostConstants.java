@@ -17,4 +17,6 @@ public class HostConstants {
     @Value("${api.getTravelBICByOderReference}")
     public String BIC_HOST_GET_BY_ORDER_REFERANCE;
 
+    public String URL_CREATE =  "/insurance/travel-insurance-service/v1/create-bic-travel-insurance/**" ;
+    public String URL_UPDATE =  "/insurance/travel-insurance-service/v1/change-bic-travel-insurance/**" ;
 }

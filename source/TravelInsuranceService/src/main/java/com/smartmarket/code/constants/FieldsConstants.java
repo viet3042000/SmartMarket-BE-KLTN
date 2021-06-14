@@ -13,14 +13,11 @@ public class FieldsConstants{
     @Value("${updateTravelBIC.DSVN.trv.si}")
     public String updateTrvSi;
 
-    @Value("${updateTravelBIC.DSVN.trv.premium}")
-    public String updateTrvPremium ;
-
     @Value("${updateTravelBIC.DSVN.trv.includePayer}")
     public String updateTrvIncludePayer ;
 
-//    @Value("${updateTravelBIC.DSVN.trv.endorsement}")
-//    public String updateTrvEndorsement;
+    @Value("${updateTravelBIC.DSVN.trv.endorsement}")
+    public String updateTrvEndorsement;
 
     @Value("${updateTravelBIC.DSVN.trv.userID}")
     public String updateTrvUserID;
@@ -52,9 +49,6 @@ public class FieldsConstants{
     @Value("${updateTravelBIC.DSVN.order.userId}")
     public String updateOrderUserId;
 
-    @Value("${updateTravelBIC.DSVN.order.ordTotal}")
-    public String updateOrderOrdTotal;
-
     @Value("${updateTravelBIC.DSVN.order.ordToken}")
     public String updateOrderOrdToken;
 
@@ -81,8 +75,6 @@ public class FieldsConstants{
     @Value("${createTravelBIC.DSVN.order.userId}")
     public String createOrderUserId;
 
-    @Value("${createTravelBIC.DSVN.order.ordTotal}")
-    public String createOrderOrdTotal;
 
     @Value("${createTravelBIC.DSVN.order.ordToken}")
     public String createOrderOrdToken;
@@ -110,9 +102,6 @@ public class FieldsConstants{
 
     @Value("${createTravelBIC.DSVN.trv.si}")
     public String createTrvSi;
-
-    @Value("${createTravelBIC.DSVN.trv.premium}")
-    public String createTrvPremium;
 
     @Value("${createTravelBIC.DSVN.trv.includePayer}")
     public String createTrvIncludePayer;
