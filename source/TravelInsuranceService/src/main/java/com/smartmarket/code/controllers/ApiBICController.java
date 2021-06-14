@@ -67,6 +67,9 @@ public class ApiBICController {
     public ResponseEntity<?> createTravelBIC(@RequestBody(required = true) BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //validate
+        if(createTravelInsuranceBICRequest.getDetail() != null && createTravelInsuranceBICRequest.getDetail().getOrders() == null){
+            throw new InvalidInputException("Không tìm thấy trường orders trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
+        }
         if (createTravelInsuranceBICRequest.getDetail() != null &&
                 createTravelInsuranceBICRequest.getDetail().getOrders() != null ){
             if(createTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
@@ -254,14 +257,14 @@ public class ApiBICController {
     public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //validate
+        if(updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null){
+            throw new InvalidInputException("Không tìm thấy trường orders trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
+        }
         if (updateTravelInsuranceBICRequest.getDetail() != null &&
                 updateTravelInsuranceBICRequest.getDetail().getOrders() != null ){
             if(updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
                 throw new InvalidInputException("Không tìm thấy trường orderReference trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
             }
-        }
-        if(updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null){
-            throw new InvalidInputException("Không tìm thấy trường orders trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
         }
 
         long startTime = System.currentTimeMillis();
