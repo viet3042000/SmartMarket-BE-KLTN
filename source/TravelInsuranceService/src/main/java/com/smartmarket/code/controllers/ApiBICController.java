@@ -40,7 +40,7 @@ import java.util.Date;
 public class ApiBICController {
 
     @Autowired
-    AuthorizationService authorizationService ;
+    AuthorizationService authorizationService;
 
     @Autowired
     APIUtils apiUtils;
@@ -50,13 +50,13 @@ public class ApiBICController {
 
 
     @Autowired
-    MapperUtils mapperUtils ;
+    MapperUtils mapperUtils;
 
     @Autowired
-    HostConstants hostConstants ;
+    HostConstants hostConstants;
 
     @Autowired
-    BICTransactionService bicTransactionService ;
+    BICTransactionService bicTransactionService;
 
 
 //    @Value("${config.token}")
@@ -67,13 +67,13 @@ public class ApiBICController {
     public ResponseEntity<?> createTravelBIC(@RequestBody(required = true) BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //validate
-        if(createTravelInsuranceBICRequest.getDetail() != null && createTravelInsuranceBICRequest.getDetail().getOrders() == null){
-            throw new InvalidInputException("Không tìm thấy trường orders trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
+        if (createTravelInsuranceBICRequest.getDetail() != null && createTravelInsuranceBICRequest.getDetail().getOrders() == null) {
+            throw new InvalidInputException("Không tìm thấy trường orders trong request", createTravelInsuranceBICRequest.getRequestId());
         }
         if (createTravelInsuranceBICRequest.getDetail() != null &&
-                createTravelInsuranceBICRequest.getDetail().getOrders() != null ){
-            if(createTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
-                throw new InvalidInputException("Không tìm thấy trường orderReference trong request",createTravelInsuranceBICRequest.getRequestId() ) ;
+                createTravelInsuranceBICRequest.getDetail().getOrders() != null) {
+            if (createTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
+                throw new InvalidInputException("Không tìm thấy trường orderReference trong request", createTravelInsuranceBICRequest.getRequestId());
             }
         }
 
@@ -97,7 +97,7 @@ public class ApiBICController {
         responseCreate = mapper2.writeValueAsString(createTravelInsuranceToBIC);
 
         //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "request", "request",
+        TargetObject tarObjectRequest = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(), "BIC", "request", "request",
                 mapper2.writeValueAsString(createTravelInsuranceBICRequest), logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
@@ -113,9 +113,9 @@ public class ApiBICController {
         jsonObjectReponseCreate = new JSONObject(jsonResultCreateBIC.getBody());
 
         try {
-        if (jsonResultCreateBIC.getStatusCode() == HttpStatus.OK
-                && jsonObjectReponseCreate != null
-                && jsonObjectReponseCreate.getBoolean("succeeded") == true ) {
+            if (jsonResultCreateBIC.getStatusCode() == HttpStatus.OK
+                    && jsonObjectReponseCreate != null
+                    && jsonObjectReponseCreate.getBoolean("succeeded") == true) {
 
 
                 Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
@@ -141,61 +141,60 @@ public class ApiBICController {
                 String timeDuration = Long.toString(elapsed);
 
                 //create BICTransaction
-                bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest,jsonObjectReponseCreate,ResponseCode.CODE.TRANSACTION_SUCCESSFUL,jsonResultCreateBIC.getStatusCode().toString());
+                bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString());
 
                 //logResponse vs BIC
-                TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+                TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
                         transactionDetail, logTimestamp, messageTimestamp, timeDuration);
                 logService.createTargetLog(tarObject.getStringObject());
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetail, responseStatus, response.getResultCode(),
-                        response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                        response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
                 logService.createSOALog2(soaObject.getStringObject());
 
 
+            } else {
+                ReponseError responseError = new ReponseError();
+                JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
+                responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
+                responseError.setResponseTime(DateTimeUtils.getCurrentDate());
+                responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
+                responseError.setDetailErrorCode(jsonResultCreateBIC.getStatusCode().toString());
+                responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
 
-        }else {
-            ReponseError responseError = new ReponseError();
-            JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-            responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-            responseError.setResponseTime(DateTimeUtils.getCurrentDate());
-            responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-            responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
-            responseError.setDetailErrorCode(jsonResultCreateBIC.getStatusCode().toString());
-            responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
+                String transactionDetail = mapper.writeValueAsString(responseError);
+                long elapsed = System.currentTimeMillis() - startTime;
+                String timeDuration = Long.toString(elapsed);
 
-            String transactionDetail = mapper.writeValueAsString(responseError);
-            long elapsed = System.currentTimeMillis() - startTime;
-            String timeDuration = Long.toString(elapsed);
+                //create BICTransaction
+                bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString());
 
-            //create BICTransaction
-            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest,jsonObjectReponseCreate,ResponseCode.CODE.ERROR_IN_BACKEND,jsonResultCreateBIC.getStatusCode().toString());
+                //logResponseError vs BIC
+                TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
+                        transactionDetail, logTimestamp, messageTimestamp, timeDuration);
+                logService.createTargetLog(tarObject.toString());
 
-            //logResponseError vs BIC
-            TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
-                    transactionDetail, logTimestamp, messageTimestamp, timeDuration);
-            logService.createTargetLog(tarObject.toString());
+                //logResponseError vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", transactionDetail, responseStatus, responseError.getResultCode(),
+                        responseError.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
 
-            //logResponseError vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog",createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetail, responseStatus, responseError.getResultCode(),
-                    responseError.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
-            logService.createSOALog2(soaObject.getStringObject());
-
-            return new ResponseEntity<>(responseError, HttpStatus.OK);
-        }
-        }catch (Exception ex){
-            throw new CustomException(ex.getMessage() , HttpStatus.INTERNAL_SERVER_ERROR ,createTravelInsuranceBICRequest.getRequestId() ) ;
+                return new ResponseEntity<>(responseError, HttpStatus.OK);
+            }
+        } catch (Exception ex) {
+            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId());
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value = "/inquire-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getTravelBIC(@RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    public ResponseEntity<?> getTravelBIC(@RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
         long startTime = System.currentTimeMillis();
         BaseResponse response = new BaseResponse();
         CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse = null;
@@ -213,17 +212,17 @@ public class ApiBICController {
         String token = authorizationService.getTokenFromDatabase();
 
         String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
-        String orderReference= queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+        String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
 
-        String requestParameter = "orderId: " + orderID + ", orderRef: "+ orderReference;
+        String requestParameter = "orderId: " + orderID + ", orderRef: " + orderReference;
 
         //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+        TargetObject tarObjectRequest = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(), "BIC", "request", "request",
                 requestParameter, logTimestamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         if (queryTravelInsuranceBICRequest.getDetail() != null) {
-            createTravelInsuranceBICResponse = mapperUtils.queryCreateObjectToBIC(queryTravelInsuranceBICRequest, token,queryTravelInsuranceBICRequest.getRequestId());
+            createTravelInsuranceBICResponse = mapperUtils.queryCreateObjectToBIC(queryTravelInsuranceBICRequest, token, queryTravelInsuranceBICRequest.getRequestId());
             String responseCreate = null;
             responseCreate = mapper2.writeValueAsString(createTravelInsuranceBICResponse);
         }
@@ -241,36 +240,36 @@ public class ApiBICController {
         String timeDuration = Long.toString(elapsed);
 
         //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
+        TargetObject tarObject = new TargetObject("targetLog", queryTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
                 transactionDetail, logTimestamp, messageTimestamp, timeDuration);
         logService.createTargetLog(tarObject.getStringObject());
 
         //logResponse vs Client
-        ServiceObject soaObject = new ServiceObject("serviceLog",queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+        ServiceObject soaObject = new ServiceObject("serviceLog", queryTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
                 messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                 "response", transactionDetail, responseStatus, response.getResultCode(),
-                response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/change-bic-travel-insurance" ,produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE} )
-    public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    @PostMapping(value = "/change-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> updateTravelBIC(@RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //validate
-        if(updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null){
-            throw new InvalidInputException("Không tìm thấy trường orders trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
+        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
+            throw new InvalidInputException("Không tìm thấy trường orders trong request", updateTravelInsuranceBICRequest.getRequestId());
         }
         if (updateTravelInsuranceBICRequest.getDetail() != null &&
-                updateTravelInsuranceBICRequest.getDetail().getOrders() != null ){
-            if(updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null ){
-                throw new InvalidInputException("Không tìm thấy trường orderReference trong request",updateTravelInsuranceBICRequest.getRequestId() ) ;
+                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
+            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
+                throw new InvalidInputException("Không tìm thấy trường orderReference trong request", updateTravelInsuranceBICRequest.getRequestId());
             }
         }
 
         long startTime = System.currentTimeMillis();
-        CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse =  new CreateTravelInsuranceBICResponse();
+        CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
         ObjectMapper mapper = new ObjectMapper();
         ObjectMapper mapper2 = new ObjectMapper();
         BaseResponse response = new BaseResponse();
@@ -282,105 +281,110 @@ public class ApiBICController {
         String messageTimestamp = logtimeStamp;
 
         //Update BIC
-        CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail()) ;
+        CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
         String responseCreate = null;
         responseCreate = mapper2.writeValueAsString(updateTravelInsuranceToBIC);
 
         //logRequest vs BIC
-        TargetObject tarObjectRequest = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "request","request",
+        TargetObject tarObjectRequest = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(), "BIC", "request", "request",
                 mapper2.writeValueAsString(updateTravelInsuranceBICRequest), logtimeStamp, messageTimestamp, null);
         logService.createTargetLog(tarObjectRequest.getStringObject());
 
         //get token from database
         String token = authorizationService.getTokenFromDatabase();
 
-        String orderID = null ;
-        if (updateTravelInsuranceToBIC.getOrders().getOrderid() != null ){
+        String orderID = null;
+        if (updateTravelInsuranceToBIC.getOrders().getOrderid() != null) {
             orderID = updateTravelInsuranceToBIC.getOrders().getOrderid().toString();
         }
 
-        ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,hostConstants.BIC_HOST_UPDATE, null, responseCreate, token,updateTravelInsuranceBICRequest.getRequestId());
+        ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID, hostConstants.BIC_HOST_UPDATE, null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId());
         //post Data to BIC
 
         //set response data to client
-        JSONObject jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody()) ;
+        JSONObject jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody());
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
 
-        if(jsonResultPutBIC.getStatusCode() == HttpStatus.OK
-                && jsonObjectReponseCreate != null
-                && jsonObjectReponseCreate.getBoolean("succeeded") == true){
+        try {
+            if (jsonResultPutBIC.getStatusCode() == HttpStatus.OK
+                    && jsonObjectReponseCreate != null
+                    && jsonObjectReponseCreate.getBoolean("succeeded") == true) {
 
-            //set response data to client
-            jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody()) ;
-            Long orderIdCreated = updateTravelInsuranceToBIC.getOrders().getOrderid();
-            boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded") ;
+                //set response data to client
+                jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody());
+                Long orderIdCreated = updateTravelInsuranceToBIC.getOrders().getOrderid();
+                boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
 
-            createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
-            createTravelInsuranceBICResponse.setSucceeded(succeeded);
-            JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-            DataCreateBIC dataCreateBIC = new DataCreateBIC() ;
-            dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
-            dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
-            createTravelInsuranceBICResponse.setData(dataCreateBIC);
-            response.setDetail(createTravelInsuranceBICResponse);
-            response.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-            response.setResponseTime(dataResponse.getString("internalMessage"));
+                createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
+                createTravelInsuranceBICResponse.setSucceeded(succeeded);
+                JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
+                DataCreateBIC dataCreateBIC = new DataCreateBIC();
+                dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
+                dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
+                createTravelInsuranceBICResponse.setData(dataCreateBIC);
+                response.setDetail(createTravelInsuranceBICResponse);
+                response.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+                response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+                response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+                response.setResponseTime(dataResponse.getString("internalMessage"));
 
-            //create BICTransaction
-            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest,jsonObjectReponseCreate,ResponseCode.CODE.TRANSACTION_SUCCESSFUL,jsonResultPutBIC.getStatusCode().toString());
+                //create BICTransaction
+                bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultPutBIC.getStatusCode().toString());
 
-            //log properties
-            String transactionDetail = mapper.writeValueAsString(response);
-            long elapsed = System.currentTimeMillis() - startTime;
-            String timeDuration = Long.toString(elapsed);
+                //log properties
+                String transactionDetail = mapper.writeValueAsString(response);
+                long elapsed = System.currentTimeMillis() - startTime;
+                String timeDuration = Long.toString(elapsed);
 
-            //logResponse vs BIC
-            TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
-                    transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
-            logService.createTargetLog(tarObject.getStringObject());
+                //logResponse vs BIC
+                TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
+                        transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
+                logService.createTargetLog(tarObject.getStringObject());
 
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetail, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());
-            logService.createSOALog2(soaObject.getStringObject());
-        }else {
-            ReponseError responseError = new ReponseError();
-            JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-            responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-            responseError.setResponseTime(DateTimeUtils.getCurrentDate());
-            responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-            responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
-            responseError.setDetailErrorCode(jsonResultPutBIC.getStatusCode().toString());
-            responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
+                //logResponse vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", transactionDetail, responseStatus, response.getResultCode(),
+                        response.getResultMessage(), logtimeStamp, request.getRemoteHost(), logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
+            } else {
+                ReponseError responseError = new ReponseError();
+                JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
+                responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
+                responseError.setResponseTime(DateTimeUtils.getCurrentDate());
+                responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+                responseError.setDetailErrorCode(jsonResultPutBIC.getStatusCode().toString());
+                responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
 
-            String transactionDetail = mapper.writeValueAsString(responseError);
-            long elapsed = System.currentTimeMillis() - startTime;
-            String timeDuration = Long.toString(elapsed);
+                String transactionDetail = mapper.writeValueAsString(responseError);
+                long elapsed = System.currentTimeMillis() - startTime;
+                String timeDuration = Long.toString(elapsed);
 
-            //create BICTransaction
-            bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest,jsonObjectReponseCreate,ResponseCode.CODE.ERROR_IN_BACKEND,jsonResultPutBIC.getStatusCode().toString());
+                //create BICTransaction
+                bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString());
 
-            //logResponseError vs BIC
-            TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(),"BIC", "response","response",
-                    transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
-            logService.createTargetLog(tarObject.toString());
+                //logResponseError vs BIC
+                TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
+                        transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
+                logService.createTargetLog(tarObject.toString());
 
-            //logResponseError vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog",updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetail, responseStatus, responseError.getResultCode(),
-                    responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(),logService.getIp());
-            logService.createSOALog2(soaObject.getStringObject());
+                //logResponseError vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", transactionDetail, responseStatus, responseError.getResultCode(),
+                        responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(), logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
 
-            return new ResponseEntity<>(responseError, HttpStatus.OK);
+                return new ResponseEntity<>(responseError, HttpStatus.OK);
+            }
+
+
+        } catch (Exception ex) {
+            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
         }
-
-        return new ResponseEntity<>(response,HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }
