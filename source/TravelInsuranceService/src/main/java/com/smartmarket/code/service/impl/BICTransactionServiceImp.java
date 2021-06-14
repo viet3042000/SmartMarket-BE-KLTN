@@ -11,6 +11,7 @@ import com.smartmarket.code.service.AccessTokenService;
 import com.smartmarket.code.service.BICTransactionService;
 import net.bytebuddy.implementation.bytecode.constant.FieldConstant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -48,18 +49,19 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
     @Override
     public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
+                                                                       ResponseEntity<String> jsonResultCreateBIC,
                                                                        String resultCode , String bicResultCode) {
         BICTransaction bicTransaction=  new BICTransaction() ;
 
         //check
         if (object !=  null && object.getDetail() != null ){
-            bicTransaction.setBicResultCode(resultCode);
+            bicTransaction.setBicResultCode(bicResultCode);
             bicTransaction.setConsumerId("DSVN");
             bicTransaction.setCustomerName("DSVN");
             bicTransaction.setCustomerAddress("default");
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setFromDate(object.getDetail().getTrv().getFromDate());
-            bicTransaction.setResultCode(bicResultCode);
+            bicTransaction.setResultCode(resultCode);
             bicTransaction.setLogTimestamp(new Date());
             bicTransaction.setOrderId(String.valueOf(object.getDetail().getOrders().getOrderId()));
             bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
