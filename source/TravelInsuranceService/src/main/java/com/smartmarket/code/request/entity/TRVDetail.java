@@ -1,11 +1,14 @@
 package com.smartmarket.code.request.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
 public class TRVDetail implements Serializable {
 
     private Long id;

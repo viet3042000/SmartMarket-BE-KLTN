@@ -1,6 +1,5 @@
 package com.smartmarket.code.exception;
 
-import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 public class APITimeOutRequestException extends SocketTimeoutException {

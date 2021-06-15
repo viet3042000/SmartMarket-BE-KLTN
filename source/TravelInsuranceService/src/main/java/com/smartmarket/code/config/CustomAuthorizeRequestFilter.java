@@ -1,17 +1,13 @@
 package com.smartmarket.code.config;
 
-import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
-import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.JwtUtils;
-
 import com.smartmarket.code.util.Utils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -24,10 +20,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;

@@ -1,8 +1,5 @@
 package com.smartmarket.code.exception;
 
-
-import org.springframework.http.HttpStatus;
-
 /**
  * @author HopNX
  */

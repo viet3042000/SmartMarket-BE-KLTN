@@ -14,7 +14,6 @@ import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
-import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ReponseError;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.BICTransactionService;
@@ -23,16 +22,11 @@ import com.smartmarket.code.util.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {

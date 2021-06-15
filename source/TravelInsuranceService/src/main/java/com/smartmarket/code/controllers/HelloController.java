@@ -25,8 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
 
 import javax.sql.DataSource;
+import javax.validation.Valid;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +36,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @RestController
+//@RequestScope
 public class HelloController {
 
     public static final Logger logger = LoggerFactory.getLogger(HelloController.class);
@@ -93,36 +96,37 @@ public class HelloController {
 
 
     @PostMapping(value = "/hello/getcache", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getStaticCache(@RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest) {
+    public ResponseEntity<?> getStaticCache(@Valid @RequestBody User user) {
 
         Response response = new Response();
-        System.out.println(config);
-        BICTransaction bicTransaction=  new BICTransaction() ;
-
-        bicTransaction.setBicResultCode("000");
-        bicTransaction.setConsumerId("aaa");
-        bicTransaction.setCustomerName("cusname");
-        bicTransaction.setEmail("email");
-        bicTransaction.setFromDate("fromdate");
-        bicTransaction.setBicResultCode("resultCode");
-        bicTransaction.setLogTimestamp(new Date());
-        bicTransaction.setOrderId("21313");
-        bicTransaction.setOrderReference("UUUDI");
-        bicTransaction.setOrdPaidMoney("5172313");
-        bicTransaction.setPhoneNumber("phone");
-        bicTransaction.setRequestId("requestId");
-        bicTransaction.setToDate("todate");
-        bicTransaction.setOrdDate("ordDate");
-        bicTransaction.setProductId("ordDate");
-        bicTransaction.setCustomerAddress("ordDate");
-        bicTransaction.setResultCode("resultCode");
-
-        bicTransactionService.create(bicTransaction) ;
+        response.setData(config);
+//        System.out.println(config);
+//        BICTransaction bicTransaction=  new BICTransaction() ;
+//
+//        bicTransaction.setBicResultCode("000");
+//        bicTransaction.setConsumerId("aaa");
+//        bicTransaction.setCustomerName("cusname");
+//        bicTransaction.setEmail("email");
+//        bicTransaction.setFromDate("fromdate");
+//        bicTransaction.setBicResultCode("resultCode");
+//        bicTransaction.setLogTimestamp(new Date());
+//        bicTransaction.setOrderId("21313");
+//        bicTransaction.setOrderReference("UUUDI");
+//        bicTransaction.setOrdPaidMoney("5172313");
+//        bicTransaction.setPhoneNumber("phone");
+//        bicTransaction.setRequestId("requestId");
+//        bicTransaction.setToDate("todate");
+//        bicTransaction.setOrdDate("ordDate");
+//        bicTransaction.setProductId("ordDate");
+//        bicTransaction.setCustomerAddress("ordDate");
+//        bicTransaction.setResultCode("resultCode");
+//
+//        bicTransactionService.create(bicTransaction) ;
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "/hello/")
+    @GetMapping(value = "/hello")
     public ResponseEntity<?> refresh() throws SQLException {
 
         final String PROPERTY_SOURCE_NAME = "databaseProperties";
@@ -134,7 +138,7 @@ public class HelloController {
                 .username(environment.getProperty("spring.datasource.username"))
                 .password(environment.getProperty("spring.datasource.password"))
                 .url(environment.getProperty("spring.datasource.url"))
-                .driverClassName("com.mysql.jdbc.Driver")
+//                .driverClassName("com.mysql.jdbc.Driver")
                 .build();
 
         // Fetch all properties

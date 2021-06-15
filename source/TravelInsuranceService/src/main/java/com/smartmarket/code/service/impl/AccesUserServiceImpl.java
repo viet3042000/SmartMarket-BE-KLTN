@@ -4,7 +4,6 @@ import com.smartmarket.code.dao.AccessUserRepository;
 import com.smartmarket.code.model.AccessUser;
 import com.smartmarket.code.service.AccesUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;

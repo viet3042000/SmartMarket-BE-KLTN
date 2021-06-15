@@ -5,16 +5,13 @@ import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.config.RequestWrapper;
 import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.constants.HostConstants;
-import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.model.BICTransaction;
-import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 

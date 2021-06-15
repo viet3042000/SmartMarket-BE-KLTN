@@ -5,7 +5,6 @@ import com.smartmarket.code.constants.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -17,9 +16,6 @@ public class DateTimeUtils {
     private static final String ZERO = "0";
     private static TimeZone tz = TimeZone.getTimeZone("Asia/Ho_Chi_Minh");
     public static Long getCurrenTime() {
-//        System.out.printf("" + new Date().getTime());
-//        System.out.printf("" + System.currentTimeMillis());
-//        Instant instant = Instant.now();
 
         return System.currentTimeMillis();
     }

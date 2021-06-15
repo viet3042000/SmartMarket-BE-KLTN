@@ -2,7 +2,6 @@ package com.smartmarket.code.service;
 
 
 import com.smartmarket.code.model.AccessUser;
-
 import java.util.Set;
 
 public interface AccesUserService {
