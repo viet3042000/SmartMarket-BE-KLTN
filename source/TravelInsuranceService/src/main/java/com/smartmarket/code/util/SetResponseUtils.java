@@ -61,7 +61,7 @@ public class SetResponseUtils {
         responseError.setResponseTime(DateTimeUtils.getCurrentDate());
         responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
-        responseError.setDetailErrorCode(jsonResultCreateBIC.getStatusCode().toString());
+        responseError.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
         responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
         return responseError ;
     }
@@ -84,6 +84,7 @@ public class SetResponseUtils {
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         response.setResponseId(ex.getResponseId());
         response.setDetailErrorCode(ex.getDetailErrorCode());
+
         response.setDetailErrorMessage(ex.getDetailErrorMessage());
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         return response ;
