@@ -7,6 +7,7 @@ import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,9 @@ public class RestControllerHandleException {
     @Autowired
     HostConstants hostConstants ;
 
+    @Autowired
+    BICTransactionExceptionService bicTransactionExceptionService ;
+
     //Lỗi do nghiệp vụ. VD: sai tên trường.VD: OrderId--> Order
     //                      thiếu trường ID/refCode lúc get.
     //                      tạo trùng
@@ -80,8 +84,10 @@ public class RestControllerHandleException {
         String messasgeId = requestBody.getString("requestId");
         String transactionDetail = requestBody.toString();
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = Long.toString(elapsed);
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.ERROR_IN_BACKEND , ex.getHttpStatus().toString()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -102,35 +108,6 @@ public class RestControllerHandleException {
                 "response", response.toString(), responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
-
-        //add BICTransaction
-        AntPathMatcher matcher = new AntPathMatcher();
-        String URLRequest = request.getRequestURI();
-        if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
-            String detailObject = requestBody.getString("requestId");
-            JSONObject detail = (requestBody.getJSONObject("detail"));
-            Gson gson = new Gson(); // Or use new GsonBuilder().create();
-            CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
-            String orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference();
-            String orderId =  "-1";
-            String customerName="DSVN";
-            String phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-            String email  = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-            String ordPaidMoney =createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-            String consumerId = "DSVN";
-            String fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate();
-            String toDate = createTravelInsuranceBICRequest.getTrv().getToDate();
-            String resultCode =ResponseCode.CODE.ERROR_IN_BACKEND;
-            String bicResultCode = ex.getHttpStatus().toString();
-            String ordDate= createTravelInsuranceBICRequest.getOrders().getOrdDate() ;
-            String productId =createTravelInsuranceBICRequest.getOrders().getProductId();
-            String customerAddress ="default";
-
-            bicTransactionService.createBICTransactionParameter(messasgeId,orderReference,orderId,customerName,
-                                                                phoneNumber,email,ordPaidMoney,consumerId,
-                                                                fromDate,toDate,new Date(),resultCode,bicResultCode,
-                                                                ordDate,productId,customerAddress) ;
-        }
 
 
         return new ResponseEntity<>(response, ex.getHttpStatus());
@@ -163,8 +140,10 @@ public class RestControllerHandleException {
         String messasgeId = requestBody.getString("requestId");
         String transactionDetail = requestBody.toString();
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = Long.toString(elapsed);
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.ERROR_IN_BACKEND , ex.getDetailErrorCode()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -187,37 +166,6 @@ public class RestControllerHandleException {
         logService.createSOALog2(soaObject.getStringObject());
 
 
-        //add BICTransaction
-        AntPathMatcher matcher = new AntPathMatcher();
-        String URLRequest = request.getRequestURI();
-        if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
-            String detailObject = requestBody.getString("requestId");
-            JSONObject detail = (requestBody.getJSONObject("detail"));
-
-            //convert jsonobject to CreateTravelInsuranceBICRequest
-            Gson gson = new Gson(); // Or use new GsonBuilder().create();
-            CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
-
-            String orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference();
-            String orderId =  "-1";
-            String customerName="DSVN";
-            String phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-            String email  = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-            String ordPaidMoney =createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-            String consumerId = "DSVN";
-            String fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate();
-            String toDate = createTravelInsuranceBICRequest.getTrv().getToDate();
-            String resultCode =ResponseCode.CODE.ERROR_IN_BACKEND;
-            String bicResultCode = ex.getDetailErrorCode();
-            String ordDate= createTravelInsuranceBICRequest.getOrders().getOrdDate() ;
-            String productId =createTravelInsuranceBICRequest.getOrders().getProductId();
-            String customerAddress ="default";
-
-            bicTransactionService.createBICTransactionParameter(messasgeId,orderReference,orderId,customerName,
-                    phoneNumber,email,ordPaidMoney,consumerId,
-                    fromDate,toDate,new Date(),resultCode,bicResultCode,
-                    ordDate,productId,customerAddress) ;
-        }
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -246,8 +194,10 @@ public class RestControllerHandleException {
         String messasgeId = requestBody.getString("requestId");
         String transactionDetail = requestBody.toString();
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = Long.toString(elapsed);
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.SOA_TIMEOUT_BACKEND , HttpStatus.REQUEST_TIMEOUT.toString()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -269,37 +219,7 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-        //add BICTransaction
-        AntPathMatcher matcher = new AntPathMatcher();
-        String URLRequest = request.getRequestURI();
-        if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
-            String detailObject = requestBody.getString("requestId");
-            JSONObject detail = (requestBody.getJSONObject("detail"));
 
-            //convert jsonobject to CreateTravelInsuranceBICRequest
-            Gson gson = new Gson(); // Or use new GsonBuilder().create();
-            CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
-
-            String orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference();
-            String orderId =  "-1";
-            String customerName="DSVN";
-            String phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-            String email  = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-            String ordPaidMoney =createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-            String consumerId = "DSVN";
-            String fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate();
-            String toDate = createTravelInsuranceBICRequest.getTrv().getToDate();
-            String resultCode =ResponseCode.CODE.ERROR_IN_BACKEND;
-            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
-            String ordDate= createTravelInsuranceBICRequest.getOrders().getOrdDate() ;
-            String productId =createTravelInsuranceBICRequest.getOrders().getProductId();
-            String customerAddress ="default";
-
-            bicTransactionService.createBICTransactionParameter(messasgeId,orderReference,orderId,customerName,
-                    phoneNumber,email,ordPaidMoney,consumerId,
-                    fromDate,toDate,new Date(),resultCode,bicResultCode,
-                    ordDate,productId,customerAddress) ;
-        }
 
         return new ResponseEntity<>(response, HttpStatus.REQUEST_TIMEOUT);
 
@@ -327,8 +247,10 @@ public class RestControllerHandleException {
         JSONObject requestBody = new JSONObject(jsonString);
         String messasgeId = requestBody.getString("requestId");
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = Long.toString(elapsed);
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.INVALID_INPUT_DATA , HttpStatus.BAD_REQUEST.toString()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -345,37 +267,6 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-        //add BICTransaction
-        AntPathMatcher matcher = new AntPathMatcher();
-        String URLRequest = request.getRequestURI();
-        if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
-            String detailObject = requestBody.getString("requestId");
-            JSONObject detail = (requestBody.getJSONObject("detail"));
-
-            //convert jsonobject to CreateTravelInsuranceBICRequest
-            Gson gson = new Gson(); // Or use new GsonBuilder().create();
-            CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
-
-            String orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" :createTravelInsuranceBICRequest.getOrders().getOrderReference()  ;
-            String orderId =  "-1";
-            String customerName="DSVN";
-            String phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-            String email  = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-            String ordPaidMoney =createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-            String consumerId = "DSVN";
-            String fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate();
-            String toDate = createTravelInsuranceBICRequest.getTrv().getToDate();
-            String resultCode =ResponseCode.CODE.ERROR_IN_BACKEND;
-            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
-            String ordDate= createTravelInsuranceBICRequest.getOrders().getOrdDate() ;
-            String productId =createTravelInsuranceBICRequest.getOrders().getProductId();
-            String customerAddress ="default";
-
-            bicTransactionService.createBICTransactionParameter(messasgeId,orderReference,orderId,customerName,
-                    phoneNumber,email,ordPaidMoney,consumerId,
-                    fromDate,toDate,new Date(),resultCode,bicResultCode,
-                    ordDate,productId,customerAddress) ;
-        }
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -455,8 +346,10 @@ public class RestControllerHandleException {
         String messasgeId = requestBody.getString("requestId");
         String transactionDetail = requestBody.toString();
 
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = Long.toString(elapsed);
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.FORMAT_MESSAGE_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
 //        if(ex.getCause() instanceof SocketTimeoutException) {
 //            //logRequest vs BIC
@@ -480,37 +373,7 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-        //add BICTransaction
-        AntPathMatcher matcher = new AntPathMatcher();
-        String URLRequest = request.getRequestURI();
-        if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
-            String detailObject = requestBody.getString("requestId");
-            JSONObject detail = (requestBody.getJSONObject("detail"));
 
-            //convert jsonobject to CreateTravelInsuranceBICRequest
-            Gson gson = new Gson(); // Or use new GsonBuilder().create();
-            CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
-
-            String orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference();
-            String orderId =  "-1";
-            String customerName="DSVN";
-            String phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-            String email  = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-            String ordPaidMoney =createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-            String consumerId = "DSVN";
-            String fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate();
-            String toDate = createTravelInsuranceBICRequest.getTrv().getToDate();
-            String resultCode =ResponseCode.CODE.ERROR_IN_BACKEND;
-            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
-            String ordDate= createTravelInsuranceBICRequest.getOrders().getOrdDate() ;
-            String productId =createTravelInsuranceBICRequest.getOrders().getProductId();
-            String customerAddress ="default";
-
-            bicTransactionService.createBICTransactionParameter(messasgeId,orderReference,orderId,customerName,
-                    phoneNumber,email,ordPaidMoney,consumerId,
-                    fromDate,toDate,new Date(),resultCode,bicResultCode,
-                    ordDate,productId,customerAddress) ;
-        }
 
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);

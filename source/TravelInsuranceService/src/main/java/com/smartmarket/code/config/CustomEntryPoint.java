@@ -46,6 +46,8 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         Date date = new Date();
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
+        int status = httpServletResponse.getStatus();
+        String responseStatus = Integer.toString(status);
 
 
 //        httpServletResponse
@@ -68,8 +70,8 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             responseError.setResponseTime(DateTimeUtils.getCurrentDate());
             responseError.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);
             responseError.setDetailErrorCode(HttpStatus.UNAUTHORIZED.toString());
-            responseError.setDetailErrorMessage(e.getMessage());
-            response.addHeader("WWW-Authenticate", e.getMessage());
+            responseError.setDetailErrorMessage("Authorized failed ");
+            response.addHeader("WWW-Authenticate", "Authorized failed ");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE+ ";"+ "charset=UTF-8" );
 //            response.setContentType("text/html; charset=UTF-8");
@@ -82,11 +84,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             JSONObject requestBody = new JSONObject(jsonString);
             String messasgeId = requestBody.getString("requestId");
 
-            int status = httpServletResponse.getStatus();
-            String responseStatus = Integer.toString(status);
 
-            long elapsed = System.currentTimeMillis() - startTime;
-            String timeDuration = Long.toString(elapsed);
+            //get time duration
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //logException
             ServiceExceptionObject soaExceptionObject =
