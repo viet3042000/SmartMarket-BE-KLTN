@@ -46,7 +46,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     LogServiceImpl logService;
 
-
     @Autowired
     MapperUtils mapperUtils;
 
@@ -58,7 +57,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
     @Autowired
     SetResponseUtils setResponseUtils;
-
 
 
     @Override
@@ -76,7 +74,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         ObjectMapper mapper = new ObjectMapper();
         BaseResponse response = new BaseResponse();
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
-
 
         //Create BIC
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
@@ -126,7 +123,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         "response", transactionDetail, responseStatus, response.getResultCode(),
                         response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
                 logService.createSOALog2(soaObject.getStringObject());
-
 
             } else {
                 JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
@@ -227,7 +223,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         long startTime = System.currentTimeMillis();
 
         //check validate json request
-//        ValidateRequest.checkValidCreateOrUpdate(updateTravelInsuranceBICRequest);
+        ValidateRequest.checkValidCreateOrUpdate(updateTravelInsuranceBICRequest);
 
         //declare value response client
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
@@ -268,18 +264,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             if (jsonResultPutBIC.getStatusCode() == HttpStatus.OK
                     && jsonObjectReponseCreate != null
                     && jsonObjectReponseCreate.getBoolean("succeeded") == true) {
-
-                //set response data to client
-//                jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody());
-//                Long orderIdCreated = jsonObjectReponseCreate.getLong("Orderid");
-//                boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
-//                createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
-//                createTravelInsuranceBICResponse.setSucceeded(succeeded);
-//                JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-//                DataCreateBIC dataCreateBIC = new DataCreateBIC();
-//                dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
-//                dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
-//                createTravelInsuranceBICResponse.setData(dataCreateBIC);
 
                 //set response client
                 response = setResponseUtils.setResponse(response,updateTravelInsuranceBICRequest,
@@ -332,7 +316,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                 return new ResponseEntity<>(responseError, HttpStatus.OK);
             }
-
 
         } catch (Exception ex) {
             throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
