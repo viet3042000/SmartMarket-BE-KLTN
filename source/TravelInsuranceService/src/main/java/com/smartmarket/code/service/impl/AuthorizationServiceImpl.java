@@ -112,6 +112,32 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return false;
     }
 
+    public boolean validActuator(String[] paths , String urlRequest) {
+        AntPathMatcher matcher = new AntPathMatcher();
+        if(paths != null){
+            for (int i= 0 ;  i < paths.length ; i++ )  {
+                String path = paths[i];
+                if (matcher.match(path, urlRequest)) {
+                    return true;
+                }
+            }
+        }
+        return false ;
+    }
+
+    public boolean validIp(String[] ipAccessArr , String ipRequest) {
+        for (int i =  0 ; i < ipAccessArr.length ; i++ ){
+            if(ipAccessArr[0].equalsIgnoreCase("ALL")){
+                return true ;
+            }
+            if(ipRequest.equals(ipAccessArr[i])){
+                return  true ;
+            }
+        }
+        return false ;
+    }
+
+
     //load token from database
 //    public String getTokenFromDatabase() throws JsonProcessingException {
 //
