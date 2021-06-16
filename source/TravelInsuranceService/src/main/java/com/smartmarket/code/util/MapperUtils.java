@@ -32,18 +32,18 @@ import java.util.Map;
 //scope to refresh fieldsConstants and hostConstants
 @Component
 //@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class MapperUtils{
+public class MapperUtils {
 
     @Autowired
     FieldsConstants fieldsConstants;
 
     @Autowired
-    HostConstants hostConstants ;
+    HostConstants hostConstants;
 
     public CreateTravelInsuranceToBIC mapCreateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
-        try{
+        try {
             Orders orders = createTravelInsuranceBICRequest.getOrders();
             TRV trv = createTravelInsuranceBICRequest.getTrv();
             ArrayList<TRVDetail> trvDetails = createTravelInsuranceBICRequest.getTrvDetails();
@@ -52,7 +52,7 @@ public class MapperUtils{
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
-            if(orders != null ){
+            if (orders != null) {
                 ordersBIC.setOrderReference(orders.getOrderReference());
                 ordersBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
                 ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.createOrderOrdCustId));
@@ -76,7 +76,7 @@ public class MapperUtils{
             }
 
 
-            if(trv != null) {
+            if (trv != null) {
                 trvBIC.setTRVID(Long.parseLong(fieldsConstants.createTrvTrvId));
                 trvBIC.setOrderid(Long.parseLong(fieldsConstants.createOrderOrderId));
                 trvBIC.setAmountPersons(trv.getAmountPersons());
@@ -119,8 +119,8 @@ public class MapperUtils{
             createTravelInsuranceToBIC.setTRV(trvBIC);
             createTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
 
-        }catch (Exception ex){
-            throw new CustomException("Lỗi xảy ra trong quá trình mapping dữ liệu ",HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            throw new CustomException("An error occurred during data mapping", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return createTravelInsuranceToBIC;
     }
@@ -129,7 +129,7 @@ public class MapperUtils{
     public CreateTravelInsuranceToBIC mapUpdateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
-        try{
+        try {
             Orders orders = createTravelInsuranceBICRequest.getOrders();
             TRV trv = createTravelInsuranceBICRequest.getTrv();
             ArrayList<TRVDetail> trvDetails = createTravelInsuranceBICRequest.getTrvDetails();
@@ -138,7 +138,7 @@ public class MapperUtils{
             trvBIC trvBIC = new trvBIC();
             ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
-            if (orders != null ){
+            if (orders != null) {
                 ordersBIC.setOrderReference(orders.getOrderReference());
                 ordersBIC.setOrderid(orders.getOrderId());
                 ordersBIC.setOrdcustid(Long.parseLong(fieldsConstants.updateOrderOrdCustId));
@@ -162,7 +162,7 @@ public class MapperUtils{
             }
 
 
-            if (trv != null ){
+            if (trv != null) {
                 trvBIC.setTRVID(trv.getTrvId());
                 trvBIC.setOrderid(Long.parseLong(trv.getOrderId()));
                 trvBIC.setAmountPersons(trv.getAmountPersons());
@@ -205,43 +205,43 @@ public class MapperUtils{
             createTravelInsuranceToBIC.setTRV(trvBIC);
             createTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
 
-        }catch (Exception ex){
-            throw new CustomException("Lỗi xảy ra trong quá trình mapping dữ liệu ",HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            throw new CustomException("An error occurred during data mapping", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return createTravelInsuranceToBIC;
     }
 
 
-    public  CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String token, String requestId) throws APITimeOutRequestException {
+    public CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String token, String requestId) throws APITimeOutRequestException {
 
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 
         APIUtils apiUtils = new APIUtils();
         Map<String, Object> map = new HashMap<>();
 
-        ResponseEntity<String> resultBIC = null ;
+        ResponseEntity<String> resultBIC = null;
         if (queryTravelInsuranceBICRequest.getDetail() != null) {
-            if(queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L)){
-                String orderId = queryTravelInsuranceBICRequest.getDetail().getOrderId() ;
-                if(orderId != null ){
+            if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L)) {
+                String orderId = queryTravelInsuranceBICRequest.getDetail().getOrderId();
+                if (orderId != null) {
                     map.put("id", orderId);
-                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_ID, null, map, token,requestId);
+                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_ID, null, map, token, requestId);
                 }
             }
-            if(queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L)){
-                String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference() ;
-                if(orderReference != null ){
+            if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L)) {
+                String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+                if (orderReference != null) {
                     map.put("id", orderReference);
-                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_REFERANCE, null, map, token,requestId);
+                    resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_REFERANCE, null, map, token, requestId);
                 }
 
             }
         }
 
-        try {
+//        try {
 
-            if (resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
-
+        if (resultBIC != null && resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
+            try {
                 JSONObject jsonObjectResultBIC = new JSONObject(resultBIC.getBody());
                 JSONObject ordersBIC = jsonObjectResultBIC.getJSONObject("Orders");
                 JSONObject trvBIC = jsonObjectResultBIC.getJSONObject("TRV");
@@ -310,12 +310,12 @@ public class MapperUtils{
                 createTravelInsuranceBICRequest.setOrders(orders);
                 createTravelInsuranceBICRequest.setTrv(trv);
                 createTravelInsuranceBICRequest.setTrvDetails(trvDetails);
+            } catch (Exception ex) {
+                throw new CustomException("An error occurred during data mapping ", HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-        }catch (Exception ex){
-            throw new CustomException("Lỗi xảy ra trong quá trình mapping dữ liệu ",HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            throw new CustomException("Can not find the insurance order", HttpStatus.BAD_REQUEST);
         }
-
 
 
         return createTravelInsuranceBICRequest;

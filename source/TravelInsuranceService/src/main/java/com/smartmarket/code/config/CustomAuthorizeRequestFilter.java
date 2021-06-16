@@ -74,7 +74,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 if (claims != null) {
                     clientId = (String) claims.get("client_id");
                 } else {
-                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy client id trong token");
+                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Not found client id in token");
                     return;
                 }
 
@@ -85,12 +85,12 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                     //check url access
                     if (urlSet == null) {
-                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy api được phép kết nối của client id trong dữ liệu");
+                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id allowed api not found in database");
                         return;
                     }
 
                 } else {
-                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Không tìm thấy client id trong dữ liệu");
+                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id not found in database");
                     return;
                 }
 
@@ -110,7 +110,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 }
 
                 if (verifyIp == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id không có quyền truy cập api với IP hiện đang truy cập");
+                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "IP client id is not allowed to access API");
                     return;
                 }
 
@@ -129,7 +129,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 }
 
                 if (verifyEndpoint == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id không có quyền truy cập api");
+                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API ");
                     return;
                 }
             }

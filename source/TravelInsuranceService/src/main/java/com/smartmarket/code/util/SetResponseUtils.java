@@ -117,7 +117,7 @@ public class SetResponseUtils {
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-            response.setDetailErrorMessage("Body request sai format json!");
+            response.setDetailErrorMessage("Format body is not JSON !");
             return response ;
         }
 
@@ -127,7 +127,7 @@ public class SetResponseUtils {
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-            response.setDetailErrorMessage("Lỗi xảy ra trong quá trình xử lý của hệ thống ");
+            response.setDetailErrorMessage("An error occurred during the processing of the system!");
             return response ;
         }
 
