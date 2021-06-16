@@ -52,6 +52,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
 //                .mvcMatchers("/**").access("@webSecurity.checkURL(authentication)")
+                .antMatchers("/actuator/*").permitAll()
                 .anyRequest().authenticated().
                 and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

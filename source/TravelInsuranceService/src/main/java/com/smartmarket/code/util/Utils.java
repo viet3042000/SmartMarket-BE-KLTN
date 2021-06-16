@@ -46,6 +46,9 @@ public class Utils {
 
     public static boolean isJSONValid(String jsonInString ) {
         try {
+            if(jsonInString.equalsIgnoreCase("")){
+                return false ;
+            }
             final ObjectMapper mapper = new ObjectMapper();
             mapper.readTree(jsonInString);
             return true;

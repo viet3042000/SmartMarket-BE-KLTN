@@ -9,6 +9,7 @@ import com.smartmarket.code.response.ReponseError;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.SetResponseUtils;
+import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -63,27 +64,30 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
             httpServletRequest = new RequestWrapper(httpServletRequest);
             String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
-            JSONObject requestBody = new JSONObject(jsonString);
-            String messasgeId = requestBody.getString("requestId");
+            if(Utils.isJSONValid(jsonString)){
+                JSONObject requestBody = new JSONObject(jsonString);
+                String messasgeId = requestBody.getString("requestId");
 
 
-            //get time duration
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+                //get time duration
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
-            //logException
-            ServiceExceptionObject soaExceptionObject =
-                    new ServiceExceptionObject("serviceLog","response",messasgeId,null,
-                            messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
-                            httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
-                            responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));
-            logService.createSOALogException(soaExceptionObject.getStringObject());
+                //logException
+                ServiceExceptionObject soaExceptionObject =
+                        new ServiceExceptionObject("serviceLog","response",messasgeId,null,
+                                messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                                httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
+                                responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));
+                logService.createSOALogException(soaExceptionObject.getStringObject());
 
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "Client",
-                    messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
-                    "response", response.toString(), responseStatus, responseError.getResultCode(),
-                    responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
-            logService.createSOALog2(soaObject.getStringObject());
+                //logResponse vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "Client",
+                        messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                        "response", response.toString(), responseStatus, responseError.getResultCode(),
+                        responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
+            }
+
 
         }
         catch (IOException ex) {
