@@ -1,12 +1,15 @@
 package com.smartmarket.code.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "urls")
+@Getter
+@Setter
 public class Url implements Serializable {
 
 	@Id
@@ -23,35 +26,5 @@ public class Url implements Serializable {
 	@Column(name = "is_active")
 	private Long isActive;
 
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getUrlName() {
-		return urlName;
-	}
-
-	public void setUrlName(String urlName) {
-		this.urlName = urlName;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public Long getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Long isActive) {
-		this.isActive = isActive;
-	}
 }

@@ -2,15 +2,11 @@ package com.smartmarket.code.util;
 
 import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.constants.HostConstants;
-import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.exception.APIResponseException;
 import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.request.entity.Orders;
 import com.smartmarket.code.request.entity.TRV;
 import com.smartmarket.code.request.entity.TRVDetail;
@@ -18,19 +14,24 @@ import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.OrdersBIC;
 import com.smartmarket.code.request.entityBIC.trvBIC;
 import com.smartmarket.code.request.entityBIC.trvDetailBIC;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+//scope to refresh fieldsConstants and hostConstants
 @Component
+//@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class MapperUtils{
 
     @Autowired

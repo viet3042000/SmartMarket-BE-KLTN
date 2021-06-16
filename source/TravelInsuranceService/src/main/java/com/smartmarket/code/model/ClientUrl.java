@@ -1,11 +1,15 @@
 package com.smartmarket.code.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "clients_urls")
+@Getter
+@Setter
 public class ClientUrl implements Serializable {
 
     @Id
@@ -22,35 +26,4 @@ public class ClientUrl implements Serializable {
     @Column(name = "IS_ACTIVE")
     private Long isActive;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
-    }
-
-    public Long getUrlId() {
-        return urlId;
-    }
-
-    public void setUrlId(Long urlId) {
-        this.urlId = urlId;
-    }
-
-    public Long getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Long isActive) {
-        this.isActive = isActive;
-    }
 }

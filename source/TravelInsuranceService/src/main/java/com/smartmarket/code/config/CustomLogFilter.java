@@ -1,9 +1,12 @@
 package com.smartmarket.code.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.service.impl.LogServiceImpl;
+import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -32,6 +35,8 @@ public class CustomLogFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         long startTime = System.currentTimeMillis();
+        ObjectMapper mapper = new ObjectMapper();
+
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
@@ -39,30 +44,40 @@ public class CustomLogFilter extends OncePerRequestFilter {
         String messageTimestamp = logtimeStamp;
 
         request = new RequestWrapper(request);
-//        System.out.println(request.getMethod());
+        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
+
         try {
             if (request.getMethod().equals("POST")) {
-                String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
-                JSONObject requestBody = new JSONObject(jsonString);
-                String messasgeId = requestBody.getString("requestId");
-                String transactionDetail = requestBody.toString();
+                if(Utils.isJSONValid(jsonString)){
+                    JSONObject requestBody = new JSONObject(jsonString);
+                    String messasgeId = requestBody.getString("requestId");
+                    String transactionDetail = requestBody.toString();
 
-                long elapsed = System.currentTimeMillis() - startTime;
-                String timeDuration = Long.toString(elapsed);
-//
-                //logRequest vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "BIC",
-                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                        "request", transactionDetail, null, null,
-                        null, logtimeStamp, request.getRemoteHost(), logService.getIp());
-                logService.createSOALog2(soaObject.getStringObject());
+                    String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+                    //
+                    //logRequest vs Client
+                    ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "BIC",
+                            messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                            "request", transactionDetail, null, null,
+                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                    logService.createSOALog2(soaObject.getStringObject());
+                }else {
+                    String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+
+                    ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "client", "BIC",
+                            messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                            "request", jsonString, null, null,
+                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                    logService.createSOALog2(soaObject.getStringObject());
+                }
+
             } else {
 
             }
-        }catch (Exception ex){
-            throw new CustomException(ex.getMessage() , HttpStatus.BAD_REQUEST ,"test" ) ;
+        } catch (Exception ex) {
+            throw new CustomException(ex.getMessage(), HttpStatus.BAD_REQUEST, "test");
         }
-        chain.doFilter(request, response);
 
+        chain.doFilter(request, response);
     }
 }

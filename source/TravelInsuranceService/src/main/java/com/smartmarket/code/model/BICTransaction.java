@@ -1,6 +1,7 @@
 package com.smartmarket.code.model;
 
-import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,6 +9,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bic_transaction")
+@Getter
+@Setter
 public class BICTransaction implements Serializable {
 
 	@Id
@@ -65,139 +68,4 @@ public class BICTransaction implements Serializable {
 	@Column(name = "customer_address")
 	private String customerAddress;
 
-	public String getCustomerAddress() {
-		return customerAddress;
-	}
-
-	public void setCustomerAddress(String customerAddress) {
-		this.customerAddress = customerAddress;
-	}
-
-	public String getProductId() {
-		return productId;
-	}
-
-	public void setProductId(String productId) {
-		this.productId = productId;
-	}
-
-	public String getOrdDate() {
-		return ordDate;
-	}
-
-	public void setOrdDate(String ordDate) {
-		this.ordDate = ordDate;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getRequestId() {
-		return requestId;
-	}
-
-	public void setRequestId(String requestId) {
-		this.requestId = requestId;
-	}
-
-	public String getOrderReference() {
-		return orderReference;
-	}
-
-	public void setOrderReference(String orderReference) {
-		this.orderReference = orderReference;
-	}
-
-	public String getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(String orderId) {
-		this.orderId = orderId;
-	}
-
-	public String getCustomerName() {
-		return customerName;
-	}
-
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
-	}
-
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getOrdPaidMoney() {
-		return ordPaidMoney;
-	}
-
-	public void setOrdPaidMoney(String ordPaidMoney) {
-		this.ordPaidMoney = ordPaidMoney;
-	}
-
-	public String getConsumerId() {
-		return consumerId;
-	}
-
-	public void setConsumerId(String consumerId) {
-		this.consumerId = consumerId;
-	}
-
-	public String getFromDate() {
-		return fromDate;
-	}
-
-	public void setFromDate(String fromDate) {
-		this.fromDate = fromDate;
-	}
-
-	public String getToDate() {
-		return toDate;
-	}
-
-	public void setToDate(String toDate) {
-		this.toDate = toDate;
-	}
-
-	public String getResultCode() {
-		return resultCode;
-	}
-
-	public void setResultCode(String resultCode) {
-		this.resultCode = resultCode;
-	}
-
-	public String getBicResultCode() {
-		return bicResultCode;
-	}
-
-	public void setBicResultCode(String bicResultCode) {
-		this.bicResultCode = bicResultCode;
-	}
-
-	public Date getLogTimestamp() {
-		return logTimestamp;
-	}
-
-	public void setLogTimestamp(Date logTimestamp) {
-		this.logTimestamp = logTimestamp;
-	}
 }

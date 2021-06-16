@@ -1,12 +1,10 @@
 package com.smartmarket.code.service;
 
 
-import com.smartmarket.code.model.AccessToken;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import org.json.JSONObject;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Date;
 

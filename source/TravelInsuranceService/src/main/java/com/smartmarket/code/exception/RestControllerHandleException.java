@@ -9,6 +9,7 @@ import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
+import com.smartmarket.code.util.SetResponseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.nimbusds.jose.util.IOUtils;
@@ -54,6 +55,9 @@ public class RestControllerHandleException {
     HostConstants hostConstants ;
 
     @Autowired
+    SetResponseUtils setResponseUtils;
+
+    @Autowired
     BICTransactionExceptionService bicTransactionExceptionService ;
 
     //Lỗi do nghiệp vụ. VD: sai tên trường.VD: OrderId--> Order
@@ -67,13 +71,9 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-        response.setResponseId(ex.getResponseId());
-        response.setDetailErrorCode(ex.getHttpStatus().toString());
-        response.setDetailErrorMessage(ex.getMessage());
+        response = setResponseUtils.setResponse(response, ex);
 
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
@@ -109,12 +109,11 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-
         return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
 
-    //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP
+    //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP (chưa kết nối được vs BIC)
     @ExceptionHandler({APIResponseException.class})
     public ResponseEntity<?> handleAPIException(APIResponseException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -123,22 +122,14 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-//        response.setResultCode(ex.getResultCode());
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-//        response.setResultMessage(ex.getResultMessage());
-        response.setResponseId(ex.getResponseId());
-        response.setDetailErrorCode(ex.getDetailErrorCode());
-        response.setDetailErrorMessage(ex.getDetailErrorMessage());
-        response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+        response = setResponseUtils.setResponse(response,ex);
 
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
         JSONObject requestBody = new JSONObject(jsonString);
         String messasgeId = requestBody.getString("requestId");
-        String transactionDetail = requestBody.toString();
 
         //add BICTransaction
         bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.ERROR_IN_BACKEND , ex.getDetailErrorCode()) ;
@@ -153,11 +144,6 @@ public class RestControllerHandleException {
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
         logService.createSOALogException(soaExceptionObject.getStringObject());
 
-        //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
-                transactionDetail, logTimestamp, messageTimestamp, timeDuration);
-        logService.createTargetLog(tarObject.getStringObject());
-
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "client",
                 messageTimestamp, "travelinsuranceservice", "1", timeDuration,
@@ -165,12 +151,11 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-
-
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout
+
+    //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout --> không nhận được response từ BIC
     @ExceptionHandler(SocketTimeoutException.class)
     public ResponseEntity<?> handleAPITimeOutException(APITimeOutRequestException ex , HttpServletRequest request,HttpServletResponse responseSelvet) throws IOException {
         long startTime = System.currentTimeMillis();
@@ -179,12 +164,9 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.SOA_TIMEOUT_BACKEND);
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG);
-        response.setDetailErrorCode(HttpStatus.REQUEST_TIMEOUT.toString());
-        response.setDetailErrorMessage(ex.getDetailErrorMessage());
+        response = setResponseUtils.setResponse(response,ex);
 
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
@@ -192,7 +174,6 @@ public class RestControllerHandleException {
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
         String messasgeId = requestBody.getString("requestId");
-        String transactionDetail = requestBody.toString();
 
         //add BICTransaction
         bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.SOA_TIMEOUT_BACKEND , HttpStatus.REQUEST_TIMEOUT.toString()) ;
@@ -207,11 +188,6 @@ public class RestControllerHandleException {
                         ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
         logService.createSOALogException(soaExceptionObject.getStringObject());
 
-        //logResponse vs BIC
-        TargetObject tarObject = new TargetObject("targetLog", messasgeId,"BIC", "response","response",
-                transactionDetail, logTimestamp, messageTimestamp, timeDuration);
-        logService.createTargetLog(tarObject.getStringObject());
-
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "client",
                 messageTimestamp, "travelinsuranceservice", "1", timeDuration,
@@ -219,11 +195,10 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-
-
         return new ResponseEntity<>(response, HttpStatus.REQUEST_TIMEOUT);
 
     }
+
 
     //Lỗi input ko đúng yêu cầu nghiệp vụ
     @ExceptionHandler(InvalidInputException.class)
@@ -234,13 +209,9 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
-        response.setResponseId(ex.getRequestId());
-        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-        response.setDetailErrorMessage(ex.getMessage());
+        response = setResponseUtils.setResponse(response,ex);
 
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
@@ -291,15 +262,10 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
-        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-        response.setDetailErrorMessage("Body request sai format json!");
+        response = setResponseUtils.setResponse(response,ex);
 
-        request = new RequestWrapper(request);
-        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
         long elapsed = System.currentTimeMillis() - startTime;
         String timeDuration = Long.toString(elapsed);
 
@@ -321,6 +287,7 @@ public class RestControllerHandleException {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+
     //jump into in first step if doesn't match with each exception above
     // Hiện tại đều chỉ bắt các lỗi do hệ thống.
     //VD: thừa dấu 1 phẩy ở cuối. (sai format body request)
@@ -333,30 +300,19 @@ public class RestControllerHandleException {
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
+        //set response to client
         ReponseError response = new ReponseError();
-        response.setResultCode(ResponseCode.CODE.FORMAT_MESSAGE_ERROR);
-        response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
-        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-        response.setDetailErrorMessage("Lỗi xảy ra trong quá trình xử lý của hệ thống ");
+        response = setResponseUtils.setResponse(response,ex);
 
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
         JSONObject requestBody = new JSONObject(jsonString);
         String messasgeId = requestBody.getString("requestId");
-        String transactionDetail = requestBody.toString();
 
         //add BICTransaction
         bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.FORMAT_MESSAGE_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
 
         String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
-//        if(ex.getCause() instanceof SocketTimeoutException) {
-//            //logRequest vs BIC
-//            TargetObject tarObjectRequest = new TargetObject("TargetLog", messasgeId, "BIC", "request", "request",
-//                    transactionDetail, logTimestamp, messageTimestamp, null);
-//            logService.createTargetLog(tarObjectRequest.getStringObject());
-//        }
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -372,9 +328,6 @@ public class RestControllerHandleException {
                 "response", response.toString(), null, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
-
-
-
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }

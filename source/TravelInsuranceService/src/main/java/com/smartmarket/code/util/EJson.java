@@ -10,7 +10,6 @@ import java.util.*;
 public class EJson {
 	private JsonElement json;
 	private Dictionary<String, String> errors;
-	private ResponseBodyJson responseBodyJson;
 
 	public EJson() {
 		super();
@@ -33,19 +32,9 @@ public class EJson {
 		this.errors = new Hashtable<String, String>();
 	}
 
-	public EJson(ResponseBodyJson responseBodyJson) {
-		super();
-		this.json = new JsonObject();
-		this.errors = new Hashtable<String, String>();
-		this.responseBodyJson = responseBodyJson;
-	}
 
 	public void put(String key, Object value) {
 		this.setValue(key, value);
-	}
-
-	public String jsonString() {
-		return json != null ? setResponseBodyJson(json) : null;
 	}
 
 	public JsonObject jsonObject() {
@@ -64,59 +53,10 @@ public class EJson {
 		return result;
 	}
 
-	public String success() {
-		setValue("result", "Success");
-		setValue("msg", "OK");
-		setValue("desc", "");
-		return setResponseBodyJson(json);
-	}
-
-	public String success(String message) {
-		setValue("result", "Success");
-		setValue("msg", "OK");
-		setValue("desc", message);
-		return setResponseBodyJson(json);
-	}
-
-	public String error() {
-		setValue("result", "Error");
-		setValue("msg", "FAIL");
-		setValue("desc", "Xuất hiện lỗi trong quá trình xử lý");
-		if (errors.size() > 0)
-			setValue("errors", errors);
-		return setResponseBodyJson(json);
-	}
-
-	public String error(String message) {
-		setValue("result", "Error");
-		setValue("msg", "FAIL");
-		setValue("desc", message);
-		if (errors.size() > 0)
-			setValue("errors", errors);
-		return setResponseBodyJson(json);
-	}
-
-	public String error(String key, String message) {
-		setValue(key, message);
-		setValue("result", "Error");
-		setValue("msg", "FAIL");
-		setValue("desc", "");
-		if (errors.size() > 0)
-			setValue("errors", errors);
-		return setResponseBodyJson(json);
-	}
-
 	public void addError(String key, String message) {
 		errors.put(key, message);
 	}
 
-	private String setResponseBodyJson(JsonElement source) {
-		String body = source.toString();
-		if (responseBodyJson != null) {
-			responseBodyJson.setBodyString(body);
-		}
-		return body;
-	}
 
 	public boolean hasValue(String key) {
 		if (json.getAsJsonObject().get(key) == null) {
@@ -190,70 +130,7 @@ public class EJson {
 		}
 		return result;
 	}
-//	public Date getFromBirthday(String key) throws CustomException {
-//		if (!hasValue(key)) {
-//			return null;
-//		}
-//		String strDate = getString(key);
-//		if (strDate.equals("")) {
-//			return null;
-//		}
-//		Date result = new Date();
-//		try {
-//			if (strDate.length() == 4) {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("yyyy");
-//				dateConvert.setLenient(false);
-//				result = dateConvert.parse(strDate);
-//			} else if (strDate.length() == 7) {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("MM/yyyy");
-//				dateConvert.setLenient(false);
-//				result = dateConvert.parse(strDate);
-//			} else {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("dd/MM/yyyy");
-//				dateConvert.setLenient(false);
-//				result = dateConvert.parse(strDate);
-//			}
-//		} catch (Exception e) {
-//			throw new CustomException(key, "Ngày không đúng định dạng");
-//		}
-//		return result;
-//
-//	}
 
-//	public Date getToBirthday(String key) throws CustomException {
-//		if (!hasValue(key)) {
-//			return null;
-//		}
-//		String strDate = getString(key);
-//		if (strDate.equals("")) {
-//			return null;
-//		}
-//		Calendar calendar = Calendar.getInstance();
-//		try {
-//			if (strDate.length() == 4) {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("yyyy");
-//				dateConvert.setLenient(false);
-//				Date result = dateConvert.parse(strDate);
-//				calendar.setTime(result);
-//				calendar.add(Calendar.YEAR, 1);
-//			} else if (strDate.length() == 7) {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("MM/yyyy");
-//				dateConvert.setLenient(false);
-//				Date result = dateConvert.parse(strDate);
-//				calendar.setTime(result);
-//				calendar.add(Calendar.MONTH, 1);
-//			} else {
-//				SimpleDateFormat dateConvert = new SimpleDateFormat("dd/MM/yyyy");
-//				dateConvert.setLenient(false);
-//				Date result = dateConvert.parse(strDate);
-//				calendar.setTime(result);
-//				calendar.add(Calendar.DATE, 1);
-//			}
-//		} catch (Exception e) {
-//			throw new CustomException(key, "Ngày không đúng định dạng");
-//		}
-//		return calendar.getTime();
-//	}
 	public EJson getJSONObject(String key) {
 		return hasValue(key) ? new EJson(json.getAsJsonObject().get(key).getAsJsonObject()) : null;
 	}

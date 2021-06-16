@@ -3,29 +3,23 @@ package com.smartmarket.code.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ReponseError;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.SetResponseUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +32,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
     @Autowired
     LogServiceImpl logService;
 
+    @Autowired
+    SetResponseUtils setResponseUtils ;
+
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException, ServletException {
@@ -49,15 +46,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         int status = httpServletResponse.getStatus();
         String responseStatus = Integer.toString(status);
 
-
-//        httpServletResponse
-//                .addHeader("message", "Luke, I am your father!");
-
-//        httpServletResponse
-//                .sendError(HttpStatus.UNAUTHORIZED.value());
-
-//        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-//        HttpServletResponse response = ((ServletRequestAttributes)requestAttributes).getResponse();
         HttpServletResponse response = httpServletResponse;
         response.setHeader("Access-Control-Allow-Origin", "*");
         response.setHeader("Access-Control-Allow-Methods", "POST, PUT, GET, OPTIONS, DELETE");
@@ -66,16 +54,10 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
         try {
             ReponseError responseError = new ReponseError();
-            responseError.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
-            responseError.setResponseTime(DateTimeUtils.getCurrentDate());
-            responseError.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);
-            responseError.setDetailErrorCode(HttpStatus.UNAUTHORIZED.toString());
-            responseError.setDetailErrorMessage("Authorized failed ");
+            responseError =  setResponseUtils.setResponse(responseError) ;
             response.addHeader("WWW-Authenticate", "Authorized failed ");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE+ ";"+ "charset=UTF-8" );
-//            response.setContentType("text/html; charset=UTF-8");
-//            response.setCharacterEncoding("UTF-8");
             response.getOutputStream()
                     .println(objectMapper.writeValueAsString(responseError));
 

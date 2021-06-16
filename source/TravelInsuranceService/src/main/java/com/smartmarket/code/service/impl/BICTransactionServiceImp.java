@@ -8,11 +8,15 @@ import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionService;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Date;
 
 @Service
+@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BICTransactionServiceImp implements BICTransactionService {
 
     @Autowired

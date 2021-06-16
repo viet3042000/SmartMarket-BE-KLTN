@@ -14,7 +14,6 @@ import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
-import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ReponseError;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.BICTransactionService;
@@ -23,16 +22,11 @@ import com.smartmarket.code.util.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {
@@ -46,7 +40,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     LogServiceImpl logService;
 
-
     @Autowired
     MapperUtils mapperUtils;
 
@@ -58,7 +51,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
     @Autowired
     SetResponseUtils setResponseUtils;
-
 
 
     @Override
@@ -76,7 +68,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         ObjectMapper mapper = new ObjectMapper();
         BaseResponse response = new BaseResponse();
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
-
 
         //Create BIC
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
@@ -126,7 +117,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         "response", transactionDetail, responseStatus, response.getResultCode(),
                         response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
                 logService.createSOALog2(soaObject.getStringObject());
-
 
             } else {
                 JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
@@ -320,7 +310,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                 return new ResponseEntity<>(responseError, HttpStatus.OK);
             }
-
 
         } catch (Exception ex) {
             throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());

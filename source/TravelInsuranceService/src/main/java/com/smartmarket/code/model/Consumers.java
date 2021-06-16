@@ -1,12 +1,15 @@
 package com.smartmarket.code.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "consumers")
+@Getter
+@Setter
 public class Consumers implements Serializable {
 
 	@Id
@@ -17,19 +20,5 @@ public class Consumers implements Serializable {
 	@Column(name = "created_at")
 	private String createAt;
 
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getCreateAt() {
-		return createAt;
-	}
-
-	public void setCreateAt(String createAt) {
-		this.createAt = createAt;
-	}
 }

@@ -1,8 +1,10 @@
 package com.smartmarket.code.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -40,6 +42,16 @@ public class Utils {
         }
         return ip;
 
+    }
+
+    public static boolean isJSONValid(String jsonInString ) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(jsonInString);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
 }

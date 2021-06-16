@@ -21,7 +21,7 @@ public class LogServiceImpl  {
     public void createSOALog2(String logBody) throws CustomException {
         logger.info(logBody) ;
     }
-
+    //  SOA Exception là bảng lưu log giao dịch của client với hệ thống
     public void createSOALogException(String logBody) throws CustomException {
         logger.info(logBody) ;
     }

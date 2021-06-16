@@ -1,8 +1,11 @@
 package com.smartmarket.code.request;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 public class BaseRequest implements Serializable {
+
+//    @NotNull(message = "abc")
     private String requestId ;
     private String requestTime ;
     private String targetId ;

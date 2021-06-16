@@ -30,8 +30,4 @@ public interface AccessUserRepository extends JpaRepository<AccessUser,Long> {
             "where ur.id =:urlId and u.id = :userIdToken and  au.userId = :userIdAccess")
     public Set<AccessUser> checkAccessUser(@Param("userIdToken") Long userIdToken, @Param("urlId") Long urlId , @Param("userIdAccess") Long userIdAccess);
 
-
-//	@Query(value = "from User u where u.username =:username")
-//	public Optional<User> findByUsername(@Param("username") String username);
-
 }

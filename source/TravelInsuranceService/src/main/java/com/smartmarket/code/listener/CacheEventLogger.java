@@ -9,8 +9,6 @@ public class CacheEventLogger implements CacheEventListener<Object, Object> {
         System.out.println("log" + cacheEvent.getKey() + cacheEvent.getOldValue() + cacheEvent.getNewValue());
     }
 
-    // ...
-
 //    @Override
 //    public void onEvent(CacheEvent cacheEvent) {
 //        System.out.println("log" + cacheEvent.getKey() + cacheEvent.getOldValue()+ cacheEvent.getNewValue());

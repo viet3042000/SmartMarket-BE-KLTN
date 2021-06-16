@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.laurentiuspilca</groupId>
-    <artifactId>ssia-ch15-ex2-rs</artifactId>
+    <artifactId>TravelInsuranceService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ssia-ch15-ex2-rs</name>
+    <name>TravelInsuranceService</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -109,12 +109,17 @@
             <version>2.4.0</version>
 
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.197</version>
-            <scope>runtime</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.h2database</groupId>-->
+<!--            <artifactId>h2</artifactId>-->
+<!--            <version>1.4.197</version>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-context</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
 
     <dependencyManagement>

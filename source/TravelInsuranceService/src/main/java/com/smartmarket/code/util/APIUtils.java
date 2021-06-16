@@ -42,28 +42,21 @@ import java.util.concurrent.TimeoutException;
 public class APIUtils {
     private Logger LOGGER = LoggerFactory.getLogger(APIUtils.class);
 
-//    @Test(timeout = 1)
     public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) throws APITimeOutRequestException {
         ResponseEntity<String> result = null;
         try {
-//            HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-//            httpRequestFactory.setConnectionRequestTimeout(1000);
-//            httpRequestFactory.setConnectTimeout(1000);
-//            httpRequestFactory.setReadTimeout(1000);
-//            RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
 
-            SimpleClientHttpRequestFactory clientHttpRequestFactory
-                    = new SimpleClientHttpRequestFactory();
-            //Connect timeout
-            clientHttpRequestFactory.setConnectTimeout(10000);
-            //Read timeout
-            clientHttpRequestFactory.setReadTimeout(10000);
+            //set Time out
+//            SimpleClientHttpRequestFactory clientHttpRequestFactory
+//                    = new SimpleClientHttpRequestFactory();
+//            //Connect timeout
+//            clientHttpRequestFactory.setConnectTimeout(10000);
+//            //Read timeout
+//            clientHttpRequestFactory.setReadTimeout(10000);
 
-            RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
-
+            RestTemplate restTemplate = new RestTemplate();
 
             String bodyrequest = body;
-//            ResponseEntity<String> result = null;
 
             HttpHeaders headers = new HttpHeaders();
 
@@ -195,7 +188,6 @@ public class APIUtils {
         catch (HttpClientErrorException e){
             throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode().toString(),e.getResponseBodyAsString());
         }
-
         return result;
     }
 }
