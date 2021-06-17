@@ -14,10 +14,10 @@ public class BaseRequest implements Serializable {
     @NotNull(message = "requestId is require")
     private String requestId ;
 
-    @NotEmpty(message = "requestTime is require")
+    @NotNull(message = "requestTime is require")
     private String requestTime ;
 
-    @NotEmpty(message = "targetId is require")
+    @NotNull(message = "targetId is require")
     private String targetId ;
 
 

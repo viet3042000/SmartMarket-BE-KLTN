@@ -30,15 +30,15 @@ public class TRV implements Serializable {
     @NotNull(message = "promotion is require")
     private Long promotion;
 
-    @NotEmpty(message = "promotionAddress is require")
+    @NotNull(message = "promotionAddress is require")
     private String promotionAddress;
 
     private String periodTime;
 
-    @NotEmpty(message = "fromDate is require")
+    @NotNull(message = "fromDate is require")
     private String fromDate;
 
-    @NotEmpty(message = "toDate is require")
+    @NotNull(message = "toDate is require")
     private String toDate;
 
     private String issueDate;

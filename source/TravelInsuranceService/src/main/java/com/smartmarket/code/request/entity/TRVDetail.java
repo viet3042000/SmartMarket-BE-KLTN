@@ -16,63 +16,17 @@ public class TRVDetail implements Serializable {
     private Long id;
     private Long trvId;
 
-    @NotEmpty(message = "fullName is require")
+    @NotNull(message = "fullName is require")
     private String fullName;
 
     @NotNull(message = "gender is require")
     private Long gender;
 
-    @NotEmpty(message = "dateofBirth is require")
-    private String dateofBirth;
+    @NotNull(message = "dateOfBirth is require")
+    private String dateOfBirth;
 
-    @NotEmpty(message = "passportCard is require")
+    @NotNull(message = "passportCard is require")
     private String passportCard;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTrvId() {
-        return trvId;
-    }
-
-    public void setTrvId(Long trvId) {
-        this.trvId = trvId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Long getGender() {
-        return gender;
-    }
-
-    public void setGender(Long gender) {
-        this.gender = gender;
-    }
-
-    public String getDateofBirth() {
-        return dateofBirth;
-    }
-
-    public void setDateofBirth(String dateofBirth) {
-        this.dateofBirth = dateofBirth;
-    }
-
-    public String getPassportCard() {
-        return passportCard;
-    }
-
-    public void setPassportCard(String passportCard) {
-        this.passportCard = passportCard;
-    }
 }

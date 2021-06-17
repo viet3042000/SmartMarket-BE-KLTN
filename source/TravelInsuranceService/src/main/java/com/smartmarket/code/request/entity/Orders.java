@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Setter
 public class Orders implements Serializable {
 
-    @NotEmpty(message = "orderReference is require")
+    @NotNull(message = "orderReference is require")
     private String orderReference ;
 
     private Long orderId ;
@@ -23,19 +23,19 @@ public class Orders implements Serializable {
 
     private String ordCustMessage;
 
-    @NotEmpty(message = "ordBillFirstName is require")
+    @NotNull(message = "ordBillFirstName is require")
     private String ordBillFirstName;
 
-    @NotEmpty(message = "ordBillMobile is require")
+    @NotNull(message = "ordBillMobile is require")
     private String ordBillMobile;
 
-    @NotEmpty(message = "ordBillStreet1 is require")
+    @NotNull(message = "ordBillStreet1 is require")
     private String ordBillStreet1;
 
-    @NotEmpty(message = "ordBillEmail is require")
+    @NotNull(message = "ordBillEmail is require")
     private String ordBillEmail;
 
-    @NotEmpty(message = "ordDate is require")
+    @NotNull(message = "ordDate is require")
     private String ordDate;
 
     @NotNull(message = "ordStatus is require")
@@ -63,7 +63,7 @@ public class Orders implements Serializable {
     @NotNull(message = "ordDiscountAmount is require")
     private BigDecimal ordDiscountAmount ;
 
-    @NotEmpty(message = "ordSource is require")
+    @NotNull(message = "ordSource is require")
     private String ordSource ;
 
     private Long userId ;

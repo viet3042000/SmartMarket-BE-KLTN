@@ -105,7 +105,7 @@ public class MapperUtils {
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
                     trvDetailBIC trvDetailBIC = new trvDetailBIC();
-                    trvDetailBIC.setDateofBirth(trvDetail.getDateofBirth());
+                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth());
                     trvDetailBIC.setFullName(trvDetail.getFullName());
                     trvDetailBIC.setGender(trvDetail.getGender());
                     trvDetailBIC.setID(Long.parseLong(fieldsConstants.createTrvDetailId));
@@ -191,7 +191,7 @@ public class MapperUtils {
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
                     trvDetailBIC trvDetailBIC = new trvDetailBIC();
-                    trvDetailBIC.setDateofBirth(trvDetail.getDateofBirth());
+                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth());
                     trvDetailBIC.setFullName(trvDetail.getFullName());
                     trvDetailBIC.setGender(trvDetail.getGender());
                     trvDetailBIC.setID(trvDetail.getId());
@@ -298,7 +298,7 @@ public class MapperUtils {
                 for (int i = 0; i < trvDetailsBIC.length(); i++) {
                     JSONObject trvDetailBIC = trvDetailsBIC.getJSONObject(i);
                     TRVDetail trvDetail = new TRVDetail();
-                    trvDetail.setDateofBirth(trvDetailBIC.getString("DateofBirth"));
+                    trvDetail.setDateOfBirth(trvDetailBIC.getString("DateofBirth"));
                     trvDetail.setFullName(trvDetailBIC.getString("FullName"));
                     trvDetail.setGender(trvDetailBIC.getLong("Gender"));
                     trvDetail.setId(trvDetailBIC.getLong("ID"));
