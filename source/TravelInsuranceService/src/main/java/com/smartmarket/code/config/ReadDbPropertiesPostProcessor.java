@@ -1,5 +1,7 @@
 package com.smartmarket.code.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -11,6 +13,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +21,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
     /**
      * Name of the custom property source added by this post processor class
      */
-    private static final String PROPERTY_SOURCE_NAME = "databaseProperties";
+    final String PROPERTY_SOURCE_NAME = "databaseProperties";
 
     /**
      * Adds Spring Environment custom logic. This custom logic fetch properties from database and setting highest precedence
@@ -26,23 +29,35 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 
+        HikariConfig config = new HikariConfig();
+        HikariDataSource ds;
         Map<String, Object> propertySource = new HashMap<>();
-        Map<String, BigDecimal> propertySourceInt = new HashMap<>();
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
         try {
             // Build manually datasource to ServiceConfig
-            DataSource ds = DataSourceBuilder
-                    .create()
-                    .username(environment.getProperty("spring.datasource.username"))
-                    .password(environment.getProperty("spring.datasource.password"))
-                    .url(environment.getProperty("spring.datasource.url"))
-//                    .driverClassName("com.mysql.jdbc.Driver")
-                    .build();
+            config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+            config.setUsername(environment.getProperty("spring.datasource.username"));
+            config.setPassword(environment.getProperty("spring.datasource.password"));
+            config.setDriverClassName("org.postgresql.Driver");
+            config.setIdleTimeout(10000);
+            config.setMaxLifetime(20000);
+            config.setMaximumPoolSize(1);
+            ds = new HikariDataSource(config);
 
+//            DataSource ds = DataSourceBuilder
+//                    .create()
+//                    .username(environment.getProperty("spring.datasource.username"))
+//                    .password(environment.getProperty("spring.datasource.password"))
+//                    .url(environment.getProperty("spring.datasource.url"))
+//                    .driverClassName("org.postgresql.Driver")
+//                    .build();
             // Fetch all properties
-            Connection connection = ds.getConnection();
-
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config");
-            ResultSet rs = preparedStatement.executeQuery();
+            connection = ds.getConnection();
+            preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config");
+            rs = preparedStatement.executeQuery();
 
             //set properties
             while (rs.next()) {
@@ -56,7 +71,6 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
             }
             rs.close();
             preparedStatement.clearParameters();
-
             preparedStatement.close();
             connection.close();
 
@@ -66,6 +80,22 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }finally {
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
 
         }
     }
