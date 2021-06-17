@@ -30,7 +30,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 
         HikariConfig config = new HikariConfig();
-        HikariDataSource ds;
+        HikariDataSource ds = null ;
         Map<String, Object> propertySource = new HashMap<>();
 
         Connection connection = null;
@@ -73,6 +73,7 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
             preparedStatement.clearParameters();
             preparedStatement.close();
             connection.close();
+            ds.close();
 
             // Create a custom property source with the highest precedence and add it to Spring Environment
             environment.getPropertySources().addFirst(new MapPropertySource(PROPERTY_SOURCE_NAME, propertySource));
@@ -92,6 +93,9 @@ public class ReadDbPropertiesPostProcessor implements EnvironmentPostProcessor {
 
                 if (connection != null) {
                     connection.close();
+                }
+                if (ds != null) {
+                    ds.close();
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
