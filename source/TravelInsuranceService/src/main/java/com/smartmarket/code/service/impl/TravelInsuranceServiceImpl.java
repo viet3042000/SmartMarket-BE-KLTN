@@ -57,7 +57,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
 
         //check validate json request
-        ValidateRequest.checkValidCreateOrUpdate(createTravelInsuranceBICRequest);
+        ValidateRequest.checkValidCreate(createTravelInsuranceBICRequest);
 
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
@@ -217,7 +217,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         long startTime = System.currentTimeMillis();
 
         //check validate json request
-        ValidateRequest.checkValidCreateOrUpdate(updateTravelInsuranceBICRequest);
+        ValidateRequest.checkValidUpdate(updateTravelInsuranceBICRequest);
 
         //declare value response client
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();

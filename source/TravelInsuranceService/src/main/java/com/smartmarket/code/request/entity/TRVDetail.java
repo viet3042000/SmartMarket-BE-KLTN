@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,9 +15,17 @@ public class TRVDetail implements Serializable {
 
     private Long id;
     private Long trvId;
+
+    @NotEmpty(message = "fullName is require")
     private String fullName;
+
+    @NotNull(message = "gender is require")
     private Long gender;
+
+    @NotEmpty(message = "dateofBirth is require")
     private String dateofBirth;
+
+    @NotEmpty(message = "passportCard is require")
     private String passportCard;
 
     public Long getId() {

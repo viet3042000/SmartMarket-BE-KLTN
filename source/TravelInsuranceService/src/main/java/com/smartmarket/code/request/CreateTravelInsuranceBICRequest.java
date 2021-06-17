@@ -6,6 +6,10 @@ import com.smartmarket.code.request.entity.TRVDetail;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -14,10 +18,13 @@ import java.util.ArrayList;
 @Setter
 public class CreateTravelInsuranceBICRequest implements Serializable {
 
-//    @NotNull(message = "abc")
-    private Orders orders;
+    @NotNull(message = "orders is required")
+    private @Valid Orders orders;
 
-    private TRV trv;
-    private ArrayList<TRVDetail> trvDetails;
+    @NotNull(message = "trv is required")
+    private @Valid TRV trv;
+
+    @NotNull(message = "trvDetails is required")
+    private @Valid ArrayList<TRVDetail> trvDetails;
 
 }
