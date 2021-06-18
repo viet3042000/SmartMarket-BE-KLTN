@@ -6,6 +6,7 @@ import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionService;
+import com.smartmarket.code.util.EJson;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -49,15 +50,15 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
     @Override
     public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
-                                                                       JSONObject jsonObjectReponseCreate,
+                                                                       EJson jsonObjectReponseCreate,
                                                                        String resultCode, String bicResultCode) {
         BICTransaction bicTransaction = new BICTransaction();
 
         //check
         if (object != null && object.getDetail() != null) {
             Long orderIdResponse = null;
-            JSONObject jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
-            if (jsonObjectReponseCreate != null && jsonObjectData.getString("type").equalsIgnoreCase("200") ) {
+            EJson jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
+            if (jsonObjectData != null && jsonObjectData.getString("type").equalsIgnoreCase("200") ) {
                 orderIdResponse = jsonObjectReponseCreate.getLong("orderId");
             }else {
                 orderIdResponse = -1L ;

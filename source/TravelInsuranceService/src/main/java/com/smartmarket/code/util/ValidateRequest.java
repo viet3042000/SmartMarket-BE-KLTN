@@ -8,29 +8,29 @@ public class ValidateRequest {
 
     public static void checkValidCreate(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
         //validate
-        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
-            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
-        }
-        if (updateTravelInsuranceBICRequest.getDetail() != null &&
-                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
-            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
-                throw new InvalidInputException("orderReference is require", updateTravelInsuranceBICRequest.getRequestId());
-            }
-        }
+//        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
+//            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
+//        }
+//        if (updateTravelInsuranceBICRequest.getDetail() != null &&
+//                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
+//            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
+//                throw new InvalidInputException("orderReference is require", updateTravelInsuranceBICRequest.getRequestId());
+//            }
+//        }
     }
 
 
     public static void checkValidUpdate(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
         //validate
-        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
-            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
-        }
-        if (updateTravelInsuranceBICRequest.getDetail() != null &&
-                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
-            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
-                throw new InvalidInputException("orderReference is require", updateTravelInsuranceBICRequest.getRequestId());
-            }
-        }
+//        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
+//            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
+//        }
+//        if (updateTravelInsuranceBICRequest.getDetail() != null &&
+//                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
+//            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
+//                throw new InvalidInputException("orderReference is require", updateTravelInsuranceBICRequest.getRequestId());
+//            }
+//        }
 
         if (updateTravelInsuranceBICRequest.getDetail() != null &&
                 updateTravelInsuranceBICRequest.getDetail().getTrv() != null) {

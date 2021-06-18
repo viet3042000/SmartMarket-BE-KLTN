@@ -14,19 +14,15 @@ import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.OrdersBIC;
 import com.smartmarket.code.request.entityBIC.trvBIC;
 import com.smartmarket.code.request.entityBIC.trvDetailBIC;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //scope to refresh fieldsConstants and hostConstants
@@ -242,10 +238,10 @@ public class MapperUtils {
 
         if (resultBIC != null && resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
             try {
-                JSONObject jsonObjectResultBIC = new JSONObject(resultBIC.getBody());
-                JSONObject ordersBIC = jsonObjectResultBIC.getJSONObject("Orders");
-                JSONObject trvBIC = jsonObjectResultBIC.getJSONObject("TRV");
-                JSONArray trvDetailsBIC = jsonObjectResultBIC.getJSONArray("TRVDetail");
+                EJson jsonObjectResultBIC = new EJson(resultBIC.getBody());
+                EJson ordersBIC = jsonObjectResultBIC.getJSONObject("Orders");
+                EJson trvBIC = jsonObjectResultBIC.getJSONObject("TRV");
+                List<EJson> trvDetailsBIC = jsonObjectResultBIC.getJSONArray("TRVDetail");
 
                 Orders orders = new Orders();
                 TRV trv = new TRV();
@@ -295,8 +291,8 @@ public class MapperUtils {
 //                trv.setCertificateForm(trvBIC.getString("PrintedPaperNo"));
 //                trv.setModuleId(trvBIC.getLong("Moduleid"));
 
-                for (int i = 0; i < trvDetailsBIC.length(); i++) {
-                    JSONObject trvDetailBIC = trvDetailsBIC.getJSONObject(i);
+                for (int i = 0; i < trvDetailsBIC.size(); i++) {
+                    EJson trvDetailBIC = trvDetailsBIC.get(i);
                     TRVDetail trvDetail = new TRVDetail();
                     trvDetail.setDateOfBirth(trvDetailBIC.getString("DateofBirth"));
                     trvDetail.setFullName(trvDetailBIC.getString("FullName"));
@@ -328,11 +324,14 @@ public class MapperUtils {
         return false;
     }
 
-    public static Long getLongFromBool(boolean value) {
-        if (value == true) {
-            return 1L;
+    public static Long getLongFromBool(Boolean value) {
+        if (value != null ){
+            if (value == true) {
+                return 1L;
+            }
+            return 0L;
         }
-        return 0L;
+        return null ;
     }
 
 }

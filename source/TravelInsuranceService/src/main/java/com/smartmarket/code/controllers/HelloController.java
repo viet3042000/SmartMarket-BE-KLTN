@@ -13,6 +13,8 @@ import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.util.APIUtils;
 import com.smartmarket.code.util.JwtUtils;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +58,7 @@ public class HelloController {
     CachingServiceImpl cachingService;
 
     @Autowired
-    BICTransactionService bicTransactionService ;
+    BICTransactionService bicTransactionService;
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
 //    @PostMapping(value = "/hello", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -131,48 +133,74 @@ public class HelloController {
 
         final String PROPERTY_SOURCE_NAME = "databaseProperties";
         Map<String, Object> propertySource = new HashMap<>();
-        // Build manually datasource to ServiceConfig
+        HikariConfig config = new HikariConfig();
+        HikariDataSource ds = null;
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet rs = null;
         try {
-        DataSource ds = DataSourceBuilder
-                .create()
-                .username(environment.getProperty("spring.datasource.username"))
-                .password(environment.getProperty("spring.datasource.password"))
-                .url(environment.getProperty("spring.datasource.url"))
+            // Build manually datasource to ServiceConfig
+            config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+            config.setUsername(environment.getProperty("spring.datasource.username"));
+            config.setPassword(environment.getProperty("spring.datasource.password"));
+            config.setDriverClassName("org.postgresql.Driver");
+            config.setIdleTimeout(10000);
+            config.setMaxLifetime(20000);
+            config.setMaximumPoolSize(1);
 //                .driverClassName("com.mysql.jdbc.Driver")
-                .build();
 
-        // Fetch all properties
-        Connection connection = ds.getConnection();
+            ds = new HikariDataSource(config);
+            // Fetch all properties
+            connection = ds.getConnection();
 
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config");
-        ResultSet rs = preparedStatement.executeQuery();
+            preparedStatement = connection.prepareStatement("SELECT key,value FROM service_config");
+            rs = preparedStatement.executeQuery();
 
-        //set properties
-        while (rs.next()) {
-            if(rs.getString("value") != null ){
-                propertySource.put(rs.getString("key"), rs.getString("value"));
-                continue;
+            //set properties
+            while (rs.next()) {
+                if (rs.getString("value") != null) {
+                    propertySource.put(rs.getString("key"), rs.getString("value"));
+                    continue;
+                }
+            }
+            rs.close();
+            preparedStatement.clearParameters();
+            ds.close();
+            preparedStatement.close();
+            connection.close();
+
+            // Create a custom property source with the highest precedence and add it to Spring Environment
+            environment.getPropertySources()
+                    .replace(
+                            PROPERTY_SOURCE_NAME,
+                            new MapPropertySource(PROPERTY_SOURCE_NAME, propertySource)
+                    );
+
+
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+
+                if (rs != null) {
+                    rs.close();
+                }
+
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+
+                if (connection != null) {
+                    connection.close();
+                }
+                if (ds != null) {
+                    ds.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         }
-        rs.close();
-        preparedStatement.clearParameters();
-
-        preparedStatement.close();
-        connection.close();
-
-        // Create a custom property source with the highest precedence and add it to Spring Environment
-        environment.getPropertySources()
-                .replace(
-                        PROPERTY_SOURCE_NAME,
-                        new MapPropertySource(PROPERTY_SOURCE_NAME, propertySource)
-                );
-
-
-    } catch (Throwable e) {
-        throw new RuntimeException(e);
-    }finally {
-
-    }
         return new ResponseEntity<>("load config thành công", HttpStatus.OK);
     }
 }

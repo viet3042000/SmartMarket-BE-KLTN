@@ -94,8 +94,8 @@ public class EJson {
 		return hasValue(key) ? json.getAsJsonObject().get(key).getAsNumber() : null;
 	}
 
-	public boolean getBoolean(String key) {
-		return hasValue(key) ? json.getAsJsonObject().get(key).getAsBoolean() : false;
+	public Boolean getBoolean(String key) {
+		return hasValue(key) ? json.getAsJsonObject().get(key).getAsBoolean() : null;
 	}
 
 	public BigDecimal convertBooleanToBigDecimal(String key) {

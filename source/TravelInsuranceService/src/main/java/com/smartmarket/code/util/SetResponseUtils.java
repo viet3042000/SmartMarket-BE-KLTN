@@ -33,12 +33,12 @@ public class SetResponseUtils {
                             CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse,
                             ResponseEntity<String> jsonResultPutBIC){
 
-        JSONObject jsonObjectReponseCreate = new JSONObject(jsonResultPutBIC.getBody());
+        EJson jsonObjectReponseCreate = new EJson(jsonResultPutBIC.getBody());
         Long orderIdCreated = jsonObjectReponseCreate.getLong("Orderid");
         boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
         createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
         createTravelInsuranceBICResponse.setSucceeded(succeeded);
-        JSONObject dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
+        EJson dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
         DataCreateBIC dataCreateBIC = new DataCreateBIC();
         dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
         dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
@@ -55,13 +55,15 @@ public class SetResponseUtils {
     public ReponseError setResponse(ReponseError responseError,
                             BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
                             ResponseEntity<String> jsonResultCreateBIC,
-                            JSONObject dataResponse){
+                            EJson dataResponse){
         responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
         responseError.setResponseTime(DateTimeUtils.getCurrentDate());
         responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
         responseError.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
-        responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
+        if (dataResponse != null){
+            responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
+        }
         return responseError ;
     }
 
