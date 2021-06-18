@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.APITimeOutRequestException;
+import com.smartmarket.code.exception.ConnectDataBaseException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
@@ -19,14 +20,17 @@ import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.TravelInsuranceService;
 import com.smartmarket.code.util.*;
+import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {
@@ -146,8 +150,13 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                 return new ResponseEntity<>(responseError, HttpStatus.OK);
             }
-        } catch (Exception ex) {
-            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId());
+        }
+        catch (Exception ex){
+            if (ex.getCause() instanceof JDBCConnectionException) {
+                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }else {
+                throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId());
+            }
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -311,8 +320,12 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return new ResponseEntity<>(responseError, HttpStatus.OK);
             }
 
-        } catch (Exception ex) {
-            throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
+        }catch (Exception ex){
+            if (ex.getCause() instanceof JDBCConnectionException) {
+                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }else {
+                throw new CustomException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
+            }
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

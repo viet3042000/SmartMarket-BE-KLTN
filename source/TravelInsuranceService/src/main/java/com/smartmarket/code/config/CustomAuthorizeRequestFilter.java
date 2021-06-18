@@ -2,13 +2,20 @@ package com.smartmarket.code.config;
 
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
+import com.smartmarket.code.exception.ConnectDataBaseException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
+import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
+import com.smartmarket.code.model.entitylog.ServiceObject;
+import com.smartmarket.code.response.ReponseError;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
+import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
+import com.smartmarket.code.util.SetResponseUtils;
 import com.smartmarket.code.util.Utils;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -22,6 +29,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +50,9 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Autowired
     AuthorizationService authorizationService ;
 
+    @Autowired
+    SetResponseUtils setResponseUtils;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -59,11 +71,11 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             AntPathMatcher matcher = new AntPathMatcher();
             String method = request.getMethod();
             String URLRequest = request.getRequestURI();
-            String ipRequest = Utils.getClientIp(request) ;
+            String ipRequest = Utils.getClientIp(request);
             String contextPath = request.getContextPath().toLowerCase();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            if (!authorizationService.validActuator(pathActuator,URLRequest)){
+            if (!authorizationService.validActuator(pathActuator, URLRequest)) {
                 //declare
                 Map<String, Object> claims = null;
                 Set<Url> urlSet = null;
@@ -97,14 +109,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //verify ip
                 boolean verifyIp = false;
-                String[] ipAccessArr = Utils.getArrayIP(client.get().getIpAccess()) ;
-                for (int i =  0 ; i < ipAccessArr.length ; i++ ){
-                    if(ipAccessArr[0].equalsIgnoreCase("ALL")){
-                        verifyIp=  true ;
+                String[] ipAccessArr = Utils.getArrayIP(client.get().getIpAccess());
+                for (int i = 0; i < ipAccessArr.length; i++) {
+                    if (ipAccessArr[0].equalsIgnoreCase("ALL")) {
+                        verifyIp = true;
                         break;
                     }
-                    if(ipRequest.equals(ipAccessArr[i])){
-                        verifyIp=  true ;
+                    if (ipRequest.equals(ipAccessArr[i])) {
+                        verifyIp = true;
                         break;
                     }
                 }
@@ -134,13 +146,63 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 }
             }
 
+        }catch (Exception ex){
+            if (ex.getCause() instanceof JDBCConnectionException) {
+                long startTime = System.currentTimeMillis();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date date = new Date();
+                String logTimestamp = formatter.format(date);
+                String messageTimestamp = logTimestamp;
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
+                //set response to client
+                ReponseError res = new ReponseError();
+                res = setResponseUtils.setResponse(res, ex);
 
-        } catch (CustomException ex) {
-            httpServletResponse.sendError(ex.getHttpStatus().value(), ex.getMessage());
+                //logException
+                ServiceExceptionObject soaExceptionObject =
+                        new ServiceExceptionObject("serviceLog","response",null,null,
+                                messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+                                request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
+                                ex.getMessage(),logService.getIp(),messageTimestamp);
+                logService.createSOALogException(soaExceptionObject.getStringObject());
+
+                //logResponse vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", response.toString(), null, res.getResultCode(),
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
+            }else {
+                long startTime = System.currentTimeMillis();
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date date = new Date();
+                String logTimestamp = formatter.format(date);
+                String messageTimestamp = logTimestamp;
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+
+                //set response to client
+                ReponseError res = new ReponseError();
+                res = setResponseUtils.setResponse(res, ex);
+
+                //logException
+                ServiceExceptionObject soaExceptionObject =
+                        new ServiceExceptionObject("serviceLog","response",null,null,
+                                messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+                                request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
+                                ex.getMessage(),logService.getIp(),messageTimestamp);
+                logService.createSOALogException(soaExceptionObject.getStringObject());
+
+                //logResponse vs Client
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                        "response", response.toString(), null, res.getResultCode(),
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                logService.createSOALog2(soaObject.getStringObject());
+            }
+            httpServletResponse.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
             return;
         }
-
         chain.doFilter(request, response);
 
     }

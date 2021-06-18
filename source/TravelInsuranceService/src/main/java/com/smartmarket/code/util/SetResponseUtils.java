@@ -1,10 +1,7 @@
 package com.smartmarket.code.util;
 
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.exception.APIResponseException;
-import com.smartmarket.code.exception.APITimeOutRequestException;
-import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.exception.InvalidInputException;
+import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.response.BaseResponse;
@@ -113,9 +110,9 @@ public class SetResponseUtils {
 
 //      HttpMessageNotReadableException
         public ReponseError setResponse(ReponseError response, HttpMessageNotReadableException ex){
-            response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
+            response.setResultCode(ResponseCode.CODE.FORMAT_MESSAGE_ERROR);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
+            response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
             response.setDetailErrorMessage("Format body is not JSON !");
             return response ;
@@ -127,6 +124,16 @@ public class SetResponseUtils {
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
+            response.setDetailErrorMessage("An error occurred during the processing of the system!");
+            return response ;
+        }
+
+    //  ConnectDataBaseException
+        public ReponseError setResponse(ReponseError response, ConnectDataBaseException ex){
+            response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+            response.setDetailErrorCode(HttpStatus.UNPROCESSABLE_ENTITY.toString());
             response.setDetailErrorMessage("An error occurred during the processing of the system!");
             return response ;
         }

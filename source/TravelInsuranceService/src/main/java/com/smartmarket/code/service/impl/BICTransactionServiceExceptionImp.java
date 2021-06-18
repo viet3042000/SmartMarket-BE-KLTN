@@ -51,6 +51,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         JSONObject requestBody = new JSONObject(jsonString);
         AntPathMatcher matcher = new AntPathMatcher();
         String URLRequest = request.getRequestURI();
+
         if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
             String messasgeId = requestBody.getString("requestId");
             JSONObject detail = (requestBody.getJSONObject("detail"));
@@ -73,26 +74,27 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             String ordDate = "-1";
             String productId = fieldsConstants.createOrderProductId;
             String customerAddress = "default";
+
             //set properties detail
-            if(createTravelInsuranceBICRequest.getOrders() != null ){
-                 orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
-                 orderId = "-1";
-                 customerName = "DSVN";
-                 phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() ;
-                 email = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail()  == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-                 ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
-                 consumerId = "DSVN";
-                 if(createTravelInsuranceBICRequest.getTrv()!= null ){
-                     fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate() == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getFromDate();
-                     toDate = createTravelInsuranceBICRequest.getTrv().getToDate()== null ? "-1" : createTravelInsuranceBICRequest.getTrv().getToDate();
-                 }
+            if (createTravelInsuranceBICRequest.getOrders() != null) {
+                orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
+                orderId = "-1";
+                customerName = "DSVN";
+                phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile();
+                email = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
+                ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
+                consumerId = "DSVN";
+                if (createTravelInsuranceBICRequest.getTrv() != null) {
+                    fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate() == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getFromDate();
+                    toDate = createTravelInsuranceBICRequest.getTrv().getToDate() == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getToDate();
+                }
 //            String resultCode = ResponseCode.CODE.ERROR_IN_BACKEND;
 //            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
-                 ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
-                 productId = fieldsConstants.createOrderProductId;
-                 customerAddress = "default";
+                ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
+                productId = fieldsConstants.createOrderProductId;
+                customerAddress = "default";
 
-                bicTransaction =  bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
+                bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
                         phoneNumber, email, ordPaidMoney, consumerId,
                         fromDate, toDate, new Date(), resultCode, bicResultCode,
                         ordDate, productId, customerAddress);
