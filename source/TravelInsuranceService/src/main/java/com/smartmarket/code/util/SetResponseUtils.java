@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class SetResponseUtils {
     //Inquery
@@ -107,6 +109,18 @@ public class SetResponseUtils {
             response.setDetailErrorMessage(ex.getMessage());
             return response ;
         }
+
+
+    //      InvalidInputException
+    public ReponseError setResponse(ReponseError response, Map<String, String> ex,String requestId){
+        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
+        response.setResponseId(requestId);
+        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
+        response.setDetailErrorMessage(ex.toString());
+        return response ;
+    }
 
 //      HttpMessageNotReadableException
         public ReponseError setResponse(ReponseError response, HttpMessageNotReadableException ex){

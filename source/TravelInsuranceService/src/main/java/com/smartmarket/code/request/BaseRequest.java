@@ -1,36 +1,24 @@
 package com.smartmarket.code.request;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class BaseRequest implements Serializable {
 
-//    @NotNull(message = "abc")
+    @NotNull(message = "requestId is require")
     private String requestId ;
+
+    @NotNull(message = "requestTime is require")
     private String requestTime ;
+
+    @NotNull(message = "targetId is require")
     private String targetId ;
 
-    public String getRequestId() {
-        return requestId;
-    }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
-
-    public String getRequestTime() {
-        return requestTime;
-    }
-
-    public void setRequestTime(String requestTime) {
-        this.requestTime = requestTime;
-    }
-
-    public String getTargetId() {
-        return targetId;
-    }
-
-    public void setTargetId(String targetId) {
-        this.targetId = targetId;
-    }
 }

@@ -224,9 +224,7 @@ public class RestControllerHandleException {
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex , HttpServletRequest request) throws IOException {
         long startTime = System.currentTimeMillis();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        Date date = new Date();
-        String logTimestamp = formatter.format(date);
+        String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
 
         //set response to client
@@ -263,14 +261,49 @@ public class RestControllerHandleException {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) throws IOException {
+        long startTime = System.currentTimeMillis();
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp ;
+
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+
             errors.put(fieldName, errorMessage);
         });
-        return errors;
+
+        request = new RequestWrapper(request);
+        String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
+        JSONObject requestBody = new JSONObject(jsonString);
+        String messasgeId = requestBody.getString("requestId");
+
+        ReponseError response = new ReponseError();
+        response = setResponseUtils.setResponse(response,errors,messasgeId);
+
+        //add BICTransaction
+        bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.INVALID_INPUT_DATA , HttpStatus.BAD_REQUEST.toString()) ;
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+
+        //logException
+        ServiceExceptionObject soaExceptionObject =
+                new ServiceExceptionObject("serviceLog","response",messasgeId,null,
+                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+                        request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
+                        ex.getMessage(),logService.getIp(),requestBody.getString("requestTime"));
+        logService.createSOALogException(soaExceptionObject.getStringObject());
+
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                "response", response.toString(), null, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+        logService.createSOALog2(soaObject.getStringObject());
+
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     //Trường hợp sai format json request
