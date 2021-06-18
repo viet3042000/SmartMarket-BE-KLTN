@@ -6,7 +6,7 @@ public class CheckFormatUtils {
         boolean isSucceededNull = jsonObjectReponseCreate.hasValue("succeeded");
         boolean isDataNull = jsonObjectReponseCreate.hasValue("data");
 
-        if(isSucceededNull==false && isDataNull==false){
+        if(isSucceededNull==true && isDataNull==true){
             return true;
         }else {
             return false;
