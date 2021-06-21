@@ -201,7 +201,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String requestToken = mapper.writeValueAsString(userLoginBIC);
         String apilogin =  hostConstants.BIC_HOST_LOGIN;
         ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_LOGIN, null, requestToken, null, null);
-        if(jsonResultGetToken.getBody() != null){
+        if(jsonResultGetToken != null && jsonResultGetToken.getBody() != null){
             //get token from response
             token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
 
