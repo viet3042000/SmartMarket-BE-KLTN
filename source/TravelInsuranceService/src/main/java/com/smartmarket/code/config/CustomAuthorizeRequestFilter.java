@@ -161,14 +161,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject("serviceLog","response",null,null,
+                        new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                ex.getMessage(),logService.getIp(),messageTimestamp);
+                                ex.getMessage(),logService.getIp());
                 logService.createSOALogException(soaExceptionObject.getStringObject());
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client","smartMarket",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", response.toString(), null, res.getResultCode(),
                         res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
@@ -187,14 +187,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject("serviceLog","response",null,null,
+                        new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                ex.getMessage(),logService.getIp(),messageTimestamp);
+                                ex.getMessage(),logService.getIp());
                 logService.createSOALogException(soaExceptionObject.getStringObject());
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",null,
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", response.toString(), null, res.getResultCode(),
                         res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());

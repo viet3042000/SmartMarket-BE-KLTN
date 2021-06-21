@@ -8,6 +8,7 @@ public class ServiceObject {
 
     String logName;
     String requestId;
+    String requestTime;
     String transactionId;
     String sourceId;
     String targetId;
@@ -28,6 +29,7 @@ public class ServiceObject {
         JSONObject json = new JSONObject();
         json.put("logName", logName);
         json.put("requestId", requestId);
+        json.put("requestTime", requestTime);
         json.put("transactionId", transactionId);
         json.put("sourceId", sourceId);
         json.put("targetId", targetId);

@@ -67,22 +67,22 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
             if(Utils.isJSONValid(jsonString)){
                 JSONObject requestBody = new JSONObject(jsonString);
-                String messasgeId = requestBody.getString("requestId");
-
+                String requestId = requestBody.getString("requestId");
+                String requestTime = requestBody.getString("requestTime");
 
                 //get time duration
                 String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",messasgeId,null,
+                        new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,
                                 messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));
                 logService.createSOALogException(soaExceptionObject.getStringObject());
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",messasgeId, null, "BIC", "Client",
+                ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "client", "smartMarket",
                         messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
                         "response", response.toString(), responseStatus, responseError.getResultCode(),
                         responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());

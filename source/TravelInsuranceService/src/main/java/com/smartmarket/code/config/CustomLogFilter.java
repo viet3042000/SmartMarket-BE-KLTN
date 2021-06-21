@@ -37,7 +37,6 @@ public class CustomLogFilter extends OncePerRequestFilter {
         long startTime = System.currentTimeMillis();
         ObjectMapper mapper = new ObjectMapper();
 
-
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logtimeStamp = formatter.format(date);
@@ -50,13 +49,14 @@ public class CustomLogFilter extends OncePerRequestFilter {
             if (request.getMethod().equals("POST")) {
                 if(Utils.isJSONValid(jsonString)){
                     JSONObject requestBody = new JSONObject(jsonString);
-                    String messasgeId = requestBody.getString("requestId");
+                    String requestId = requestBody.getString("requestId");
+                    String requestTime = requestBody.getString("requestTime");
                     String transactionDetail = requestBody.toString();
 
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
                     //
                     //logRequest vs Client
-                    ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "smartMarket",
+                    ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                             "request", transactionDetail, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
@@ -64,7 +64,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
-                    ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "client", "smartMarket",
+                    ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                             "request", jsonString, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
