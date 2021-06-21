@@ -8,7 +8,6 @@ import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
 import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ReponseError;
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -84,18 +83,17 @@ public class SetResponseUtils {
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         response.setResponseId(ex.getResponseId());
-        response.setDetailErrorCode(ex.getDetailErrorCode());
+        response.setDetailErrorCode(ex.getDetailErrorCode().toString());
 
         response.setDetailErrorMessage(ex.getDetailErrorMessage());
-        response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
         return response ;
     }
 
 //      APITimeOutRequestException
-        public ReponseError setResponse(ReponseError response, APITimeOutRequestException ex){
-            response.setResultCode(ResponseCode.CODE.SOA_TIMEOUT_BACKEND);
+        public ReponseError setResponse(ReponseError response, APIAccessException ex){
+            response.setResultCode(ex.getResultCode());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultMessage(ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG);
+            response.setResultMessage(ex.getResultMessage());
             response.setDetailErrorCode(HttpStatus.REQUEST_TIMEOUT.toString());
             response.setDetailErrorMessage(ex.getDetailErrorMessage());
             return response ;

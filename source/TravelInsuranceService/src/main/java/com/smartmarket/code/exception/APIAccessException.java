@@ -1,8 +1,14 @@
 package com.smartmarket.code.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.client.ResourceAccessException;
+
 import java.net.SocketTimeoutException;
 
-public class APITimeOutRequestException extends SocketTimeoutException {
+@Getter
+@Setter
+public class APIAccessException extends ResourceAccessException {
 
     private static final long serialVersionUID = 1L;
 
@@ -10,12 +16,15 @@ public class APITimeOutRequestException extends SocketTimeoutException {
     private String resultCode;
     private String resultMessage;
     private String detailErrorMessage;
+    private String errorDetail;
 
-    public APITimeOutRequestException(String responseId, String resultCode, String resultMessage,String detailErrorMessage) {
+    public APIAccessException(String responseId, String resultCode, String resultMessage, String detailErrorMessage, String errorDetail) {
+        super(errorDetail);
         this.responseId = responseId;
         this.resultCode = resultCode;
         this.resultMessage = resultMessage;
         this.detailErrorMessage = detailErrorMessage;
+        this.errorDetail = errorDetail ;
     }
 
     public String getResponseId() {

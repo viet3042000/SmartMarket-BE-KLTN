@@ -1,5 +1,7 @@
 package com.smartmarket.code.exception;
 
+import org.springframework.http.HttpStatus;
+
 public class APIResponseException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;
@@ -7,11 +9,11 @@ public class APIResponseException extends RuntimeException{
     private String responseId;
     private String resultCode;
     private String resultMessage;
-    private String detailErrorCode;
+    private HttpStatus detailErrorCode;
     private String detailErrorMessage;
 
     public APIResponseException(String responseId ,String resultCode , String resultMessage ,
-                                String detailErrorCode, String detailErrorMessage) {
+                                HttpStatus detailErrorCode, String detailErrorMessage) {
         this.responseId = responseId;
         this.resultCode = resultCode;
         this.resultMessage = resultMessage;
@@ -43,11 +45,11 @@ public class APIResponseException extends RuntimeException{
         this.resultMessage = resultMessage;
     }
 
-    public String getDetailErrorCode() {
+    public HttpStatus getDetailErrorCode() {
         return detailErrorCode;
     }
 
-    public void setDetailErrorCode(String detailErrorCode) {
+    public void setDetailErrorCode(HttpStatus detailErrorCode) {
         this.detailErrorCode = detailErrorCode;
     }
 

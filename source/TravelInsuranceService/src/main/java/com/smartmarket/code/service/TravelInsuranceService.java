@@ -1,7 +1,7 @@
 package com.smartmarket.code.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.smartmarket.code.exception.APITimeOutRequestException;
+import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
@@ -14,17 +14,17 @@ public interface TravelInsuranceService {
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
                                              HttpServletRequest request,
                                              HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APITimeOutRequestException;
+            throws JsonProcessingException, APIAccessException;
 
     public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APITimeOutRequestException;
+            throws JsonProcessingException, APIAccessException;
 
     public ResponseEntity<?> updateTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
                                              HttpServletRequest request,
                                              HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APITimeOutRequestException;
+            throws JsonProcessingException, APIAccessException;
 
 }
 

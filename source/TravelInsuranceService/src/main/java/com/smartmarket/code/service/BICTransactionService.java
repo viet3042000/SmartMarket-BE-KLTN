@@ -18,5 +18,5 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
                                                         String ordPaidMoney, String consumerId, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
-                                                        String customerAddress) ;
+                                                        String customerAddress , String clientIp) ;
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.exception.APITimeOutRequestException;
+import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.ConnectDataBaseException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.entitylog.ServiceObject;
@@ -26,10 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {
@@ -59,7 +57,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 //    private StartTimeBean startTimeBeanProvider;
 
     @Override
-    public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
 
 //        System.out.println("start : " + startTimeBeanProvider.getStartTime());
 
@@ -174,7 +172,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
 
     @Override
-    public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //time start
         long startTime = System.currentTimeMillis();
 
@@ -235,7 +233,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     }
 
     @Override
-    public ResponseEntity<?> updateTravelBIC( BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+    public ResponseEntity<?> updateTravelBIC( BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //start time
         long startTime = System.currentTimeMillis();
 

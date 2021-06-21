@@ -10,6 +10,7 @@ import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
+import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +75,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             String ordDate = "-1";
             String productId = fieldsConstants.createOrderProductId;
             String customerAddress = "default";
+            String clientIp = "unknown" ;
 
             //set properties detail
             if (createTravelInsuranceBICRequest.getOrders() != null) {
@@ -93,11 +95,12 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
                 productId = fieldsConstants.createOrderProductId;
                 customerAddress = "default";
+                clientIp = Utils.getClientIp(request) ;
 
                 bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
                         phoneNumber, email, ordPaidMoney, consumerId,
                         fromDate, toDate, new Date(), resultCode, bicResultCode,
-                        ordDate, productId, customerAddress);
+                        ordDate, productId, customerAddress,clientIp);
             }
 
         }

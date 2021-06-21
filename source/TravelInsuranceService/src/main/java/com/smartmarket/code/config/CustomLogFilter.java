@@ -56,7 +56,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
                     //
                     //logRequest vs Client
-                    ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "BIC",
+                    ServiceObject soaObject = new ServiceObject("serviceLog", messasgeId, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                             "request", transactionDetail, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
@@ -64,7 +64,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
-                    ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "client", "BIC",
+                    ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                             "request", jsonString, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());

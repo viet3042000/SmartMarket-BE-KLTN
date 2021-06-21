@@ -16,15 +16,12 @@ import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.EJson;
 import com.smartmarket.code.util.SetResponseUtils;
-import org.hibernate.exception.JDBCConnectionException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -157,7 +154,7 @@ public class RestControllerHandleException {
         //add BICTransaction
         try {
             //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.ERROR_IN_BACKEND , ex.getDetailErrorCode()) ;
+            bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.ERROR_IN_BACKEND , ex.getDetailErrorCode().toString()) ;
         }catch(Exception e){
             String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
@@ -195,13 +192,13 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject.getStringObject());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, ex.getDetailErrorCode());
     }
 
 
     //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout --> không nhận được response từ BIC
-    @ExceptionHandler(SocketTimeoutException.class)
-    public ResponseEntity<?> handleAPITimeOutException(APITimeOutRequestException ex , HttpServletRequest request,HttpServletResponse responseSelvet) throws IOException {
+    @ExceptionHandler(APIAccessException.class)
+    public ResponseEntity<?> handleAPITimeOutException(APIAccessException ex , HttpServletRequest request, HttpServletResponse responseSelvet) throws IOException {
         long startTime = System.currentTimeMillis();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
@@ -251,7 +248,7 @@ public class RestControllerHandleException {
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"responseException",messasgeId,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
-                        Throwables.getStackTraceAsString(ex),logService.getIp(),requestBody.getString("requestTime"));
+                        ex.getErrorDetail(),logService.getIp(),requestBody.getString("requestTime"));
         logService.createSOALogException(soaExceptionObject.getStringObject());
 
         //logResponse vs Client

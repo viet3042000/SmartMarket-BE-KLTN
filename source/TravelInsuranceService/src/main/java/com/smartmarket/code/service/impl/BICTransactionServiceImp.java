@@ -90,7 +90,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
                                                         String ordPaidMoney, String consumerId, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
-                                                        String customerAddress) {
+                                                        String customerAddress , String clientIp) {
         BICTransaction bicTransaction = new BICTransaction();
 
         bicTransaction.setOrderId(orderId);
@@ -108,6 +108,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setRequestId(requestId);
         bicTransaction.setToDate(toDate);
         bicTransaction.setOrdDate(ordDate);
+        bicTransaction.setClientIp(clientIp);
         bicTransaction.setProductId(fieldsConstants.createOrderProductId);
 
 

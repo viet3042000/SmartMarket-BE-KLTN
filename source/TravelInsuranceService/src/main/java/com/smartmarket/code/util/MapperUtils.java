@@ -2,9 +2,8 @@ package com.smartmarket.code.util;
 
 import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.constants.HostConstants;
-import com.smartmarket.code.exception.APITimeOutRequestException;
+import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
@@ -209,7 +208,7 @@ public class MapperUtils {
     }
 
 
-    public CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String token, String requestId) throws APITimeOutRequestException {
+    public CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String token, String requestId) throws APIAccessException {
 
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 

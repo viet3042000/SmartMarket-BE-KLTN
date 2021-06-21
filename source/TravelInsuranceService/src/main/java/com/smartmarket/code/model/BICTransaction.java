@@ -68,4 +68,7 @@ public class BICTransaction implements Serializable {
 	@Column(name = "customer_address")
 	private String customerAddress;
 
+	@Column(name = "client_ip")
+	private String clientIp;
+
 }
