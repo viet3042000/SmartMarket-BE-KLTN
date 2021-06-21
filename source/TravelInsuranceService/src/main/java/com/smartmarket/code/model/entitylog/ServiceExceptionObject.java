@@ -7,7 +7,7 @@ import org.json.JSONObject;
 public class ServiceExceptionObject {
     String logName;
     String logType;
-    String messageId ;
+    String requestId ;
     String transactionId;
     String messageTimestamp ;
     String serviceName ;
@@ -24,7 +24,7 @@ public class ServiceExceptionObject {
         JSONObject json = new JSONObject();
         json.put("logName",logName);
         json.put("logType",logType);
-        json.put("messageId",messageId);
+        json.put("requestId",requestId);
         json.put("transactionId",transactionId);
         json.put("messageTimestamp",messageTimestamp);
         json.put("serviceName",serviceName);

@@ -7,7 +7,7 @@ import org.json.JSONObject;
 public class ServiceObject {
 
     String logName;
-    String messageId;
+    String requestId;
     String transactionId;
     String sourceId;
     String targetId;
@@ -27,7 +27,7 @@ public class ServiceObject {
     public String getStringObject() {
         JSONObject json = new JSONObject();
         json.put("logName", logName);
-        json.put("messageId", messageId);
+        json.put("requestId", requestId);
         json.put("transactionId", transactionId);
         json.put("sourceId", sourceId);
         json.put("targetId", targetId);

@@ -7,7 +7,7 @@ import net.minidev.json.JSONObject;
 public class TargetObject {
     String logName;
     String transactionId;
-    String messageId;
+    String requestId;
     String targetService;
     String logType;
     String transactionDetail;
@@ -19,7 +19,7 @@ public class TargetObject {
         JSONObject json = new JSONObject();
         json.put("logName", logName);
         json.put("transactionId", transactionId);
-        json.put("messageId", messageId);
+        json.put("requestId", requestId);
         json.put("targetService", targetService);
         json.put("logType", logType);
         json.put("transactionDetail", transactionDetail);
