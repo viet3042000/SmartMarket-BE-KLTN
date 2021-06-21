@@ -2,6 +2,7 @@ package com.smartmarket.code.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.util.IOUtils;
+import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
@@ -74,7 +75,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject("serviceLog","response",messasgeId,null,
+                        new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",messasgeId,null,
                                 messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));

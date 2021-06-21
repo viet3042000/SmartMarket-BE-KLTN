@@ -11,13 +11,11 @@ import java.io.Serializable;
 @Setter
 public class QueryTravelInsuranceBICRequest implements Serializable {
 
-    @NotNull(message = "orders is required")
+    @NotNull(message = "inquiryType is required")
     private Long inquiryType ;
 
-    @NotNull(message = "orderId is required")
     private String orderId ;
 
-    @NotNull(message = "orderReference is required")
     private String orderReference ;
 
 }

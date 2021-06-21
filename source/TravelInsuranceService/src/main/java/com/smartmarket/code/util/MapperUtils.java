@@ -4,6 +4,7 @@ import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.exception.APITimeOutRequestException;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
@@ -55,7 +56,7 @@ public class MapperUtils {
                 ordersBIC.setOrdcustmessage(fieldsConstants.createOrderOrdCustMessage);
                 ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
                 ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-                ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
+                ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().equals("") == true ? "Not Address" : orders.getOrdBillStreet1() );
                 ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
                 ordersBIC.setOrddate(orders.getOrdDate());
                 ordersBIC.setOrdstatus(orders.getOrdStatus());
@@ -101,7 +102,7 @@ public class MapperUtils {
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
                     trvDetailBIC trvDetailBIC = new trvDetailBIC();
-                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth());
+                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth() == null ? "" : trvDetail.getDateOfBirth() );
                     trvDetailBIC.setFullName(trvDetail.getFullName());
                     trvDetailBIC.setGender(trvDetail.getGender());
                     trvDetailBIC.setID(Long.parseLong(fieldsConstants.createTrvDetailId));
@@ -187,7 +188,7 @@ public class MapperUtils {
             if (trvDetails != null && trvDetails.size() > 0) {
                 for (TRVDetail trvDetail : trvDetails) {
                     trvDetailBIC trvDetailBIC = new trvDetailBIC();
-                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth());
+                    trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth() == null ? "" : trvDetail.getDateOfBirth());
                     trvDetailBIC.setFullName(trvDetail.getFullName());
                     trvDetailBIC.setGender(trvDetail.getGender());
                     trvDetailBIC.setID(trvDetail.getId());

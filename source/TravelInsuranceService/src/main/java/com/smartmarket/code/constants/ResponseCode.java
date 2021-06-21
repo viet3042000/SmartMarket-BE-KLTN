@@ -15,6 +15,7 @@ public class ResponseCode {
         public static final String AUTHORIZED_FAILED = "010";//Authorized failed
         public static final String TRANSACTION_REFUSED = "011";//Transaction refused
         public static final String AUTHORIZED_FAIL_TO_BACKEND = "012";//Authorized fail to backend
+        public static final String GENERAL_ERROR = "013";//general errror
         public static final String NO_DATA_FOUND = "015";//No data found
         public static final String DUPLICATE_TRANSACTION = "016";//Duplicate transaction
         public static final String SECURITY_VIOLATION = "063";//Security violation
@@ -36,6 +37,7 @@ public class ResponseCode {
         public static final String OBJECT_ALREADY_EXISTS_MSG = "Object already exists";//Object already exists
         public static final String INVALID_FUNCTIONCODE_MSG = "Invalid FunctionCode";//Invalid FunctionCode
         public static final String AUTHORIZED_FAILED_MSG = "Authorized failed";//Authorized failed
+        public static final String GENERAL_ERROR_MSG = "General error";//general errror
         public static final String TRANSACTION_REFUSED_MSG = "Transaction refused";//Transaction refused
         public static final String AUTHORIZED_FAIL_TO_BACKEND_MSG = "Authorized fail to backend";//Authorized fail to backend
         public static final String NO_DATA_FOUND_MSG = "No data found";//No data found

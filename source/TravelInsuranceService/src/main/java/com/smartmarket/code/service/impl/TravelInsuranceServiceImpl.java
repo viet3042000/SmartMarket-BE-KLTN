@@ -21,16 +21,15 @@ import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.TravelInsuranceService;
 import com.smartmarket.code.util.*;
 import org.hibernate.exception.JDBCConnectionException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.CannotCreateTransactionException;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
+import java.util.Date;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {
@@ -56,9 +55,13 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     SetResponseUtils setResponseUtils;
 
+//    @Autowired
+//    private StartTimeBean startTimeBeanProvider;
 
     @Override
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
+
+//        System.out.println("start : " + startTimeBeanProvider.getStartTime());
 
         //check validate json request
         ValidateRequest.checkValidCreate(createTravelInsuranceBICRequest);
@@ -174,6 +177,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
         //time start
         long startTime = System.currentTimeMillis();
+
+        //check validate json request
+        ValidateRequest.checkValidInquire(queryTravelInsuranceBICRequest);
 
         //delcare used value
         BaseResponse response = new BaseResponse();

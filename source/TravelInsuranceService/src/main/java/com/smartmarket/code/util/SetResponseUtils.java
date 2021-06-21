@@ -136,9 +136,9 @@ public class SetResponseUtils {
 
 //      Exception
         public ReponseError setResponse(ReponseError response, Exception ex){
-            response.setResultCode(ResponseCode.CODE.FORMAT_MESSAGE_ERROR);
+            response.setResultCode(ResponseCode.CODE.GENERAL_ERROR);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
+            response.setResultMessage(ResponseCode.MSG.GENERAL_ERROR_MSG);
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
             response.setDetailErrorMessage("An error occurred during the processing of the system!");
             return response ;

@@ -22,7 +22,6 @@ public class TRVDetail implements Serializable {
     @NotNull(message = "gender is require")
     private Long gender;
 
-    @NotNull(message = "dateOfBirth is require")
     private String dateOfBirth;
 
     @NotNull(message = "passportCard is require")

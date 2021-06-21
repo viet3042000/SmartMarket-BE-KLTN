@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -41,13 +42,17 @@ import java.util.Date;
 @RequestMapping("/insurance/travel-insurance-service/v1/")
 public class ApiBICController {
 
+//    @Autowired
+//    private StartTimeBean startTimeBeanProvider;
+
     @Autowired
     TravelInsuranceService travelInsuranceService ;
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
     @PostMapping(value = "/create-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createTravelBIC(@Valid @RequestBody(required = true) BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APITimeOutRequestException {
-       return travelInsuranceService.createTravelBIC(createTravelInsuranceBICRequest,request,responseSelvet);
+//        System.out.println("start : " + startTimeBeanProvider.startTime);
+        return travelInsuranceService.createTravelBIC(createTravelInsuranceBICRequest,request,responseSelvet);
     }
 
 
