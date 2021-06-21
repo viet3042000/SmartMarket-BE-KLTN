@@ -145,7 +145,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     //logResponseError vs BIC
                     TargetObject tarObject = new TargetObject("targetLog", createTravelInsuranceBICRequest.getRequestId(), "BIC", "response", "response",
                             transactionDetail, logTimestamp, messageTimestamp, timeDuration);
-                    logService.createTargetLog(tarObject.toString());
+                    logService.createTargetLog(tarObject.getStringObject());
 
                     //logResponseError vs Client
                     ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
@@ -325,7 +325,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     //logResponseError vs BIC
                     TargetObject tarObject = new TargetObject("targetLog", updateTravelInsuranceBICRequest.getRequestId(), "BIC", "updateOrderTravelInsurance", "response",
                             transactionDetail, logtimeStamp, messageTimestamp, timeDuration);
-                    logService.createTargetLog(tarObject.toString());
+                    logService.createTargetLog(tarObject.getStringObject());
 
                     //logResponseError vs Client
                     ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), null, "BIC", "client",
