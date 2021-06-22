@@ -142,5 +142,11 @@ public class FieldsConstants{
     @Value("${createTravelBIC.DSVN.trvDetail.trvId}")
     public String createTrvDetailTrvId;
 
+    @Value("${createTravelBIC.DSVN.trv.fromZoneGuid}")
+    public String createTrvFromZoneGuid;
+
+    @Value("${createTravelBIC.DSVN.trv.toZoneGuid}")
+    public String createTrvToZoneGuid;
+
 
 }

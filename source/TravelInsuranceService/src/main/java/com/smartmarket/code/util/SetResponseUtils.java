@@ -34,7 +34,7 @@ public class SetResponseUtils {
                             ResponseEntity<String> jsonResultPutBIC){
 
         EJson jsonObjectReponseCreate = new EJson(jsonResultPutBIC.getBody());
-        Long orderIdCreated = jsonObjectReponseCreate.getLong("Orderid");
+        Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
         boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
         createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
         createTravelInsuranceBICResponse.setSucceeded(succeeded);

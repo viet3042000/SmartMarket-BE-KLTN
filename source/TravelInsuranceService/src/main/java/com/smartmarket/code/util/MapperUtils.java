@@ -95,6 +95,8 @@ public class MapperUtils {
                 trvBIC.setPrintedPaperNo(fieldsConstants.createTrvPrintedPaperNo);
                 trvBIC.setCertificateForm(fieldsConstants.createTrvCertificateForm);
                 trvBIC.setModuleid(Long.parseLong(fieldsConstants.createTrvModuleId));
+                trvBIC.setFromZoneGuid(fieldsConstants.createTrvFromZoneGuid);
+                trvBIC.setToZoneGuid(fieldsConstants.createTrvToZoneGuid);
             }
 
 
@@ -181,6 +183,8 @@ public class MapperUtils {
                 trvBIC.setPrintedPaperNo(fieldsConstants.updateTrvPrintedPaperNo);
                 trvBIC.setCertificateForm(fieldsConstants.updateTrvCertificateForm);
                 trvBIC.setModuleid(Long.parseLong(fieldsConstants.updateTrvModuleId));
+                trvBIC.setFromZoneGuid(fieldsConstants.createTrvFromZoneGuid);
+                trvBIC.setToZoneGuid(fieldsConstants.createTrvToZoneGuid);
 
             }
 
