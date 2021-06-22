@@ -56,12 +56,15 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
         try {
             ReponseError responseError = new ReponseError();
-            responseError =  setResponseUtils.setResponse(responseError) ;
+            responseError =  setResponseUtils.setResponseCustomEntryPoint(responseError) ;
             response.addHeader("WWW-Authenticate", "Authorized failed ");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE+ ";"+ "charset=UTF-8" );
             response.getOutputStream()
                     .println(objectMapper.writeValueAsString(responseError));
+            ObjectMapper mapper = new ObjectMapper();
+            String responseBody = mapper.writeValueAsString(response);
+            JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
             httpServletRequest = new RequestWrapper(httpServletRequest);
             String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
@@ -79,14 +82,14 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                                 messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));
-                logService.createSOALogException(soaExceptionObject.getStringObject());
+                logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "client", "smartMarket",
+                ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "smartMarket", "client",
                         messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
-                        "response", response.toString(), responseStatus, responseError.getResultCode(),
+                        "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
                         responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
-                logService.createSOALog2(soaObject.getStringObject());
+                logService.createSOALog2(soaObject);
             }
 
 

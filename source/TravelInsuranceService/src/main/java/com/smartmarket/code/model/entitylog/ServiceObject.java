@@ -17,8 +17,8 @@ public class ServiceObject {
     String serviceVersion;
     String timeDuration;
     String logType;
-    String transactionDetail;
-    String responseStatus;
+    org.json.JSONObject transactionDetail;
+    String responseStatus;//httpcode
     String errorCode;
     String errorMsg;
     String logTimestamp;

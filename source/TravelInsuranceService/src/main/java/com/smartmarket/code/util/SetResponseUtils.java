@@ -8,6 +8,7 @@ import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
 import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ReponseError;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Component
 public class SetResponseUtils {
     //Inquery
-    public BaseResponse setResponse(BaseResponse response,
+    public BaseResponse setResponseInquery(BaseResponse response,
                             CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse){
         response.setDetail(createTravelInsuranceBICResponse);
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -51,7 +52,7 @@ public class SetResponseUtils {
     }
 
     //Create Error
-    public ReponseError setResponse(ReponseError responseError,
+    public ReponseError setResponseError(ReponseError responseError,
                             BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
                             ResponseEntity<String> jsonResultCreateBIC,
                             EJson dataResponse){
@@ -67,7 +68,7 @@ public class SetResponseUtils {
     }
 
     //CustomException
-    public ReponseError setResponse(ReponseError response, CustomException ex){
+    public ReponseError setResponseCustomException(ReponseError response, CustomException ex){
         response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -78,7 +79,7 @@ public class SetResponseUtils {
     }
 
     //APIResponseException
-    public ReponseError setResponse(ReponseError response, APIResponseException ex){
+    public ReponseError setResponseAPIResponseException(ReponseError response, APIResponseException ex){
         response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -89,8 +90,8 @@ public class SetResponseUtils {
         return response ;
     }
 
-//      APITimeOutRequestException
-        public ReponseError setResponse(ReponseError response, APIAccessException ex){
+//      APIAccessException
+        public ReponseError setResponseAPIAccessException(ReponseError response, APIAccessException ex){
             response.setResultCode(ex.getResultCode());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ex.getResultMessage());
@@ -100,7 +101,7 @@ public class SetResponseUtils {
         }
 
 //      InvalidInputException
-        public ReponseError setResponse(ReponseError response, InvalidInputException ex){
+        public ReponseError setResponseInvalidInputException(ReponseError response, InvalidInputException ex){
             response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
@@ -111,8 +112,8 @@ public class SetResponseUtils {
         }
 
 
-    //      InvalidInputException
-    public ReponseError setResponse(ReponseError response, Map<String, String> ex,String requestId){
+    //MethodArgumentNotValidException
+    public ReponseError setResponseMethodArgumentNotValidException(ReponseError response, Map<String, String> ex,String requestId){
         response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
@@ -123,7 +124,7 @@ public class SetResponseUtils {
     }
 
 //      HttpMessageNotReadableException
-        public ReponseError setResponse(ReponseError response, HttpMessageNotReadableException ex){
+        public ReponseError setResponseHttpMessageNotReadableException(ReponseError response, HttpMessageNotReadableException ex){
             response.setResultCode(ResponseCode.CODE.FORMAT_MESSAGE_ERROR);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.FORMAT_MESSAGE_ERROR_MSG);
@@ -133,7 +134,7 @@ public class SetResponseUtils {
         }
 
 //      Exception
-        public ReponseError setResponse(ReponseError response, Exception ex){
+        public ReponseError setResponseException(ReponseError response, Exception ex){
             response.setResultCode(ResponseCode.CODE.GENERAL_ERROR);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.GENERAL_ERROR_MSG);
@@ -143,7 +144,7 @@ public class SetResponseUtils {
         }
 
     //  ConnectDataBaseException
-        public ReponseError setResponse(ReponseError response, ConnectDataBaseException ex){
+        public ReponseError setResponseConnectDataBaseException(ReponseError response, ConnectDataBaseException ex){
             response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -153,7 +154,7 @@ public class SetResponseUtils {
         }
 
 //      CustomEntryPoint
-        public ReponseError setResponse(ReponseError responseError){
+        public ReponseError setResponseCustomEntryPoint(ReponseError responseError){
             responseError.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
             responseError.setResponseTime(DateTimeUtils.getCurrentDate());
             responseError.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);

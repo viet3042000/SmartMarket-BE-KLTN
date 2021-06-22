@@ -1,6 +1,9 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
+import com.smartmarket.code.model.entitylog.ServiceObject;
+import com.smartmarket.code.model.entitylog.TargetObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,17 +16,17 @@ public class LogServiceImpl  {
     private Logger logger = LoggerFactory.getLogger(LogServiceImpl.class);
 
     //  Target là lưu log mình giao dịch với BIC
-    public void createTargetLog(String logBody){
-        logger.info(logBody);
+    public void createTargetLog(TargetObject targetObject){
+        logger.info(targetObject.getStringObject());
     }
 
     //  SOA là bảng lưu log giao dịch của client với hệ thống
-    public void createSOALog2(String logBody) throws CustomException {
-        logger.info(logBody) ;
+    public void createSOALog2(ServiceObject serviceObject) throws CustomException {
+        logger.info(serviceObject.getStringObject()) ;
     }
     //  SOA Exception là bảng lưu log giao dịch của client với hệ thống
-    public void createSOALogException(String logBody) throws CustomException {
-        logger.info(logBody) ;
+    public void createSOALogException(ServiceExceptionObject serviceExceptionObject) throws CustomException {
+        logger.info(serviceExceptionObject.getStringObject()) ;
     }
 
     public String getIp() {

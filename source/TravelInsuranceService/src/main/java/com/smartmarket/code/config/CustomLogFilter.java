@@ -51,24 +51,25 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     JSONObject requestBody = new JSONObject(jsonString);
                     String requestId = requestBody.getString("requestId");
                     String requestTime = requestBody.getString("requestTime");
-                    String transactionDetail = requestBody.toString();
+                    String stringRequestBody = requestBody.toString();
+                    JSONObject transactionDetail = new JSONObject(stringRequestBody);
 
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-                    //
+
                     //logRequest vs Client
                     ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                             "request", transactionDetail, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
-                    logService.createSOALog2(soaObject.getStringObject());
+                    logService.createSOALog2(soaObject);
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                     ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                            "request", jsonString, null, null,
+                            "request", null, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
-                    logService.createSOALog2(soaObject.getStringObject());
+                    logService.createSOALog2(soaObject);
                 }
 
             } else {

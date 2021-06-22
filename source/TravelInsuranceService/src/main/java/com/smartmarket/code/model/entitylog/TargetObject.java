@@ -1,7 +1,7 @@
 package com.smartmarket.code.model.entitylog;
 
 import lombok.AllArgsConstructor;
-import net.minidev.json.JSONObject;
+import org.json.JSONObject;
 
 @AllArgsConstructor
 public class TargetObject {
@@ -11,7 +11,7 @@ public class TargetObject {
     String requestTime;
     String targetService;
     String logType;
-    String transactionDetail;
+    JSONObject transactionDetail;
     String logTimestamp;
     String messageTimestamp;
     String timeDuration;
@@ -31,4 +31,5 @@ public class TargetObject {
 
         return json.toString();
     }
+
 }

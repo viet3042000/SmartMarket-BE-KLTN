@@ -1,5 +1,6 @@
 package com.smartmarket.code.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.exception.ConnectDataBaseException;
@@ -16,6 +17,7 @@ import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.SetResponseUtils;
 import com.smartmarket.code.util.Utils;
 import org.hibernate.exception.JDBCConnectionException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -157,7 +159,10 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //set response to client
                 ReponseError res = new ReponseError();
-                res = setResponseUtils.setResponse(res, ex);
+                res = setResponseUtils.setResponseException(res, ex);
+                ObjectMapper mapper = new ObjectMapper();
+                String responseBody = mapper.writeValueAsString(res);
+                JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -165,14 +170,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                                 ex.getMessage(),logService.getIp());
-                logService.createSOALogException(soaExceptionObject.getStringObject());
+                logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client","smartMarket",
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                        "response", response.toString(), null, res.getResultCode(),
+                        "response", transactionDetailResponse, null, res.getResultCode(),
                         res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
-                logService.createSOALog2(soaObject.getStringObject());
+                logService.createSOALog2(soaObject);
             }else {
                 long startTime = System.currentTimeMillis();
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -183,7 +188,10 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //set response to client
                 ReponseError res = new ReponseError();
-                res = setResponseUtils.setResponse(res, ex);
+                res = setResponseUtils.setResponseException(res, ex);
+                ObjectMapper mapper = new ObjectMapper();
+                String responseBody = mapper.writeValueAsString(res);
+                JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -191,14 +199,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                                 ex.getMessage(),logService.getIp());
-                logService.createSOALogException(soaExceptionObject.getStringObject());
+                logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "client",null,
+                ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket", "client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                        "response", response.toString(), null, res.getResultCode(),
+                        "response", transactionDetailResponse, null, res.getResultCode(),
                         res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
-                logService.createSOALog2(soaObject.getStringObject());
+                logService.createSOALog2(soaObject);
             }
             httpServletResponse.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
             return;
