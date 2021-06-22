@@ -32,4 +32,7 @@ public class trvBIC {
     private String PrintedPaperNo;
     private String CertificateForm;
     private Long Moduleid ;
+    private String FromZoneGuid ;
+    private String ToZoneGuid ;
+
 }
