@@ -33,11 +33,11 @@ import java.util.Map;
 public class APIUtils {
     private Logger LOGGER = LoggerFactory.getLogger(APIUtils.class);
 
-    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token , String requestId) throws APIAccessException {
+    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token, String requestId) throws APIAccessException {
         ResponseEntity<String> result = null;
-        try {
 
-            //set Time out
+
+        //set Time out
 //            SimpleClientHttpRequestFactory clientHttpRequestFactory
 //                    = new SimpleClientHttpRequestFactory();
 //            //Connect timeout
@@ -45,149 +45,126 @@ public class APIUtils {
 //            //Read timeout
 //            clientHttpRequestFactory.setReadTimeout(10000);
 
-            RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
 
-            String bodyrequest = body;
+        String bodyrequest = body;
 
-            HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
 
-            if (!StringUtils.isEmpty(token)) {
-                headers.add("Authorization", "Bearer " + token);
-            }
-
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            if (headerParam != null) {
-                Iterator<String> keys = headerParam.jsonObject().keySet().iterator();
-                // headers.add("session", UUID.randomUUID().toString());
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    headers.add(key, headerParam.getString(key));
-                }
-            }
-            HttpEntity<String> entity = new HttpEntity<String>(bodyrequest, headers);
-
-            result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-            if (result == null) {
-                throw new CustomException("Not found request body!", HttpStatus.BAD_REQUEST);
-            }
-            if(result.getStatusCode() != HttpStatus.OK ){
-                throw new CustomException("",result.getStatusCode());
-            }
-
+        if (!StringUtils.isEmpty(token)) {
+            headers.add("Authorization", "Bearer " + token);
         }
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (headerParam != null) {
+            Iterator<String> keys = headerParam.jsonObject().keySet().iterator();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                headers.add(key, headerParam.getString(key));
+            }
+        }
+        HttpEntity<String> entity = new HttpEntity<String>(bodyrequest, headers);
+
+        result = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
         //catch truong hop chua goi dc sang BIC
-        catch (ResourceAccessException e){
-            if(e.getCause() instanceof ConnectException) {
-                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
-            }
-            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
-        }
-        //catch truong hop goi dc sang BIC nhưng loi
-        catch (HttpClientErrorException e){
-            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
-        }
+//        catch (ResourceAccessException e){
+//            if(e.getCause() instanceof ConnectException) {
+//                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//            }
+//            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//        }
+//        //catch truong hop goi dc sang BIC nhưng loi
+//        catch (HttpClientErrorException e){
+//            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
+//        }
 
         return result;
     }
 
 
-    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token , String requestId) throws APIAccessException {
+    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token, String requestId) throws APIAccessException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<String> result = null ;
-        try {
+        ResponseEntity<String> result = null;
 
-            if (!StringUtils.isEmpty(token)) {
-                headers.add("Authorization", "Bearer " + token);
-            }
-
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-            UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
-            if (param != null) {
-                for (Map.Entry<String, Object> entry : param.entrySet()) {
-                    builder.queryParam(entry.getKey(), entry.getValue());
-                }
-            }
-
-            HttpEntity<?> entity = new HttpEntity<>(headers);
-            if(pathVariable != null ){
-                result = restTemplate.exchange(builder.buildAndExpand(pathVariable).toUri(), HttpMethod.GET, entity,
-                        String.class);
-
-            }else{
-                result = restTemplate.exchange(builder.build().toUri(), HttpMethod.GET, entity,
-                        String.class);
-            }
-
-            if (result == null) {
-                throw new CustomException("Not found request body!", HttpStatus.BAD_REQUEST ,requestId);
-            }
-            if (result.getStatusCode() != HttpStatus.OK) {
-                throw new CustomException("An error occurred during API call!", result.getStatusCode(),requestId);
-            }
-
+        if (!StringUtils.isEmpty(token)) {
+            headers.add("Authorization", "Bearer " + token);
         }
+
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+        if (param != null) {
+            for (Map.Entry<String, Object> entry : param.entrySet()) {
+                builder.queryParam(entry.getKey(), entry.getValue());
+            }
+        }
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        if (pathVariable != null) {
+            result = restTemplate.exchange(builder.buildAndExpand(pathVariable).toUri(), HttpMethod.GET, entity,
+                    String.class);
+
+        } else {
+            result = restTemplate.exchange(builder.build().toUri(), HttpMethod.GET, entity,
+                    String.class);
+        }
+
         //catch truong hop chua goi dc sang BIC
-        catch (ResourceAccessException e){
-            if(e.getCause() instanceof ConnectException) {
-                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
-            }
-            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
-        }
-        //catch truong hop goi dc sang BIC nhưng loi
-        catch (HttpClientErrorException e){
-            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
-        }
+//        catch (ResourceAccessException e){
+//            if(e.getCause() instanceof ConnectException) {
+//                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//            }
+//            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//        }
+//        //catch truong hop goi dc sang BIC nhưng loi
+//        catch (HttpClientErrorException e){
+//            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
+//        }
 
         return result;
     }
 
-    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token,String requestId) throws APIAccessException {
+    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token, String requestId) throws APIAccessException {
         RestTemplate restTemplate = new RestTemplate();
-//        ObjectMapper mapper = new ObjectMapper();
         String bodyrequest = body;
         ResponseEntity<String> result = null;
-        if (ID == null){
-            throw new CustomException("Không tìm thấy orderId trong bản tin request!", HttpStatus.BAD_REQUEST,requestId);
+        if (ID == null) {
+            throw new CustomException("Không tìm thấy orderId trong bản tin request!", HttpStatus.BAD_REQUEST, requestId);
         }
-        try {
 
-            HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = new HttpHeaders();
 
-            if (!StringUtils.isEmpty(token)) {
-                headers.add("Authorization", "Bearer " + token);
-            }
-
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            if (headerParam != null) {
-                Iterator<String> keys = headerParam.jsonObject().keySet().iterator();
-                // headers.add("session", UUID.randomUUID().toString());
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    headers.add(key, headerParam.getString(key));
-                }
-            }
-            HttpEntity<String> entity = new HttpEntity<String>(bodyrequest, headers);
-
-            url = url +"/"+ ID;
-            result = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
-            if (result == null) {
-                throw new CustomException("Not found request body!", HttpStatus.BAD_REQUEST);
-            }
-
+        if (!StringUtils.isEmpty(token)) {
+            headers.add("Authorization", "Bearer " + token);
         }
-        //catch truong hop chua goi dc sang BIC
-        catch (ResourceAccessException e){
-            if(e.getCause() instanceof ConnectException) {
-                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (headerParam != null) {
+            Iterator<String> keys = headerParam.jsonObject().keySet().iterator();
+            // headers.add("session", UUID.randomUUID().toString());
+            while (keys.hasNext()) {
+                String key = keys.next();
+                headers.add(key, headerParam.getString(key));
             }
-            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
         }
-        //catch truong hop goi dc sang BIC nhưng loi
-        catch (HttpClientErrorException e){
-            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
-        }
+        HttpEntity<String> entity = new HttpEntity<String>(bodyrequest, headers);
+
+        url = url + "/" + ID;
+        result = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+
+//        }
+//        //catch truong hop chua goi dc sang BIC
+//        catch (ResourceAccessException e){
+//            if(e.getCause() instanceof ConnectException) {
+//                throw new APIAccessException(requestId, ResponseCode.CODE.SOA_TIMEOUT_BACKEND,ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//            }
+//            throw new APIAccessException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getMessage(), Throwables.getStackTraceAsString(e));
+//        }
+//        //catch truong hop goi dc sang BIC nhưng loi
+//        catch (HttpClientErrorException e){
+//            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
+//        }
         return result;
     }
 }

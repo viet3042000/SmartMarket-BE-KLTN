@@ -12,4 +12,5 @@ public class CheckFormatUtils {
             return false;
         }
     }
+
 }

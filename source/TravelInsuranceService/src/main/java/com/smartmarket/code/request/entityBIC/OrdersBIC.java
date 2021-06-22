@@ -31,5 +31,6 @@ public class OrdersBIC {
     private BigDecimal Ordtotal;
     private BigDecimal Orddiscountamount;
     private Long UserId ;
+    private String Ordsource ;
 
 }

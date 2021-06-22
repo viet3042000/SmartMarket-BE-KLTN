@@ -63,7 +63,6 @@ public class Orders implements Serializable {
     @NotNull(message = "ordDiscountAmount is require")
     private BigDecimal ordDiscountAmount ;
 
-    @NotNull(message = "ordSource is require")
     private String ordSource ;
 
     private Long userId ;

@@ -67,6 +67,9 @@ public class FieldsConstants{
     @Value("${updateTravelBIC.DSVN.order.orderShipModule}")
     public String updateOrderOrderShipModule;
 
+    @Value("${updateTravelBIC.DSVN.order.ordSource}")
+    public String updateOrderOrdSource;
+
     //CREATE API DSVN
 
     @Value("${createTravelBIC.DSVN.order.orderId}")
@@ -93,6 +96,9 @@ public class FieldsConstants{
 
     @Value("${createTravelBIC.DSVN.order.orderShipModule}")
     public String createOrderOrderShipModule;
+
+    @Value("${createTravelBIC.DSVN.order.ordSource}")
+    public String createOrderOrdSource;
 
     @Value("${createTravelBIC.DSVN.trv.trvId}")
     public String createTrvTrvId;
@@ -147,6 +153,9 @@ public class FieldsConstants{
 
     @Value("${createTravelBIC.DSVN.trv.toZoneGuid}")
     public String createTrvToZoneGuid;
+
+
+
 
 
 }
