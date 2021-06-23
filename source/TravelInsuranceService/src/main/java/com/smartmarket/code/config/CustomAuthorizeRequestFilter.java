@@ -59,6 +59,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -151,12 +152,11 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
         }catch (Exception ex){
             if (ex.getCause() instanceof JDBCConnectionException) {
-                long startTime = System.currentTimeMillis();
+
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 Date date = new Date();
                 String logTimestamp = formatter.format(date);
                 String messageTimestamp = logTimestamp;
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //set response to client
                 ReponseError res = new ReponseError();
@@ -169,6 +169,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ObjectMapper mapper = new ObjectMapper();
                 String responseBody = mapper.writeValueAsString(res);
                 JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -185,12 +187,11 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                         res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
                 logService.createSOALog2(soaObject);
             }else {
-                long startTime = System.currentTimeMillis();
+
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 Date date = new Date();
                 String logTimestamp = formatter.format(date);
                 String messageTimestamp = logTimestamp;
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //set response to client
                 ReponseError res = new ReponseError();
@@ -198,6 +199,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ObjectMapper mapper = new ObjectMapper();
                 String responseBody = mapper.writeValueAsString(res);
                 JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =

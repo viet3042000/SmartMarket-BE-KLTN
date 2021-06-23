@@ -68,7 +68,7 @@ public class RestControllerHandleException {
     //                      tạo trùng
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleCustomException(CustomException ex , HttpServletRequest request, HttpServletResponse responseSelvet) throws IOException{
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -93,8 +93,6 @@ public class RestControllerHandleException {
         String requestURL = request.getRequestURL().toString();
         String targetService = requestURL.substring(requestURL.indexOf("v1/")+3,requestURL.length());
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -106,6 +104,8 @@ public class RestControllerHandleException {
         ResponseWrapper responseCopier = new ResponseWrapper(responseSelvet);
         byte[] body = responseCopier.getCopy();
         String stringBody = new String(body, responseSelvet.getCharacterEncoding());
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         if(stringBody.isEmpty()) {
             //logResponse vs BIC
@@ -133,7 +133,7 @@ public class RestControllerHandleException {
     //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP (chưa kết nối được vs BIC)
     @ExceptionHandler({APIResponseException.class})
     public ResponseEntity<?> handleAPIException(APIResponseException ex , HttpServletRequest request) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -176,7 +176,7 @@ public class RestControllerHandleException {
     //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout --> không nhận được response từ BIC
     @ExceptionHandler(APIAccessException.class)
     public ResponseEntity<?> handleAPITimeOutException(APIAccessException ex , HttpServletRequest request, HttpServletResponse responseSelvet) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -222,7 +222,7 @@ public class RestControllerHandleException {
     //Lỗi input ko đúng yêu cầu nghiệp vụ
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex , HttpServletRequest request) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
 
@@ -262,7 +262,8 @@ public class RestControllerHandleException {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp ;
 
@@ -335,7 +336,8 @@ public class RestControllerHandleException {
     //Trường hợp sai format json request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> globalHttpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -347,15 +349,13 @@ public class RestControllerHandleException {
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
         JSONObject transactionDetailResponse = new JSONObject(responseBody);
-        long elapsed = System.currentTimeMillis() - startTime;
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //add BICTransaction
         try {
             //add BICTransaction
             bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.INVALID_INPUT_DATA , HttpStatus.BAD_REQUEST.toString()) ;
         }catch(CannotCreateTransactionException e){
-            timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //logException
             ServiceExceptionObject soaExceptionObject =
@@ -375,7 +375,7 @@ public class RestControllerHandleException {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -398,7 +398,8 @@ public class RestControllerHandleException {
     // loi connect DB
     @ExceptionHandler(ConnectDataBaseException.class)
     public ResponseEntity<?> globalJDBCConnectionExceptionHandler(ConnectDataBaseException ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -438,7 +439,8 @@ public class RestControllerHandleException {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> globalExceptionHandler(Exception ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -463,7 +465,7 @@ public class RestControllerHandleException {
             bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
         }catch(CannotCreateTransactionException e){
             String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-            
+
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,

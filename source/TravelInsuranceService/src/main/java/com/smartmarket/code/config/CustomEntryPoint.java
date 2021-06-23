@@ -40,7 +40,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException, ServletException {
-        long startTime = System.currentTimeMillis();
+        long startTime = DateTimeUtils.getStartTimeFromRequest(httpServletRequest);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
@@ -95,9 +95,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         catch (IOException ex) {
 //            ex.printStackTrace();
 
-            //get time duration
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
             //set response to client
             ReponseError res = new ReponseError();
             res.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
@@ -109,6 +106,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             ObjectMapper mapper = new ObjectMapper();
             String responseBody = mapper.writeValueAsString(res);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+            //get time duration
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //logException
             ServiceExceptionObject soaExceptionObject =

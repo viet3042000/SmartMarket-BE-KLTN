@@ -39,7 +39,6 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
         //set start time
         request.setAttribute("startTime"  , DateTimeUtils.getCurrenTime());
-
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
         ObjectMapper mapper = new ObjectMapper();
