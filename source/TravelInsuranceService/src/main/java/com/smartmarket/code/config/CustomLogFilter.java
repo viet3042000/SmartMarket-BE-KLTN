@@ -6,9 +6,11 @@ import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.StartTimeBean;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -30,11 +32,16 @@ public class CustomLogFilter extends OncePerRequestFilter {
     @Autowired
     LogServiceImpl logService;
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        long startTime = System.currentTimeMillis();
+        //set start time
+        request.setAttribute("startTime"  , DateTimeUtils.getCurrenTime());
+
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         ObjectMapper mapper = new ObjectMapper();
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");

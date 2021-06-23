@@ -2,6 +2,7 @@ package com.smartmarket.code.util;
 
 import com.smartmarket.code.constants.Format;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -115,6 +116,14 @@ public class DateTimeUtils {
         long endTime = System.currentTimeMillis() ;
         long elapsed = endTime - startTime;
         return Long.toString(elapsed) ;
+    }
+
+    public static Long getStartTimeFromRequest(HttpServletRequest request){
+        Long startTime =  null ;
+        if(request != null ){
+            startTime =(Long) request.getAttribute("startTime") ;
+        }
+        return startTime ;
     }
 
 }
