@@ -112,7 +112,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String responseStatus = Integer.toString(status);
             EJson jsonObjectReponseCreate = null;
 
-            if (jsonResultCreateBIC != null) {
+            if (jsonResultCreateBIC != null && jsonResultCreateBIC.getBody() != null ) {
                 jsonObjectReponseCreate = new EJson(jsonResultCreateBIC.getBody());
                 JSONObject responseBodyFromBIC = new JSONObject(jsonResultCreateBIC.getBody());
 
@@ -296,7 +296,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 }
             }
 
-            if (resultBIC != null) {
+            if (resultBIC != null && resultBIC.getBody() != null) {
                 EJson jsonObjectResultBIC = new EJson(resultBIC.getBody());
 
                 //check valid response
@@ -333,6 +333,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else {
                     throw new CustomException("Can not find the insurance order", HttpStatus.BAD_REQUEST);
                 }
+            }else {
+                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId());
             }
 
         } catch (Exception ex) {
@@ -431,7 +433,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String responseStatus = Integer.toString(status);
 
 
-            if (jsonResultPutBIC != null) {
+            if (jsonResultPutBIC != null && jsonResultPutBIC.getBody() != null ) {
                 EJson jsonObjectReponseUpdate = new EJson(jsonResultPutBIC.getBody());
                 JSONObject responseBodyFromBIC = new JSONObject(jsonResultPutBIC.getBody());
 
