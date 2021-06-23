@@ -3,7 +3,7 @@ package com.smartmarket.code.model.entitylog;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 public class TargetObject {
     String logName;
     String transactionId;
@@ -15,6 +15,22 @@ public class TargetObject {
     String logTimestamp;
     String messageTimestamp;
     String timeDuration;
+
+    public TargetObject(String logName, String transactionId, String requestId, String requestTime,
+                         String targetService, String logType, JSONObject transactionDetail,
+                         String logTimestamp,String messageTimestamp, String timeDuration){
+
+        this.logName= logName;
+        this.transactionId= transactionId;
+        this.requestId= requestId;
+        this.requestTime= requestTime;
+        this.targetService= targetService;
+        this.logType= logType;
+        this.transactionDetail= transactionDetail;
+        this.logTimestamp= logTimestamp;
+        this.messageTimestamp= messageTimestamp;
+        this.timeDuration= timeDuration;
+    }
 
     public String getStringObject() {
         JSONObject json = new JSONObject();

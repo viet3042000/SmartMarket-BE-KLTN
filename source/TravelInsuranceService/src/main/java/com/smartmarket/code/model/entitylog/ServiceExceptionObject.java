@@ -3,7 +3,7 @@ package com.smartmarket.code.model.entitylog;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 
-@AllArgsConstructor
+//@AllArgsConstructor
 public class ServiceExceptionObject {
     String logName;
     String logType;
@@ -19,6 +19,28 @@ public class ServiceExceptionObject {
     String errorCode ;//result code
     String errorDetail ;// exception chi tiết
     String clientIp ;
+
+    public ServiceExceptionObject(String logName,String logType,String requestId ,String requestTime,
+                                  String transactionId, String messageTimestamp ,String serviceName ,
+                                  String operationName , String serviceVersion , String hostName ,
+                                  String errorMsg , String errorCode ,String errorDetail, String clientIp){
+
+        this.logName = logName;
+        this.logType = logType;
+        this.requestId = requestId;
+        this.requestTime = requestTime;
+        this.transactionId = transactionId;
+        this.messageTimestamp = messageTimestamp;
+        this.serviceName = serviceName;
+        this.operationName = operationName;
+        this.serviceVersion = serviceVersion;
+        this.hostName = hostName;
+        this.errorMsg = errorMsg;
+        this.errorCode = errorCode;
+        this.errorDetail = errorDetail;
+        this.clientIp = clientIp;
+
+    }
 
     public String getStringObject(){
         JSONObject json = new JSONObject();

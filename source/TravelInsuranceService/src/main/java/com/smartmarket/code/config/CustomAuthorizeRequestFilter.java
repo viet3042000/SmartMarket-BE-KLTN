@@ -1,6 +1,7 @@
 package com.smartmarket.code.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.exception.ConnectDataBaseException;
@@ -159,7 +160,12 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //set response to client
                 ReponseError res = new ReponseError();
-                res = setResponseUtils.setResponseException(res, ex);
+                res.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
+                res.setResponseTime(DateTimeUtils.getCurrentDate());
+                res.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                res.setDetailErrorCode(HttpStatus.UNPROCESSABLE_ENTITY.toString());
+                res.setDetailErrorMessage("An error occurred during the processing of the system!");
+
                 ObjectMapper mapper = new ObjectMapper();
                 String responseBody = mapper.writeValueAsString(res);
                 JSONObject transactionDetailResponse = new JSONObject(responseBody);

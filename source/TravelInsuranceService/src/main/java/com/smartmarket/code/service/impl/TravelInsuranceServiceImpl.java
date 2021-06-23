@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -94,7 +95,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs BIC
-            TargetObject tarObjectRequest = new TargetObject("targetLog", null,createTravelInsuranceBICRequest.getRequestId(),createTravelInsuranceBICRequest.getRequestTime(), "CreateTravelInsuranceBIC","createOrderTravelInsurance",
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null,createTravelInsuranceBICRequest.getRequestId(),createTravelInsuranceBICRequest.getRequestTime(), "CreateTravelInsuranceBIC","request",
                     transactionDetail, logTimestamp, messageTimestamp,null);
             logService.createTargetLog(tarObjectRequest);
 
@@ -337,7 +338,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             }
 
         } catch (Exception ex) {
-
             try {
                 //catch truong hop chua goi dc sang BIC
                 if (ex instanceof ResourceAccessException) {
@@ -376,9 +376,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-
         }
-
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -392,7 +390,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         BaseResponse response = new BaseResponse();
 
         try {
-
             //check validate json request
             ValidateRequest.checkValidUpdate(updateTravelInsuranceBICRequest);
 
@@ -407,7 +404,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String responseCreate = null;
             responseCreate = mapper.writeValueAsString(updateTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
-
 
             //logRequest vs BIC
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(),updateTravelInsuranceBICRequest.getRequestTime(), "updateOrderTravelInsurance", "request",
@@ -430,7 +426,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //set response data to client
             int status = responseSelvet.getStatus();
             String responseStatus = Integer.toString(status);
-
 
             if (jsonResultPutBIC != null && jsonResultPutBIC.getBody() != null ) {
                 EJson jsonObjectReponseUpdate = new EJson(jsonResultPutBIC.getBody());
@@ -508,7 +503,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
             }
 
-
         } catch (Exception ex) {
 
             try {
@@ -548,7 +542,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
 
         }
 

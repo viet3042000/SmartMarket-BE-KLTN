@@ -91,11 +91,39 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                         responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
                 logService.createSOALog2(soaObject);
             }
-
-
         }
         catch (IOException ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
+
+            //get time duration
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+
+            //set response to client
+            ReponseError res = new ReponseError();
+            res.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
+            res.setResponseTime(DateTimeUtils.getCurrentDate());
+            res.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);
+            res.setDetailErrorCode(HttpStatus.UNAUTHORIZED.toString());
+            res.setDetailErrorMessage("Token is wrong");
+
+            ObjectMapper mapper = new ObjectMapper();
+            String responseBody = mapper.writeValueAsString(res);
+            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+            //logException
+            ServiceExceptionObject soaExceptionObject =
+                    new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
+                            messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                            httpServletRequest.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
+                            res.getDetailErrorMessage(),logService.getIp());
+            logService.createSOALogException(soaExceptionObject);
+
+            //logResponse vs Client
+            ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
+                    messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                    "response", transactionDetailResponse, responseStatus, res.getResultCode(),
+                    res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
+            logService.createSOALog2(soaObject);
         }
     }
 }
