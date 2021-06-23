@@ -159,9 +159,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         responseError = setResponseUtils.setResponseError(responseError,createTravelInsuranceBICRequest,
                                 jsonResultCreateBIC,dataResponse );
 
-                        String responseBody = mapper.writeValueAsString(response);
+                        String responseBody = mapper.writeValueAsString(responseError);
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
 
                         //create BICTransaction
                         bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString());

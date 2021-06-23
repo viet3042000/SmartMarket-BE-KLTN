@@ -90,31 +90,6 @@ public class RestControllerHandleException {
         String requestURL = request.getRequestURL().toString();
         String targetService = requestURL.substring(requestURL.indexOf("v1/")+3,requestURL.length());
 
-
-//        try {
-////            //add BICTransaction
-////            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, ex.getHttpStatus().toString());
-////        }catch(Exception e){
-////            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-////
-////            //logException
-////            ServiceExceptionObject soaExceptionObject =
-////                    new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,
-////                            messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
-////                            request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
-////                            Throwables.getStackTraceAsString(e),logService.getIp(),messageTimestamp);
-////            logService.createSOALogException(soaExceptionObject.getStringObject());
-////
-////            //logResponse vs Client
-////            ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "client",null,
-////                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-////                    "response", response.toString(), null, response.getResultCode(),
-////                    response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
-////            logService.createSOALog2(soaObject.getStringObject());
-////
-////            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-////        }
-
         String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
         //logException
