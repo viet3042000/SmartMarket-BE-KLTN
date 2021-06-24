@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -308,9 +307,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     if (resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
                         createTravelInsuranceBICResponse = mapperUtils.queryCreateObjectToBIC(queryTravelInsuranceBICRequest, resultBIC, token, queryTravelInsuranceBICRequest.getRequestId());
 
-                        String responseCreate = mapper.writeValueAsString(createTravelInsuranceBICResponse);
-                        JSONObject responseBodyBIC= new JSONObject(responseCreate);
-
                         //set response to client
                         response = setResponseUtils.setResponseInquery(response, createTravelInsuranceBICResponse);
                         String responseBody = mapper.writeValueAsString(response);
@@ -321,7 +317,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                         //logResponse vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(),queryTravelInsuranceBICRequest.getRequestTime(), "getOrderTravelInsurance", "response",
-                                responseBodyBIC, logTimestamp, messageTimestamp, timeDurationResponse);
+                                jsonObjectResultBICLog, logTimestamp, messageTimestamp, timeDurationResponse);
                         logService.createTargetLog(tarObject);
 
                         //logResponse vs Client
