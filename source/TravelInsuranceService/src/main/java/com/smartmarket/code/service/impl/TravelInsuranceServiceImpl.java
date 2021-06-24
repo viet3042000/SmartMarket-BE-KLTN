@@ -181,10 +181,10 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         return new ResponseEntity<>(responseError, HttpStatus.OK);
                     }
                 } else {
-                    throw new CustomException("Format of BIC response is not TRUE", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId());
+                    throw new CustomException("Format of BIC response is not TRUE", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),responseBodyFromBIC);
                 }
             } else {
-                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId());
+                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),null);
             }
             //check format reponse from BIC
 
@@ -222,7 +222,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else {
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatus().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), createTravelInsuranceBICRequest.getRequestId());
+                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), createTravelInsuranceBICRequest.getRequestId(),customException.getResponseBIC());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -299,6 +299,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             if (resultBIC != null && resultBIC.getBody() != null) {
                 EJson jsonObjectResultBIC = new EJson(resultBIC.getBody());
+                JSONObject jsonObjectResultBICLog = new JSONObject(resultBIC.getBody());
 
                 //check valid response
                 boolean isValidFormatResponse = CheckFormatUtils.checkFormat(jsonObjectResultBIC);
@@ -332,10 +333,10 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                     }
                 } else {
-                    throw new CustomException("Can not find the insurance order", HttpStatus.BAD_REQUEST);
+                    throw new CustomException("Can not find the insurance order", HttpStatus.BAD_REQUEST, queryTravelInsuranceBICRequest.getRequestId(),jsonObjectResultBICLog);
                 }
             }else {
-                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId());
+                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null);
             }
 
         } catch (Exception ex) {
@@ -371,7 +372,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else {
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatus().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), queryTravelInsuranceBICRequest.getRequestId());
+                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), queryTravelInsuranceBICRequest.getRequestId(),customException.getResponseBIC());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -501,10 +502,10 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         return new ResponseEntity<>(responseError, HttpStatus.OK);
                     }
                 } else {
-                    throw new CustomException("Format of BIC response is not TRUE", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
+                    throw new CustomException("Format of BIC response is not TRUE", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),responseBodyFromBIC);
                 }
             } else {
-                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId());
+                throw new CustomException("Not found body response from BIC ", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),null);
             }
 
         } catch (Exception ex) {
@@ -541,7 +542,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else {
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatus().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), updateTravelInsuranceBICRequest.getRequestId());
+                    throw new CustomException(ex.getMessage(), customException.getHttpStatus(), updateTravelInsuranceBICRequest.getRequestId(),customException.getResponseBIC());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

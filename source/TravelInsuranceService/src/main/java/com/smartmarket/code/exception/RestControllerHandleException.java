@@ -103,17 +103,16 @@ public class RestControllerHandleException {
 
         ResponseWrapper responseCopier = new ResponseWrapper(responseSelvet);
         byte[] body = responseCopier.getCopy();
-        String stringBody = new String(body, responseSelvet.getCharacterEncoding());
 
         String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
-        if(stringBody.isEmpty()) {
+        if(ex.getResponseBIC() == null ) {
             //logResponse vs BIC
             TargetObject tarObject = new TargetObject("targetLog", null, requestId, requestTime, targetService, "response", null,
                     logTimestamp, messageTimestamp, timeDuration);
             logService.createTargetLog(tarObject);
         }else{
-            JSONObject responseBodyBIC = new JSONObject(stringBody);
+            JSONObject responseBodyBIC = ex.getResponseBIC();
             TargetObject tarObject = new TargetObject("targetLog", null, requestId, requestTime, targetService, "response", responseBodyBIC,
                     logTimestamp, messageTimestamp, timeDuration);
             logService.createTargetLog(tarObject);
