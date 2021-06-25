@@ -1,6 +1,7 @@
 package com.smartmarket.code.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.ResponseCode;
@@ -78,10 +79,10 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,
+                        new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
                                 messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
-                                responseError.getDetailErrorMessage(),logService.getIp(),requestBody.getString("requestTime"));
+                                responseError.getDetailErrorMessage(),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
@@ -115,7 +116,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
                             messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
                             httpServletRequest.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                            res.getDetailErrorMessage(),logService.getIp());
+                            Throwables.getStackTraceAsString(ex),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
 
             //logResponse vs Client

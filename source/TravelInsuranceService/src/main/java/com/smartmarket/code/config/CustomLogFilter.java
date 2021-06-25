@@ -70,10 +70,12 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     logService.createSOALog2(soaObject);
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+                    JSONObject transactionDetail = new JSONObject();
+                    transactionDetail.put("transactionDetail","Format request body is not true ");
 
                     ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                            "request", null, null, null,
+                            "request", transactionDetail, null, null,
                             null, logtimeStamp, request.getRemoteHost(), logService.getIp());
                     logService.createSOALog2(soaObject);
                 }

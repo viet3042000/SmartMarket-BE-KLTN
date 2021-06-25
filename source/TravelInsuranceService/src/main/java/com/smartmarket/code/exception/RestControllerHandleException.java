@@ -18,7 +18,6 @@ import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.EJson;
 import com.smartmarket.code.util.SetResponseUtils;
-import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,6 @@ import org.springframework.web.context.request.WebRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -202,7 +200,7 @@ public class RestControllerHandleException {
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
                         messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
-                        ex.getErrorDetail(),logService.getIp());
+                        Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
 
         //logResponse vs Client
@@ -270,7 +268,6 @@ public class RestControllerHandleException {
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-
             errors.put(fieldName, errorMessage);
         });
 

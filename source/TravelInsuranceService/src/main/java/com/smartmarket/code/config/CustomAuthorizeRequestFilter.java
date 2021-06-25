@@ -1,6 +1,7 @@
 package com.smartmarket.code.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
@@ -177,7 +178,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                ex.getMessage(),logService.getIp());
+                                Throwables.getStackTraceAsString(ex),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
@@ -207,7 +208,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                ex.getMessage(),logService.getIp());
+                                Throwables.getStackTraceAsString(ex),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
 
                 //logResponse vs Client
