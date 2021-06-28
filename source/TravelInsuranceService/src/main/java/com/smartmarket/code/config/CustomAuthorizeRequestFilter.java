@@ -171,8 +171,6 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 String responseBody = mapper.writeValueAsString(res);
                 JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
@@ -180,6 +178,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                                 Throwables.getStackTraceAsString(ex),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
+
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logResponse vs Client
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
@@ -201,8 +201,6 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 String responseBody = mapper.writeValueAsString(res);
                 JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
@@ -210,6 +208,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                                 Throwables.getStackTraceAsString(ex),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
+
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logResponse vs Client
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket", "client",

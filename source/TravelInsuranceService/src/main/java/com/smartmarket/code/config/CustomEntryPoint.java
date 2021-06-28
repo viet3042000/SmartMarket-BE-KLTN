@@ -74,9 +74,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                 String requestId = requestBody.getString("requestId");
                 String requestTime = requestBody.getString("requestTime");
 
-                //get time duration
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -84,6 +81,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
+
+                //get time duration
+                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
                 //logResponse vs Client
                 ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "smartMarket", "client",
@@ -94,7 +94,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             }
         }
         catch (IOException ex) {
-//            ex.printStackTrace();
 
             //set response to client
             ReponseError res = new ReponseError();
@@ -108,9 +107,6 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             String responseBody = mapper.writeValueAsString(res);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
-            //get time duration
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
@@ -118,6 +114,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                             httpServletRequest.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                             Throwables.getStackTraceAsString(ex),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
+
+            //get time duration
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
