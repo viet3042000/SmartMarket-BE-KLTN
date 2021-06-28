@@ -4,14 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.config.RequestWrapper;
-import com.smartmarket.code.config.ResponseWrapper;
 import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
-import com.smartmarket.code.model.entitylog.TargetObject;
-import com.smartmarket.code.response.ReponseError;
+import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
@@ -66,14 +64,14 @@ public class RestControllerHandleException {
     //                      tạo trùng
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<?> handleCustomException(CustomException ex , HttpServletRequest request, HttpServletResponse responseSelvet) throws IOException{
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseCustomException(response, ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -99,45 +97,31 @@ public class RestControllerHandleException {
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
 
-        ResponseWrapper responseCopier = new ResponseWrapper(responseSelvet);
-        byte[] body = responseCopier.getCopy();
-
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
-        if(ex.getResponseBIC() == null ) {
-            //logResponse vs BIC
-            TargetObject tarObject = new TargetObject("targetLog", null, requestId, requestTime, targetService, "response", null,
-                    logTimestamp, messageTimestamp, timeDuration);
-            logService.createTargetLog(tarObject);
-        }else{
-            JSONObject responseBodyBIC = ex.getResponseBIC();
-            TargetObject tarObject = new TargetObject("targetLog", null, requestId, requestTime, targetService, "response", responseBodyBIC,
-                    logTimestamp, messageTimestamp, timeDuration);
-            logService.createTargetLog(tarObject);
-        }
+        //calculate time duration
+        String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
-                messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                messageTimestamp, "travelinsuranceservice ", "1", timeDurationResponse,
                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject);
 
-        return new ResponseEntity<>(response, ex.getHttpStatus());
+        return new ResponseEntity<>(response, ex.getHttpStatusDetailCode());
     }
 
 
     //Lỗi kỹ thuật khi gọi --> BIC. VD: sai IP (chưa kết nối được vs BIC)
     @ExceptionHandler({APIResponseException.class})
     public ResponseEntity<?> handleAPIException(APIResponseException ex , HttpServletRequest request) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseAPIResponseException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -149,8 +133,6 @@ public class RestControllerHandleException {
         String requestId = requestBody.getString("requestId");
         String requestTime = requestBody.getString("requestTime");
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject("serviceLog","response",requestId,requestTime,null,
@@ -159,9 +141,12 @@ public class RestControllerHandleException {
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
 
+        //calculate time duration
+        String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
-                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                 "response", transactionDetailResponse, null, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
         logService.createSOALog2(soaObject);
@@ -173,14 +158,14 @@ public class RestControllerHandleException {
     //Lỗi kỹ thuật khi gọi --> BIC. VD: BIC trả ra bị timeout --> không nhận được response từ BIC
     @ExceptionHandler(APIAccessException.class)
     public ResponseEntity<?> handleAPITimeOutException(APIAccessException ex , HttpServletRequest request, HttpServletResponse responseSelvet) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         String logTimestamp = formatter.format(date);
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseAPIAccessException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -194,7 +179,6 @@ public class RestControllerHandleException {
         String requestId = requestBody.getString("requestId");
         String requestTime = requestBody.getString("requestTime");
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -202,6 +186,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
@@ -219,12 +205,12 @@ public class RestControllerHandleException {
     //Lỗi input ko đúng yêu cầu nghiệp vụ
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<?> handleInvalidInputException(InvalidInputException ex , HttpServletRequest request) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseInvalidInputException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -236,9 +222,6 @@ public class RestControllerHandleException {
         String requestId = requestBody.getString("requestId");
         String requestTime = requestBody.getString("requestTime");
 
-
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -246,6 +229,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
@@ -259,7 +244,7 @@ public class RestControllerHandleException {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp ;
@@ -277,7 +262,7 @@ public class RestControllerHandleException {
         String requestId = requestBody.getString("requestId");
         String requestTime = requestBody.getString("requestTime");
 
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseMethodArgumentNotValidException(response,errors,requestId);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -289,8 +274,6 @@ public class RestControllerHandleException {
             //add BICTransaction
             bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.INVALID_INPUT_DATA , HttpStatus.BAD_REQUEST.toString()) ;
         }catch(CannotCreateTransactionException e){
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -298,6 +281,8 @@ public class RestControllerHandleException {
                             request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                             Throwables.getStackTraceAsString(e),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
+
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
@@ -309,8 +294,6 @@ public class RestControllerHandleException {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -318,6 +301,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
@@ -332,7 +317,7 @@ public class RestControllerHandleException {
     //Trường hợp sai format json request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> globalHttpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
@@ -340,7 +325,7 @@ public class RestControllerHandleException {
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseHttpMessageNotReadableException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -351,8 +336,6 @@ public class RestControllerHandleException {
             //add BICTransaction
             bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.INVALID_INPUT_DATA , HttpStatus.BAD_REQUEST.toString()) ;
         }catch(CannotCreateTransactionException e){
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
@@ -360,6 +343,8 @@ public class RestControllerHandleException {
                             request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                             Throwables.getStackTraceAsString(e),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
+
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
@@ -371,8 +356,6 @@ public class RestControllerHandleException {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
@@ -380,6 +363,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
@@ -394,7 +379,7 @@ public class RestControllerHandleException {
     // loi connect DB
     @ExceptionHandler(ConnectDataBaseException.class)
     public ResponseEntity<?> globalJDBCConnectionExceptionHandler(ConnectDataBaseException ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
@@ -402,13 +387,11 @@ public class RestControllerHandleException {
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseConnectDataBaseException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
         JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
-        String timeDuration = Long.toString(startTime);
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -417,6 +400,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp(),messageTimestamp);
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = Long.toString(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
@@ -435,7 +420,7 @@ public class RestControllerHandleException {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> globalExceptionHandler(Exception ex,HttpServletRequest request, WebRequest webRequest) throws IOException {
-        long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
@@ -443,7 +428,7 @@ public class RestControllerHandleException {
         String messageTimestamp = logTimestamp;
 
         //set response to client
-        ReponseError response = new ReponseError();
+        ResponseError response = new ResponseError();
         response = setResponseUtils.setResponseException(response,ex);
         ObjectMapper mapper = new ObjectMapper();
         String responseBody = mapper.writeValueAsString(response);
@@ -460,7 +445,6 @@ public class RestControllerHandleException {
             //add BICTransaction
             bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
         }catch(CannotCreateTransactionException e){
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //logException
             ServiceExceptionObject soaExceptionObject =
@@ -469,6 +453,8 @@ public class RestControllerHandleException {
                             request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                             Throwables.getStackTraceAsString(e),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
+
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
@@ -480,8 +466,6 @@ public class RestControllerHandleException {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
-        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
@@ -489,6 +473,8 @@ public class RestControllerHandleException {
                         request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),logService.getIp());
         logService.createSOALogException(soaExceptionObject);
+
+        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
 
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",

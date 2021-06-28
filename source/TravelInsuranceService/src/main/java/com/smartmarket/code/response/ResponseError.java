@@ -7,7 +7,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class ReponseError {
+public class ResponseError {
 
     private String responseId;
     private String responseTime;

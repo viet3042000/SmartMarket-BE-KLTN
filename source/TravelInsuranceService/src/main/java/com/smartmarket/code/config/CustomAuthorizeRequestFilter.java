@@ -5,13 +5,11 @@ import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
-import com.smartmarket.code.exception.ConnectDataBaseException;
-import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
-import com.smartmarket.code.response.ReponseError;
+import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
@@ -160,7 +158,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 String messageTimestamp = logTimestamp;
 
                 //set response to client
-                ReponseError res = new ReponseError();
+                ResponseError res = new ResponseError();
                 res.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
                 res.setResponseTime(DateTimeUtils.getCurrentDate());
                 res.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -195,7 +193,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 String messageTimestamp = logTimestamp;
 
                 //set response to client
-                ReponseError res = new ReponseError();
+                ResponseError res = new ResponseError();
                 res = setResponseUtils.setResponseException(res, ex);
                 ObjectMapper mapper = new ObjectMapper();
                 String responseBody = mapper.writeValueAsString(res);

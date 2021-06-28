@@ -7,7 +7,7 @@ import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
-import com.smartmarket.code.response.ReponseError;
+import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.SetResponseUtils;
@@ -56,7 +56,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
         try {
-            ReponseError responseError = new ReponseError();
+            ResponseError responseError = new ResponseError();
             responseError =  setResponseUtils.setResponseCustomEntryPoint(responseError) ;
             response.addHeader("WWW-Authenticate", "Authorized failed ");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -96,7 +96,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         catch (IOException ex) {
 
             //set response to client
-            ReponseError res = new ReponseError();
+            ResponseError res = new ResponseError();
             res.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
             res.setResponseTime(DateTimeUtils.getCurrentDate());
             res.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);

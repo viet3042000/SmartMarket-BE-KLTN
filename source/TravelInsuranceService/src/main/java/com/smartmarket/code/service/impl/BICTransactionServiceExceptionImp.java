@@ -51,18 +51,16 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
         String orderReference ="-1" ;
         String orderId = "-1";
-        String customerName = "DSVN";
+        String customerName = "-1";
         String phoneNumber ="-1";
         String email = "-1";
         String ordPaidMoney = "-1";
         String consumerId = "DSVN";
         String fromDate = "-1";
         String toDate = "-1";
-//            String resultCode = ResponseCode.CODE.ERROR_IN_BACKEND;
-//            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
         String ordDate = "-1";
         String productId = fieldsConstants.createOrderProductId;
-        String customerAddress = "default";
+        String customerAddress = "-1";
         String clientIp = "unknown" ;
 
         if(Utils.isJSONValid(jsonString)){
@@ -78,25 +76,24 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 Gson gson = new Gson(); // Or use new GsonBuilder().create();
                 CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
 
-
                 //set properties detail
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
                     orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
                     orderId = "-1";
-                    customerName = "DSVN";
+                    customerName = createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName();
                     phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile();
                     email = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
                     ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
                     consumerId = "DSVN";
+
                     if (createTravelInsuranceBICRequest.getTrv() != null) {
                         fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate() == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getFromDate();
                         toDate = createTravelInsuranceBICRequest.getTrv().getToDate() == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getToDate();
                     }
-//            String resultCode = ResponseCode.CODE.ERROR_IN_BACKEND;
-//            String bicResultCode = HttpStatus.REQUEST_TIMEOUT.toString();
+
                     ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
                     productId = fieldsConstants.createOrderProductId;
-                    customerAddress = "default";
+                    customerAddress = createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
                     clientIp = Utils.getClientIp(request) ;
 
                     bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,

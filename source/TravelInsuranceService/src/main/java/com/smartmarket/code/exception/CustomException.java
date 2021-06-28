@@ -14,39 +14,84 @@ public class CustomException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private final String message;
-    private final HttpStatus httpStatus;
+    private String detailErrorMessage;
+    private HttpStatus httpStatusDetailCode;
+    private String httpStatusCode;
+    private String errorMessage;
     private String responseId;
-    private JSONObject responseBIC ;
+    private JSONObject responseBIC;
 
-    public CustomException(String message, HttpStatus httpStatus, String responseId ,JSONObject responseBIC ) {
-        this.message = message;
-        this.httpStatus = httpStatus;
+    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC
+                            , String httpStatusCode, String errorMessage ) {
+        this.detailErrorMessage = detailErrorMessage;
+        this.httpStatusDetailCode = httpStatusDetailCode;
         this.responseId = responseId;
-        this.responseBIC = responseBIC ;
+        this.responseBIC = responseBIC;
+        this.httpStatusCode = httpStatusCode;
+        this.errorMessage = errorMessage;
+
+    }
+
+    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC) {
+        this.detailErrorMessage = detailErrorMessage;
+        this.httpStatusDetailCode = httpStatusDetailCode;
+        this.responseId = responseId;
+        this.responseBIC = responseBIC;
 
     }
 
 
-    public CustomException(String message, HttpStatus httpStatus, String responseId) {
-        this.message = message;
-        this.httpStatus = httpStatus;
+    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId) {
+        this.detailErrorMessage = detailErrorMessage;
+        this.httpStatusDetailCode = httpStatus;
         this.responseId = responseId;
 
     }
 
-    public CustomException(String message, HttpStatus httpStatus) {
-        this.message = message;
-        this.httpStatus = httpStatus;
+    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId,String httpStatusCode, String errorMessage) {
+        this.detailErrorMessage = detailErrorMessage;
+        this.httpStatusDetailCode = httpStatus;
+        this.responseId = responseId;
+        this.httpStatusCode = httpStatusCode;
+        this.errorMessage = errorMessage;
+
     }
 
-    @Override
-    public String getMessage() {
-        return message;
+    public CustomException(String detailErrorMessage, HttpStatus httpStatus) {
+        this.detailErrorMessage = detailErrorMessage;
+        this.httpStatusDetailCode = httpStatus;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public String getDetailErrorMessage() {
+        return detailErrorMessage;
+    }
+
+    public void setDetailErrorMessage(String detailErrorMessage) {
+        this.detailErrorMessage = detailErrorMessage;
+    }
+
+    public HttpStatus getHttpStatusDetailCode() {
+        return httpStatusDetailCode;
+    }
+
+    public void setHttpStatusDetailCode(HttpStatus httpStatusDetailCode) {
+        this.httpStatusDetailCode = httpStatusDetailCode;
+    }
+
+    public String getHttpStatusCode() {
+        return httpStatusCode;
+    }
+
+    public void setHttpStatusCode(String httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public String getResponseId() {
