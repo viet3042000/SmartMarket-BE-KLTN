@@ -237,7 +237,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -353,13 +353,14 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     }
                 } else {
                     //logResponse vs BIC
+                    EJson dataResponse = (jsonObjectResultBIC.getJSONObject("data"));
                     String requestURL = request.getRequestURL().toString();
                     String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
 
                     TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), targetService, "response", jsonObjectResultBICLog,
                             logTimestamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
-                    throw new CustomException("",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                    throw new CustomException("Not found order",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
                 }
             } else {
                 //logResponse vs BIC
@@ -401,7 +402,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -587,7 +588,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode().toString());
-                    throw new CustomException(ex.getMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
                 }
             } catch (JDBCConnectionException jdbcConnect) {
                 throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
