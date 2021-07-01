@@ -70,10 +70,10 @@ public class SetResponseUtils {
     public ResponseError setResponseCustomException(ResponseError response, CustomException ex){
         response.setResultCode(ex.getHttpStatusCode());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
-        response.setResultMessage(ex.getMessage());
+        response.setResultMessage(ex.getErrorMessage());
 //        response.setResponseId(ex.getResponseId());
-        response.setDetailErrorCode(ex.getHttpStatusCode().toString());
-        response.setDetailErrorMessage(ex.getMessage());
+        response.setDetailErrorCode(ex.getHttpStatusDetailCode().toString());
+        response.setDetailErrorMessage(ex.getDetailErrorMessage());
         return response ;
     }
 
