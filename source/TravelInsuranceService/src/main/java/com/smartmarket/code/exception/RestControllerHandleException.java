@@ -440,31 +440,6 @@ public class RestControllerHandleException {
         String requestId = requestBody.getString("requestId");
         String requestTime = requestBody.getString("requestTime");
 
-        //add BICTransaction
-        try {
-            //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
-        }catch(CannotCreateTransactionException e){
-
-            //logException
-            ServiceExceptionObject soaExceptionObject =
-                    new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
-                            messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
-                            request.getRemoteHost(), response.getResultMessage(),response.getResultCode(),
-                            Throwables.getStackTraceAsString(e),logService.getIp());
-            logService.createSOALogException(soaExceptionObject);
-
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, "BIC", "smartMarket","client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetailResponse, null, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
-            logService.createSOALog2(soaObject);
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
 
         //logException
         ServiceExceptionObject soaExceptionObject =

@@ -39,7 +39,6 @@ public class MapperUtils {
     public CreateTravelInsuranceToBIC mapCreateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
-        try {
             Orders orders = createTravelInsuranceBICRequest.getOrders();
             TRV trv = createTravelInsuranceBICRequest.getTrv();
             ArrayList<TRVDetail> trvDetails = createTravelInsuranceBICRequest.getTrvDetails();
@@ -112,14 +111,12 @@ public class MapperUtils {
                     trvDetailBIC.setPassportCard(trvDetail.getPassportCard());
                     trvDetailsBICs.add(trvDetailBIC);
                 }
-            }
+
 
             createTravelInsuranceToBIC.setOrders(ordersBIC);
             createTravelInsuranceToBIC.setTRV(trvBIC);
             createTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
 
-        } catch (Exception ex) {
-            throw new CustomException("An error occurred during data mapping", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return createTravelInsuranceToBIC;
     }
@@ -128,7 +125,6 @@ public class MapperUtils {
     public CreateTravelInsuranceToBIC mapUpdateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
 
-        try {
             Orders orders = createTravelInsuranceBICRequest.getOrders();
             TRV trv = createTravelInsuranceBICRequest.getTrv();
             ArrayList<TRVDetail> trvDetails = createTravelInsuranceBICRequest.getTrvDetails();
@@ -201,14 +197,12 @@ public class MapperUtils {
                     trvDetailBIC.setPassportCard(trvDetail.getPassportCard());
                     trvDetailsBICs.add(trvDetailBIC);
                 }
-            }
+
 
             createTravelInsuranceToBIC.setOrders(ordersBIC);
             createTravelInsuranceToBIC.setTRV(trvBIC);
             createTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
 
-        } catch (Exception ex) {
-            throw new CustomException("An error occurred during data mapping", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return createTravelInsuranceToBIC;
     }
