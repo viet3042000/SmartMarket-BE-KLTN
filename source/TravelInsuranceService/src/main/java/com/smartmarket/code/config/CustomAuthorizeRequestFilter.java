@@ -11,6 +11,8 @@ import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.AuthorizationService;
+import com.smartmarket.code.service.ClientService;
+import com.smartmarket.code.service.UrlService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
@@ -32,10 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
@@ -54,6 +53,12 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     SetResponseUtils setResponseUtils;
+
+    @Autowired
+    ClientService clientService ;
+
+    @Autowired
+    UrlService urlService ;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -94,9 +99,10 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 }
 
                 //find client by clientName
-                Optional<Client> client = clientRepository.findByclientName(clientId);
+
+                Optional<Client> client = clientService.findByclientName(clientId);
                 if (client.isPresent() == true) {
-                    urlSet = urlRepository.findUrlByClientIdActive(client.get().getId());
+                    urlSet = urlService.findUrlByClientId(client.get().getId());
 
                     //check url access
                     if (urlSet == null) {
@@ -144,7 +150,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 }
 
                 if (verifyEndpoint == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API ");
+                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API");
                     return;
                 }
             }

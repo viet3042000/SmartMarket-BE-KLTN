@@ -13,7 +13,4 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface BICTransactionRepository extends JpaRepository<BICTransaction, Long> {
-
-
-
 }

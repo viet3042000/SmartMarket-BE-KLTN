@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -19,6 +20,9 @@ import java.util.Date;
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class BICTransactionServiceImp implements BICTransactionService {
+
+    @Autowired
+    ConfigurableEnvironment environment;
 
     @Autowired
     private BICTransactionRepository bicTransactionRepository;
@@ -78,7 +82,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setRequestId(object.getRequestId());
             bicTransaction.setToDate(object.getDetail().getTrv().getToDate());
             bicTransaction.setOrdDate(object.getDetail().getOrders().getOrdDate());
-            bicTransaction.setProductId(fieldsConstants.createOrderProductId);
+            bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId") );
         }
 
         return bicTransactionRepository.save(bicTransaction);
@@ -90,7 +94,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
                                                         String ordPaidMoney, String consumerId, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
-                                                        String customerAddress , String clientIp) {
+                                                        String customerAddress , String clientIp,String type) {
         BICTransaction bicTransaction = new BICTransaction();
 
         bicTransaction.setOrderId(orderId);
@@ -109,8 +113,8 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setToDate(toDate);
         bicTransaction.setOrdDate(ordDate);
         bicTransaction.setClientIp(clientIp);
-        bicTransaction.setProductId(fieldsConstants.createOrderProductId);
-
+        bicTransaction.setType(type);
+        bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
 
         return bicTransactionRepository.save(bicTransaction);
     }

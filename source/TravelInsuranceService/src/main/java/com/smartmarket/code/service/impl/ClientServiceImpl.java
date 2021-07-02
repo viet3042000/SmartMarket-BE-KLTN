@@ -1,8 +1,10 @@
 package com.smartmarket.code.service.impl;
 
+import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
+import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.UrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -10,45 +12,50 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.cache.management.CacheStatisticsMXBean;
+import javax.management.JMX;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class UrlServiceImpl implements UrlService {
+public class ClientServiceImpl implements ClientService {
 
     @Autowired
-    UrlRepository urlRepository ;
+    ClientRepository clientRepository ;
 
 //    @Override
 //    public Set<Url> findUrlByClientIdActive(Long clientId) {
 //        return urlRepository.findUrlByClientIdActive(clientId);
 //    }
 
+    @Override
+    @Cacheable(cacheNames = "client", key = "#clientIdCode")
+    public Optional<Client> findByclientName(String clientIdCode) {
+        return clientRepository.findByclientName(clientIdCode);
+    }
 
+
+    @CacheEvict(cacheNames = "client", key = "#clientIdCode")
+    public void evictSingleClientNameCacheValue(String clientIdCode) {
+    }
+
+
+    @CachePut(cacheNames = "client" , key = "#clientIdCode")
+    public Optional<Client> updateClientCacheByClientIdCode(String clientIdCode) {
+        return clientRepository.findByclientName(clientIdCode);
+    }
 
     @Override
-    @Cacheable(cacheNames = "hoptest"
-            , key = "#userId"
-    )
-    public Set<Url> findUrlByUserIdActive(Long userId) {
-        return urlRepository.findUrlByUserIdActive(userId);
+    @Cacheable(cacheNames = "clientlist")
+    public List<Client> getAllCacheListClient() {
+        return clientRepository.findAll();
     }
 
-
-    @Cacheable(cacheNames = "urllist", key = "#clientId")
-    public Set<Url> findUrlByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
-    }
-
-    @CacheEvict(cacheNames = "urllist", key = "#clientId")
-    public void evictSingleClientIdCacheValue(String clientId) {
-    }
-
-
-    @CachePut(cacheNames = "client" , key = "#clientId")
-    public Set<Url> updateClientCacheByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
-    }
 
 //    @Caching(
 //            cacheable = @Cacheable(value = "tasks", condition = "!#noCache", key = "'ALL'"),

@@ -3,6 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
+import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
@@ -23,6 +24,7 @@ import com.smartmarket.code.util.*;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     SetResponseUtils setResponseUtils;
 
+    @Autowired
+    ConfigurableEnvironment environment;
 
     @Autowired
     BICTransactionExceptionService bicTransactionExceptionService;
@@ -101,7 +105,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_CREATE, null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId());
+            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId());
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
@@ -238,9 +242,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode().toString());
                     throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
-                }
-
-                else {
+                }else {
                     bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
                     throw ex ;
                 }
@@ -305,7 +307,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     if (orderId != null) {
                         map.put("id", orderId);
                         startTime = System.currentTimeMillis();
-                        resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_ID, null, map, token, queryTravelInsuranceBICRequest.getRequestId());
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOrderId"), null, map, token, queryTravelInsuranceBICRequest.getRequestId());
                         timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
                     }
                 }
@@ -314,7 +316,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     if (orderReference != null) {
                         map.put("id", orderReference);
                         startTime = System.currentTimeMillis();
-                        resultBIC = apiUtils.getApiWithParam(hostConstants.BIC_HOST_GET_BY_ORDER_REFERANCE, null, map, token, queryTravelInsuranceBICRequest.getRequestId());
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOderReference"), null, map, token, queryTravelInsuranceBICRequest.getRequestId());
                         timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
                     }
 
@@ -407,12 +409,14 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
-                }
-                else {
+                } else {
                     throw ex ;
                 }
+
             } catch (JDBCConnectionException jdbcConnect) {
-                throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                if (ex.getCause() instanceof JDBCConnectionException) {
+                    throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
             }
 
         }
@@ -461,7 +465,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID, hostConstants.BIC_HOST_UPDATE, null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId());
+            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId());
 
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);

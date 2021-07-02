@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
@@ -26,14 +29,17 @@ import java.util.Base64;
 
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${publicKey}")
-    private String publicKey;
+//    @Value("${publicKey}")
+//    private String publicKey;
 
     @Autowired
     private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
 
     @Autowired
     private CustomEntryPoint customEntryPoint;
+
+    @Autowired
+    ConfigurableEnvironment environment;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -65,7 +71,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     public JwtDecoder jwtDecoder() {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            byte[] key = Base64.getDecoder().decode(publicKey);
+            byte[] key = Base64.getDecoder().decode(environment.getRequiredProperty("publicKey"));
 
             X509EncodedKeySpec x509 = new X509EncodedKeySpec(key);
             PublicKey rsaKey = (RSAPublicKey) keyFactory.generatePublic(x509);

@@ -15,6 +15,7 @@ import com.smartmarket.code.util.APIUtils;
 import com.smartmarket.code.util.JwtUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -46,8 +47,9 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Autowired
     APIUtils apiUtils;
 
+
     @Autowired
-    HostConstants hostConstants;
+    ConfigurableEnvironment environment;
 
     @Override
     public boolean AuthorUserAccess(Long userId) {
@@ -192,15 +194,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         //post get token
         UserLoginBIC userLoginBIC = new UserLoginBIC();
-        userLoginBIC.setUsername("bic-dsvn@bic.vn");
-        userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
-        userLoginBIC.setDomainname("vetautructuyen.com.vn");
+        userLoginBIC.setUsername(environment.getRequiredProperty("account.DSVN.username"));
+        userLoginBIC.setPassword(environment.getRequiredProperty("account.DSVN.password"));
+        userLoginBIC.setDomainname(environment.getRequiredProperty("account.DSVN.domainName"));
 
         ObjectMapper mapper = new ObjectMapper();
 
         String requestToken = mapper.writeValueAsString(userLoginBIC);
-        String apilogin =  hostConstants.BIC_HOST_LOGIN;
-        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(hostConstants.BIC_HOST_LOGIN, null, requestToken, null, null);
+        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null);
         if(jsonResultGetToken != null && jsonResultGetToken.getBody() != null){
             //get token from response
             token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
