@@ -15,10 +15,12 @@ public class Consumers implements Serializable {
 	@Id
 	@Column(name = "consumerId")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String id;
 
 	@Column(name = "created_at")
 	private String createAt;
 
+	@Column(name = "consumer_id_sync")
+	private String consumerIdSync;
 
 }
