@@ -33,8 +33,8 @@ public class Main implements ApplicationRunner{
 
     // can desinate multi topic , partition , concurrency,...
     //Each function is marked by @KafkaListener = 1 consumer
-//    @KafkaListener(topics = "${kafka.topic.users}")
-    @KafkaListener(topics = "postgres.public.users")
+    @KafkaListener(topics = "${kafka.topic.users}")
+//    @KafkaListener(topics = "postgres.public.users")
     public void listen(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment){
         try {
             for (ConsumerRecord<String, String> record : records) {
