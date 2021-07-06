@@ -3,6 +3,7 @@ package com.smartmarket.code.config;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,6 @@ public class KafkaConsumerConfig{
 
     @Autowired
     ConfigurableEnvironment environment;
-
-    @Autowired
-    Acknowledgment acknowledgment;
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
@@ -74,17 +72,25 @@ public class KafkaConsumerConfig{
         factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
 
             //Auto triggered before rebalancing starts and after the consumer stopped consuming messages
+//            @Override
+//            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+//                // acknowledge any pending Acknowledgments (if using manual acks)
+//                // commit before rebalance
+////                acknowledgment.acknowledge();
+//            }
+
+            //Auto triggered before rebalancing starts and after the consumer stopped consuming messages
             @Override
-            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+            public void onPartitionsRevokedBeforeCommit(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
                 // acknowledge any pending Acknowledgments (if using manual acks)
                 // commit before rebalance
-//                acknowledgment.acknowledge();
+                consumer.commitSync();
             }
 
             //Auto triggered after rebalancing stop but before consumer starts consuming messages
             @Override
             public void onPartitionsAssigned(Consumer<?, ?> consumer,Collection<TopicPartition> partitions) {
-
+                
             }
         });
 
