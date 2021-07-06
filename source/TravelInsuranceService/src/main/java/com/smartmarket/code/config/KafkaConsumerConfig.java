@@ -35,8 +35,8 @@ public class KafkaConsumerConfig{
     @Autowired
     ConfigurableEnvironment environment;
 
-//    @Autowired
-//    Acknowledgment acknowledgment;
+    @Autowired
+    Acknowledgment acknowledgment;
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {

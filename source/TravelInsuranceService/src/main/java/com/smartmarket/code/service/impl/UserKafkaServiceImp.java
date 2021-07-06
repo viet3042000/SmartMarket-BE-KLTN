@@ -39,8 +39,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
         return userRepository.updateConsumerClientKafka(userIdSync,username, password);
     }
 
-    public int deleteUserKafka(Number userId) {
-        return userRepository.deleteConsumerClientKafka(userId);
+    public int deleteUserKafka(Number userIdSync) {
+        return userRepository.deleteConsumerClientKafka(userIdSync);
     }
 
     public int truncateUserKafka() {

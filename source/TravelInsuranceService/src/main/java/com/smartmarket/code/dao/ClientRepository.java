@@ -23,15 +23,16 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
 	@Modifying(clearAutomatically = true)
 	// Đây là Native SQL
-	@Query(value = "UPDATE clients set secret = :secret, is_active = :isActive, " +
+	@Query(value = "UPDATE clients set secret =:secret, is_active = :isActive, " +
 			" consumer_id = :consumerId, ip_access = :ipAccess, client_id_code = :clientIdCode " +
-			"where client_id_sync = :clientIdSync", nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("clientIdSync") String clientIdSync,@Param("clientIdCode") String clientIdCode,
-										 @Param("secret") String secret ,@Param("isActive") Long isActive,@Param("ipAccess") String ipAccess) ;
+			"where client_id_sync =:clientId", nativeQuery = true)
+	public int updateConsumerClientKafka(@Param("clientId") Long clientId,@Param("clientIdCode") String clientIdCode,
+										 @Param("secret") String secret ,@Param("isActive") Long isActive,
+										 @Param("consumerId") String consumerId,@Param("ipAccess") String ipAccess) ;
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM clients where client_id_sync = :clientIdSync", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("clientIdSync") Number clientIdSync) ;
+	@Query(value = "DELETE FROM clients where client_id_sync =:clientId", nativeQuery = true)
+	public int deleteConsumerClientKafka(@Param("clientId") Long clientIdSync) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE clients",  nativeQuery = true)

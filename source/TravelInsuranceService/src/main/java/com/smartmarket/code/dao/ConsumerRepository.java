@@ -8,17 +8,20 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @Transactional
 @Repository
 public interface ConsumerRepository extends JpaRepository<Consumers, Integer> {
 
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL
-    @Query(value = "UPDATE consumers set created_at =:createAt where consumer_id_sync = :consumerIdSync", nativeQuery = true)
-    public int updateConsumerClientKafka(@Param("consumerIdSync") String consumerIdSync, @Param("createAt") String createAt) ;
+    @Query(value = "UPDATE consumers set created_at =:createAt where consumer_id_sync =:consumerIdSync", nativeQuery = true)
+    public int updateConsumerClientKafka(@Param("consumerIdSync") String consumerIdSync, @Param("createAt") Date createAt) ;
 
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM consumers where consumer_id_sync := consumerIdSync", nativeQuery = true)
+    @Query(value = "DELETE FROM consumers where consumer_id_sync =:consumerIdSync", nativeQuery = true)
     public int deleteConsumerClientKafka(@Param("consumerIdSync") String consumerIdSync) ;
 
     @Modifying(clearAutomatically = true)

@@ -15,8 +15,9 @@ public class Client implements Serializable {
 
 	@Id
 	@Column(name = "client_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Number id;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_id_seq")
+	@SequenceGenerator(sequenceName = "client_id_sequence", allocationSize = 1, name = "client_id_seq")
+	private Long id;
 
 	@Column(name = "client_id_code")
 	private String clientIdCode;
@@ -35,5 +36,5 @@ public class Client implements Serializable {
 	private String ipAccess;
 
 	@Column(name = "client_id_sync")
-	private Number clientIdSync;
+	private Long clientIdSync;
 }

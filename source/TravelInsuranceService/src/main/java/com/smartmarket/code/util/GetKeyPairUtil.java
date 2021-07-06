@@ -12,7 +12,6 @@ import java.util.Map;
 public class GetKeyPairUtil {
     public void getKeyPair(JSONObject jsonObject, Map<String, Object> keyPairs) throws JSONException {
         //Get key-pair in afterObj
-//        JSONArray keys = jsonObject.names();
         Iterator<String> keys = jsonObject.keys();
 
         while(keys.hasNext()) {
@@ -23,18 +22,5 @@ public class GetKeyPairUtil {
             Object value = o; // Here's your value
             keyPairs.put(key, o);
         }
-
-//        for (int i = 0; i < keys.length(); i++) {
-//            if( keys.get(i) instanceof String) {
-//                String key = keys.getString(i); // Here's your key
-//                String value = jsonObject.getString(key); // Here's your value
-//                keyPairs.put(key, value);
-//            }
-//            else if (keys.get(i) instanceof Long){
-//                String key = keys.getString(i); // Here's your key
-//                Long value = jsonObject.getLong(key); // Here's your value
-//                keyPairsLong.put(key, value);
-//            }
-//        }
     }
 }

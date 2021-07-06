@@ -16,6 +16,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +34,9 @@ public class Main implements ApplicationRunner{
 
     // can desinate multi topic , partition , concurrency,...
     //Each function is marked by @KafkaListener = 1 consumer
-    @KafkaListener(topics = "${kafka.topic.users}")
-//    @KafkaListener(topics = "postgres.public.users")
+//    @KafkaListener(topics = "${kafka.topic.users}")
+    @KafkaListener(topics = "${kafka.topic.clients}")
+//    @KafkaListener(topics = "postgres.public.clients")
     public void listen(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment){
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -53,7 +55,6 @@ public class Main implements ApplicationRunner{
 
                             //Get key-pair in afterObj
                             Map<String, Object> keyPairs = new HashMap<>();
-//                        Map<String, Number> keyPairsLong = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
@@ -99,7 +100,9 @@ public class Main implements ApplicationRunner{
         }catch (CommitFailedException ex) {
             // Do giữa các lần poll, thời gian xử lý của consumer lâu quá ,
             // nên coordinator tưởng là consumer chết rồi , nên không commit được
-            ex.getMessage();
+            ex.printStackTrace();
+        }catch (ParseException ex){
+            ex.printStackTrace();
         }
         catch (Exception ex) {
             ex.printStackTrace();

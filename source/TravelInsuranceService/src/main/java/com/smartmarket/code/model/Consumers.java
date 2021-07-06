@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "consumers")
@@ -13,12 +14,12 @@ import java.io.Serializable;
 public class Consumers implements Serializable {
 
 	@Id
-	@Column(name = "consumerId")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "consumer_id")
 	private String id;
 
-	@Column(name = "created_at")
-	private String createAt;
+	@Column(name = "created_at", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createAt;
 
 	@Column(name = "consumer_id_sync")
 	private String consumerIdSync;

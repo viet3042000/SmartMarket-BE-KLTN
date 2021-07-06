@@ -4,6 +4,8 @@ import com.smartmarket.code.service.DataBaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @Service
@@ -17,7 +19,7 @@ public class DataBaseServiceImp implements DataBaseService {
     @Autowired
     ConsumerKafkaServiceImp consumerKafkaServiceImp;
 
-    public void createDatabase(String table, Map<String, Object> keyPairs){
+    public void createDatabase(String table, Map<String, Object> keyPairs) throws ParseException {
         //Create table with key-value in afterObj to TravelInsurance DB that match with key-pair in sourceObj
         //key-pair in sourceObj ("table","schema", "name")-->"name"."schema"."table" (=topic name)
         //VD: postgres.public.clients
@@ -32,10 +34,10 @@ public class DataBaseServiceImp implements DataBaseService {
         }
     }
 
-    public void updateDatabase(String table, Map<String, Object> keyPairs){
+    public void updateDatabase(String table, Map<String, Object> keyPairs) throws ParseException {
         //Update table with key-value in afterObj to TravelInsurance DB that match with key-pair in sourceObj
         if(table.equals("clients")) {
-            String clientIdSync = "";
+            Long clientId = 0L;
             String clientIdCode = "";
             String secret = "";
             Long isActive = 0L;
@@ -43,8 +45,8 @@ public class DataBaseServiceImp implements DataBaseService {
             String ipAccess = "";
 
             for (String k : keyPairs.keySet()) {
-                if (k.equals("client_id_sync")) {
-                    clientIdSync =(String) keyPairs.get(k);
+                if (k.equals("client_id")) {
+                    clientId =((Number)keyPairs.get(k)).longValue();
                 }
                 if (k.equals("client_id_code")) {
                     clientIdCode =(String) keyPairs.get(k);
@@ -53,17 +55,17 @@ public class DataBaseServiceImp implements DataBaseService {
                     secret =(String) keyPairs.get(k);
                 }
                 if (k.equals("is_active")) {
-                    isActive = (Long) keyPairs.get(k);
+                    isActive = ((Number)keyPairs.get(k)).longValue();
                 }
                 if (k.equals("consumer_id")) {
-                    consumerId =(String)  keyPairs.get(k);
+                    consumerId =(String) keyPairs.get(k);
                 }
                 if (k.equals("ip_access")) {
                     ipAccess = (String)  keyPairs.get(k);
                 }
             }
-            clientKafkaServiceImp.updateConsumerClientKafka(clientIdSync,clientIdCode,secret ,
-                    isActive, ipAccess);
+            clientKafkaServiceImp.updateConsumerClientKafka(clientId,clientIdCode,secret ,
+                    isActive,consumerId, ipAccess);
         }
         if(table.equals("users")){
             Number userIdSync = 0;
@@ -90,29 +92,30 @@ public class DataBaseServiceImp implements DataBaseService {
         if(table.equals("consumers")){
             String consumerIdSync = "";
             String createAt = "";
-
+            //convert string --> date with formart tương ứng
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
             for (String k : keyPairs.keySet()) {
-                if (k.equals("consumer_id_sync")) {
-                    consumerIdSync =(String)  keyPairs.get(k);
+                if (k.equals("consumerId")) {
+                    consumerIdSync =(String)keyPairs.get(k);
                 }
                 if (k.equals("created_at")) {
-                    createAt =(String)  keyPairs.get(k);
+                    createAt = (String)keyPairs.get(k);
                 }
             }
-            consumerKafkaServiceImp.updateConsumerKafka(consumerIdSync, createAt);
+            consumerKafkaServiceImp.updateConsumerKafka(consumerIdSync, formatter.parse(createAt));
         }
     }
 
     public void deleteDatabase(String table, Map<String, Object> keyPairs){
         if(table.equals("clients")) {
-            Number clientIdSync = 0;
+            Long clientId = 0L;
 
             for (String k : keyPairs.keySet()) {
-                if (k.equals("client_id_sync")) {
-                    clientIdSync =(Number) keyPairs.get(k);
+                if (k.equals("client_id")) {
+                    clientId =((Number)keyPairs.get(k)).longValue();
                 }
             }
-            clientKafkaServiceImp.deleteConsumerClientKafka(clientIdSync);
+            clientKafkaServiceImp.deleteConsumerClientKafka(clientId);
         }
         if(table.equals("users")){
             Number userId = 0;
@@ -128,7 +131,7 @@ public class DataBaseServiceImp implements DataBaseService {
             String consumerIdSync = "";
 
             for (String k : keyPairs.keySet()) {
-                if (k.equals("consumer_id_sync")) {
+                if (k.equals("consumerId")) {
                     consumerIdSync =(String) keyPairs.get(k);
                 }
             }

@@ -29,8 +29,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 										 @Param("password") String password) ;
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM users where user_id_sync =:userId", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("userId") Number userId) ;
+	@Query(value = "DELETE FROM users where user_id_sync =:userIdSync", nativeQuery = true)
+	public int deleteConsumerClientKafka(@Param("userIdSync") Number userIdSync) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE users",  nativeQuery = true)
