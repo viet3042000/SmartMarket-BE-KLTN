@@ -3,9 +3,10 @@ server.error.include-message = always
 server.error.include-binding-errors=always
 
 spring.datasource.type=com.zaxxer.hikari.HikariDataSource
-spring.datasource.url=jdbc:postgresql://10.14.101.204:5432/travelinsurance
-spring.datasource.username=travelinsuranceuser
-spring.datasource.password=travelinsuranceuser
+
+spring.datasource.url=jdbc:postgresql://10.14.101.204:5432/opendataservice
+spring.datasource.username=opendata
+spring.datasource.password=opendata
 spring.jpa.hibernate.ddl-auto=none
 spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
