@@ -1,0 +1,17 @@
+server.port=9090
+server.error.include-message = always
+
+spring.datasource.url=jdbc:mysql://localhost:3306/authorization_demo?autoReconnect=true&useSSL=false
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.platform=mysql
+spring.jpa.hibernate.ddl-auto=none
+
+#cache
+#spring.cache.jcache.config=classpath:ehcache.xml
+#spring.cache.jcache.provider=org.ehcache.jsr107.EhcacheCachingProvider
+#debug=true
+
+
+publicKey=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvBsaJq7S5wA+kzeVOVpVWwkWdVha4s38XM/pa/yr47av7+z3VTmvDRyAHcaT92whREFpLv9cj5lTeJSibyr/Mrm/YtjCZVWgaOYIhwrXwKLqPr/11inWsAkfIytvHWTxZYEcXLgAXFuUuaS3uF9gEiNQwzGTU1v0FqkqTBr4B8nW3HCN47XUu0t8Y0e+lf4s4OxQawWD79J9/5d3Ry0vbV3Am1FtGJiJvOwRsIfVChDpYStTcHTCMqtvWbV6L11BWkpzGXSW4Hv43qa+GSYOD2QU68Mb59oSk2OB+BtOLpJofmbGEGgvmwyCI9MwIDAQAB
+
