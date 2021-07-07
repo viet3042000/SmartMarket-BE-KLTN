@@ -1,35 +1,22 @@
 package com.smartmarket.code.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.model.BICTransaction;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.entity.User;
-import com.smartmarket.code.request.entity.UserLoginBIC;
+import com.smartmarket.code.request.entity.UserLoginOpenData;
 import com.smartmarket.code.response.Response;
-import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.util.APIUtils;
-import com.smartmarket.code.util.JwtUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.RequestScope;
 
-import javax.sql.DataSource;
 import javax.validation.Valid;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -56,9 +43,6 @@ public class HelloController {
 
     @Autowired
     CachingServiceImpl cachingService;
-
-    @Autowired
-    BICTransactionService bicTransactionService;
 
     //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
 //    @PostMapping(value = "/hello", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
@@ -98,7 +82,7 @@ public class HelloController {
 
 
     @PostMapping(value = "/hello/getcache", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getStaticCache(@Valid @RequestBody User user) {
+    public ResponseEntity<?> getStaticCache(@Valid @RequestBody UserLoginOpenData user) {
 
         Response response = new Response();
         response.setData(environment.getProperty("config"));

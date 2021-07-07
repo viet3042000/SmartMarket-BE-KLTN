@@ -4,6 +4,7 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
 import com.smartmarket.code.response.DataCreateBIC;
@@ -19,8 +20,11 @@ import java.util.Map;
 public class SetResponseUtils {
     //Inquery
     public BaseResponse setResponseInquery(BaseResponse response,
-                            CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse){
+                            CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse,
+                                           BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest){
         response.setDetail(createTravelInsuranceBICResponse);
+        response.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
         return response ;
@@ -46,7 +50,7 @@ public class SetResponseUtils {
         response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-        response.setResponseTime(dataResponse.getString("internalMessage"));
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
         return response ;
     }
 
@@ -71,7 +75,7 @@ public class SetResponseUtils {
         response.setResultCode(ex.getHttpStatusCode());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ex.getErrorMessage());
-//        response.setResponseId(ex.getResponseId());
+        response.setResponseId(ex.getResponseId());
         response.setDetailErrorCode(ex.getHttpStatusDetailCode().toString());
         response.setDetailErrorMessage(ex.getDetailErrorMessage());
         return response ;
@@ -82,7 +86,7 @@ public class SetResponseUtils {
         response.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-//        response.setResponseId(ex.getResponseId());
+        response.setResponseId(ex.getResponseId());
         response.setDetailErrorCode(ex.getDetailErrorCode().toString());
 
         response.setDetailErrorMessage(ex.getDetailErrorMessage());
@@ -104,7 +108,7 @@ public class SetResponseUtils {
             response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
-//            response.setResponseId(ex.getRequestId());
+            response.setResponseId(ex.getRequestId());
             response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
             response.setDetailErrorMessage(ex.getMessage());
             return response ;
@@ -116,7 +120,7 @@ public class SetResponseUtils {
         response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
-//        response.setResponseId(requestId);
+        response.setResponseId(requestId);
         response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
         response.setDetailErrorMessage(ex.toString());
         return response ;

@@ -77,7 +77,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
-                                messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                                messageTimestamp, "opendataservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),logService.getIp());
                 logService.createSOALogException(soaExceptionObject);
@@ -87,7 +87,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
                 //logResponse vs Client
                 ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "smartMarket", "client",
-                        messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                        messageTimestamp, "opendataservice ", "1", timeDuration,
                         "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
                         responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
                 logService.createSOALog2(soaObject);
@@ -110,7 +110,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
-                            messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                            messageTimestamp, "opendataservice", httpServletRequest.getRequestURI(),"1",
                             httpServletRequest.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                             Throwables.getStackTraceAsString(ex),logService.getIp());
             logService.createSOALogException(soaExceptionObject);
@@ -120,7 +120,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                    messageTimestamp, "opendataservice ", "1", timeDuration,
                     "response", transactionDetailResponse, responseStatus, res.getResultCode(),
                     res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),logService.getIp());
             logService.createSOALog2(soaObject);

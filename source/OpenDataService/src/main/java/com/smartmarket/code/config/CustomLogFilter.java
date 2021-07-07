@@ -53,31 +53,31 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
         try {
             if (request.getMethod().equals("POST")) {
-//                if(Utils.isJSONValid(jsonString)){
-//                    JSONObject requestBody = new JSONObject(jsonString);
-//                    String requestId = requestBody.getString("requestId");
-//                    String requestTime = requestBody.getString("requestTime");
-//                    String stringRequestBody = requestBody.toString();
-//                    JSONObject transactionDetail = new JSONObject(stringRequestBody);
-//
-//                    //logRequest vs Client
-//                    ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
-//                            messageTimestamp, "travelinsuranceservice", "1", null,
-//                            "request", transactionDetail, null, null,
-//                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
-//                    logService.createSOALog2(soaObject);
-//                }else {
-//                    String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
-//                    JSONObject transactionDetail = new JSONObject();
-//                    transactionDetail.put("transactionDetail","Format request body is not true ");
-//
-//                    //logRequest vs Client
-//                    ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
-//                            messageTimestamp, "travelinsuranceservice", "1", null,
-//                            "request", transactionDetail, null, null,
-//                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
-//                    logService.createSOALog2(soaObject);
-//                }
+                if(Utils.isJSONValid(jsonString)){
+                    JSONObject requestBody = new JSONObject(jsonString);
+                    String requestId = requestBody.getString("requestId");
+                    String requestTime = requestBody.getString("requestTime");
+                    String stringRequestBody = requestBody.toString();
+                    JSONObject transactionDetail = new JSONObject(stringRequestBody);
+
+                    //logRequest vs Client
+                    ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
+                            messageTimestamp, "opendataservice", "1", null,
+                            "request", transactionDetail, null, null,
+                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                    logService.createSOALog2(soaObject);
+                }else {
+                    String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+                    JSONObject transactionDetail = new JSONObject();
+                    transactionDetail.put("transactionDetail","Format request body is not true ");
+
+                    //logRequest vs Client
+                    ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
+                            messageTimestamp, "opendataservice", "1", null,
+                            "request", transactionDetail, null, null,
+                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                    logService.createSOALog2(soaObject);
+                }
 
             } else {
 

@@ -1,7 +1,6 @@
 package com.smartmarket.code.exception;
 
 
-import com.smartmarket.code.util.EJson;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 
@@ -19,24 +18,24 @@ public class CustomException extends RuntimeException {
     private String httpStatusCode;
     private String errorMessage;
     private String responseId;
-    private JSONObject responseBIC;
+    private JSONObject responseBackend;
 
-    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC
+    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBackend
                             , String httpStatusCode, String errorMessage ) {
         this.detailErrorMessage = detailErrorMessage;
         this.httpStatusDetailCode = httpStatusDetailCode;
         this.responseId = responseId;
-        this.responseBIC = responseBIC;
+        this.responseBackend = responseBackend;
         this.httpStatusCode = httpStatusCode;
         this.errorMessage = errorMessage;
 
     }
 
-    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC) {
+    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBackend) {
         this.detailErrorMessage = detailErrorMessage;
         this.httpStatusDetailCode = httpStatusDetailCode;
         this.responseId = responseId;
-        this.responseBIC = responseBIC;
+        this.responseBackend = responseBackend;
 
     }
 
@@ -102,11 +101,11 @@ public class CustomException extends RuntimeException {
         this.responseId = responseId;
     }
 
-    public JSONObject getResponseBIC() {
-        return responseBIC;
+    public JSONObject getResponseBackend() {
+        return responseBackend;
     }
 
-    public void setResponseBIC(JSONObject responseBIC) {
-        this.responseBIC = responseBIC;
+    public void setResponseBackend(JSONObject responseBackend) {
+        this.responseBackend = responseBackend;
     }
 }

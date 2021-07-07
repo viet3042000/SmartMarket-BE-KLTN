@@ -3,13 +3,12 @@ package com.smartmarket.code.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.AccessUser;
 import com.smartmarket.code.model.Url;
 import com.smartmarket.code.model.User;
-import com.smartmarket.code.request.entity.UserLoginBIC;
+import com.smartmarket.code.request.entity.UserLoginOpenData;
 import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.APIUtils;
 import com.smartmarket.code.util.JwtUtils;
@@ -193,15 +192,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String token = "" ;
 
         //post get token
-        UserLoginBIC userLoginBIC = new UserLoginBIC();
-        userLoginBIC.setUsername(environment.getRequiredProperty("account.DSVN.username"));
-        userLoginBIC.setPassword(environment.getRequiredProperty("account.DSVN.password"));
-        userLoginBIC.setDomainname(environment.getRequiredProperty("account.DSVN.domainName"));
+        UserLoginOpenData userLogin = new UserLoginOpenData();
+        userLogin.setUsername(environment.getRequiredProperty("account.openData.username"));
+        userLogin.setPassword(environment.getRequiredProperty("account.openData.password"));
 
         ObjectMapper mapper = new ObjectMapper();
 
-        String requestToken = mapper.writeValueAsString(userLoginBIC);
-        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null);
+        String requestToken = mapper.writeValueAsString(userLogin);
+        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginOpenData"), null, requestToken, null, null);
         if(jsonResultGetToken != null && jsonResultGetToken.getBody() != null){
             //get token from response
             token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));

@@ -338,7 +338,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject responseBodyBIC = new JSONObject(responseCreate);
 
                         //set response to client
-                        response = setResponseUtils.setResponseInquery(response, createTravelInsuranceBICResponse);
+                        response = setResponseUtils.setResponseInquery(response, createTravelInsuranceBICResponse,queryTravelInsuranceBICRequest);
                         String responseBody = mapper.writeValueAsString(response);
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 

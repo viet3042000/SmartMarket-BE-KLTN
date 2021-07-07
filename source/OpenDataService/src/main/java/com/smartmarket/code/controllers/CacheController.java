@@ -2,30 +2,26 @@ package com.smartmarket.code.controllers;
 
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.ConnectDataBaseException;
-import com.smartmarket.code.request.entity.User;
 import com.smartmarket.code.response.BaseResponse;
-import com.smartmarket.code.response.Response;
 import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.ServiceConfigService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
-import com.smartmarket.code.service.impl.ClientServiceImpl;
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.cache.management.CacheStatisticsMXBean;
-import javax.validation.Valid;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/insurance/travel-insurance-service/v1/")
+@RequestMapping("/opendata-service/v1/")
 public class CacheController {
 
 

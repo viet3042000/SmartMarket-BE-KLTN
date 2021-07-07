@@ -3,13 +3,10 @@ package com.smartmarket.code.util;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.QueryOpenDataRequest;
 import com.smartmarket.code.response.BaseResponse;
-import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
-import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ResponseError;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 
@@ -18,52 +15,14 @@ import java.util.Map;
 @Component
 public class SetResponseUtils {
     //Inquery
-    public BaseResponse setResponseInquery(BaseResponse response,
-                            CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse){
-        response.setDetail(createTravelInsuranceBICResponse);
+    public BaseResponse setResponseInquery( BaseDetail<QueryOpenDataRequest> queryOpenDataRequest,BaseResponse response,
+                                            Object queryOpenDataResponse){
+        response.setDetail(queryOpenDataResponse);
+        response.setResponseTime(DateTimeUtils.getCurrentDate() );
+        response.setResponseId(queryOpenDataRequest.getRequestTime());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
         return response ;
-    }
-
-    //Create/Update
-    public BaseResponse setResponse(BaseResponse response,
-                            BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
-                            CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse,
-                            ResponseEntity<String> jsonResultPutBIC){
-
-        EJson jsonObjectReponseCreate = new EJson(jsonResultPutBIC.getBody());
-        Long orderIdCreated = jsonObjectReponseCreate.getLong("orderId");
-        boolean succeeded = jsonObjectReponseCreate.getBoolean("succeeded");
-        createTravelInsuranceBICResponse.setOrderId(String.valueOf(orderIdCreated));
-        createTravelInsuranceBICResponse.setSucceeded(succeeded);
-        EJson dataResponse = (jsonObjectReponseCreate.getJSONObject("data"));
-        DataCreateBIC dataCreateBIC = new DataCreateBIC();
-        dataCreateBIC.setMessage(dataResponse.getString("userMessage"));
-        dataCreateBIC.setCreatedate(dataResponse.getString("internalMessage"));
-        createTravelInsuranceBICResponse.setData(dataCreateBIC);
-        response.setDetail(createTravelInsuranceBICResponse);
-        response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
-        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-        response.setResponseTime(dataResponse.getString("internalMessage"));
-        return response ;
-    }
-
-    //Create Update Error
-    public ResponseError setResponseError(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
-                                          ResponseEntity<String> jsonResultCreateBIC,
-                                          EJson dataResponse){
-        ResponseError responseError =  new ResponseError() ;
-        responseError.setResultCode(ResponseCode.CODE.ERROR_IN_BACKEND);
-        responseError.setResponseTime(DateTimeUtils.getCurrentDate());
-        responseError.setResultMessage(ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-        responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
-        responseError.setDetailErrorCode(jsonResultCreateBIC.getStatusCode().toString());
-        if (dataResponse != null){
-            responseError.setDetailErrorMessage(dataResponse.getString("userMessage"));
-        }
-        return responseError ;
     }
 
     //CustomException

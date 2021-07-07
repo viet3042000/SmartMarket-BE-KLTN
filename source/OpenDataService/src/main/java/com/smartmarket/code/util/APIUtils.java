@@ -21,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -88,11 +89,7 @@ public class APIUtils {
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<String> result = null;
 
-        if (!StringUtils.isEmpty(token)) {
-            headers.add("Authorization", "Bearer " + token);
-        }
-
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+//        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
         if (param != null) {
             for (Map.Entry<String, Object> entry : param.entrySet()) {
@@ -106,6 +103,7 @@ public class APIUtils {
                     String.class);
 
         } else {
+            URI uri = builder.build().toUri() ;
             result = restTemplate.exchange(builder.build().toUri(), HttpMethod.GET, entity,
                     String.class);
         }
