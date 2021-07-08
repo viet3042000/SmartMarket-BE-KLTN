@@ -10,6 +10,7 @@ public class TargetObject {
     String requestId;
     String requestTime;
     String targetService;
+    String operationName;
     String logType;
     JSONObject transactionDetail;
     String logTimestamp;
@@ -17,7 +18,7 @@ public class TargetObject {
     String timeDuration;
 
     public TargetObject(String logName, String transactionId, String requestId, String requestTime,
-                         String targetService, String logType, JSONObject transactionDetail,
+                         String targetService,String operationName ,String logType, JSONObject transactionDetail,
                          String logTimestamp,String messageTimestamp, String timeDuration){
 
         this.logName= logName;
@@ -25,6 +26,7 @@ public class TargetObject {
         this.requestId= requestId;
         this.requestTime= requestTime;
         this.targetService= targetService;
+        this.operationName= operationName;
         this.logType= logType;
         this.transactionDetail= transactionDetail;
         this.logTimestamp= logTimestamp;
@@ -39,6 +41,7 @@ public class TargetObject {
         json.put("requestId", requestId);
         json.put("requestTime", requestTime);
         json.put("targetService", targetService);
+        json.put("operationName", operationName);
         json.put("logType", logType);
         json.put("transactionDetail", transactionDetail);
         json.put("logTimestamp", logTimestamp);

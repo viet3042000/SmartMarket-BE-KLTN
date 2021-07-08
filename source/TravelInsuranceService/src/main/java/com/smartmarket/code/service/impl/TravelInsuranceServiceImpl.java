@@ -3,7 +3,6 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
-import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
@@ -92,7 +91,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs BIC
-            TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), "CreateTravelInsuranceBIC", "request",
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","request",
                     transactionDetail, logTimestamp, messageTimestamp, null);
             logService.createTargetLog(tarObjectRequest);
 
@@ -138,7 +137,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString());
 
                         //logResponse vs BIC
-                        TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), "CreateTravelInsuranceBIC", "response",
+                        TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","response",
                                 responseBodyFromBIC, logTimestamp, messageTimestamp, timeDurationBIC);
                         logService.createTargetLog(tarObject);
 
@@ -166,7 +165,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString());
 
                         //logResponseError vs BIC
-                        TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), "CreateTravelInsuranceBIC", "response",
+                        TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC", "response",
                                 responseBodyFromBIC, logTimestamp, messageTimestamp, timeDurationBIC);
                         logService.createTargetLog(tarObject);
 
@@ -189,7 +188,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     String requestURL = request.getRequestURL().toString();
                     String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
 
-                    TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), targetService, "response", responseBodyFromBIC,
+                    TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","response", responseBodyFromBIC,
                             logTimestamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
 
@@ -199,7 +198,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 //logResponse vs BIC
                 String requestURL = request.getRequestURL().toString();
                 String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
-                TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), targetService, "response", null,
+                TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC" ,"response", null,
                         logTimestamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
@@ -293,7 +292,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             }
 
             //logRequest vs BIC
-            TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "getOrderTravelInsurance", "request",
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","request",
                     transactionDetail, logTimestamp, messageTimestamp, null);
             logService.createTargetLog(tarObjectRequest);
 
@@ -343,7 +342,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //logResponse vs BIC
-                        TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "getOrderTravelInsurance", "response",
+                        TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","response",
                                 jsonObjectResultBICLog, logTimestamp, messageTimestamp, timeDurationBIC);
                         logService.createTargetLog(tarObject);
 
@@ -364,7 +363,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     String requestURL = request.getRequestURL().toString();
                     String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
 
-                    TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), targetService, "response", jsonObjectResultBICLog,
+                    TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","response", jsonObjectResultBICLog,
                             logTimestamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
                     throw new CustomException("Not found order",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -373,7 +372,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 //logResponse vs BIC
                 String requestURL = request.getRequestURL().toString();
                 String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
-                TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), targetService, "response", null,
+                TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","response", null,
                         logTimestamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
@@ -448,7 +447,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs BIC
-            TargetObject tarObjectRequest = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "updateOrderTravelInsurance", "request",
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","request",
                     transactionDetail, logtimeStamp, messageTimestamp, null);
             logService.createTargetLog(tarObjectRequest);
 
@@ -498,7 +497,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //logResponse vs BIC
-                        TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "updateOrderTravelInsurance", "response",
+                        TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","response",
                                 responseBodyFromBIC, logtimeStamp, messageTimestamp, timeDurationBIC);
                         logService.createTargetLog(tarObject);
 
@@ -526,7 +525,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString());
 
                         //logResponseError vs BIC
-                        TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "updateOrderTravelInsurance", "response",
+                        TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","response",
                                 responseBodyFromBIC, logtimeStamp, messageTimestamp, timeDurationBIC);
                         logService.createTargetLog(tarObject);
 
@@ -548,7 +547,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     String requestURL = request.getRequestURL().toString();
                     String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
 
-                    TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), targetService, "response", responseBodyFromBIC,
+                    TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance", "updateTravelBIC","response", responseBodyFromBIC,
                             logtimeStamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
                     throw new CustomException("",jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -558,7 +557,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 //logResponse vs BIC
                 String requestURL = request.getRequestURL().toString();
                 String targetService = requestURL.substring(requestURL.indexOf("v1/") + 3, requestURL.length());
-                TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), targetService, "response", null,
+                TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","response", null,
                         logtimeStamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
