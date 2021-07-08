@@ -23,7 +23,7 @@ public class ApiOpenDataController {
     OpenDataService openDataService ;
 
     //    /opendata-service/v1/query-data/**
-    @PostMapping(value = "/query-data", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/inquiry-smart-search-contract", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> queryOpenData(@Valid @RequestBody BaseDetail<QueryOpenDataRequest> queryOpenDataRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         return openDataService.queryOpenData(queryOpenDataRequestBaseDetail,request,responseSelvet) ;
     }

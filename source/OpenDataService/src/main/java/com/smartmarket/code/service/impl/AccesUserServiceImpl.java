@@ -16,12 +16,14 @@ public class AccesUserServiceImpl implements AccesUserService {
 
     @Override
     public Set<AccessUser> findAccessUserByUserIdAndUserUrlId(Long userIdToken, Long urlId) {
-        return accessUserRepository.findAccessUserByUserIdAndUserUrlId(userIdToken,urlId);
+//        return accessUserRepository.findAccessUserByUserIdAndUserUrlId(userIdToken,urlId);
+        return null;
     }
 
     @Override
     public Set<AccessUser> checkAccessUser(Long userIdToken, Long urlId, Long userIdAccess) {
-        return accessUserRepository.checkAccessUser(userIdToken,urlId,userIdAccess);
+//        return accessUserRepository.checkAccessUser(userIdToken,urlId,userIdAccess);
+        return null ;
 
     }
 

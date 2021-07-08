@@ -20,6 +20,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -78,12 +79,12 @@ public class QueryOpenDataServiceImpl implements OpenDataService {
             transactionDetail.put("rows", rows);
 
             //get token from database
-            String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MmJmNzBlMS1jZTEyLTQyODktYTgyOS1kZjI5ZDgyNjViM2MiLCJyb2xlcyI6WyJhZG1pbiIsInNlYXJjaGVyIl0sImlzcyI6InRvYW5saDQiLCJkYXRhR3JvdXBzIjpbInF1eWV0ZGluaF90b3RyaW5oOkZJUyBGUFMiLCJob3Bkb25nX2hvc29fbmhhbnN1OkZJUyBCT018RklTIEZUUyIsImNvbmd2YW5faG9zb2dpYW9kaWNoOkZJUyBFUlAiXSwiZXhwIjoxNjI1NTUyNjgxLCJkYXRhU291cmNlcyI6WyJob3Bkb25nX2hvc29fbmhhbnN1IiwicXV5ZXRkaW5oX3RvdHJpbmgiLCJjb25ndmFuX2hvc29naWFvZGljaCJdLCJpYXQiOjE2MjU1NTIzODF9.-pQV9DY6U7FI-u1pMfzdtr2C8WtRh0nQx-a0Dj6i9ts";
-//            String token = authorizationService.getTokenFromDatabase();
+//            String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MmJmNzBlMS1jZTEyLTQyODktYTgyOS1kZjI5ZDgyNjViM2MiLCJyb2xlcyI6WyJhZG1pbiIsInNlYXJjaGVyIl0sImlzcyI6InRvYW5saDQiLCJkYXRhR3JvdXBzIjpbInF1eWV0ZGluaF90b3RyaW5oOkZJUyBGUFMiLCJob3Bkb25nX2hvc29fbmhhbnN1OkZJUyBCT018RklTIEZUUyIsImNvbmd2YW5faG9zb2dpYW9kaWNoOkZJUyBFUlAiXSwiZXhwIjoxNjI1NTUyNjgxLCJkYXRhU291cmNlcyI6WyJob3Bkb25nX2hvc29fbmhhbnN1IiwicXV5ZXRkaW5oX3RvdHJpbmgiLCJjb25ndmFuX2hvc29naWFvZGljaCJdLCJpYXQiOjE2MjU1NTIzODF9.-pQV9DY6U7FI-u1pMfzdtr2C8WtRh0nQx-a0Dj6i9ts";
+            String token = authorizationService.getTokenFromDatabase();
 
-//            if (StringUtils.isEmpty(token)) {
-//                throw new CustomException("Not found token response from open data", HttpStatus.INTERNAL_SERVER_ERROR, queryOpenDataRequest.getRequestId(),ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-//            }
+            if (StringUtils.isEmpty(token)) {
+                throw new CustomException("Not found token response from open data", HttpStatus.INTERNAL_SERVER_ERROR, queryOpenDataRequest.getRequestId(),ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+            }
 
             //logRequest vs OpenData
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryOpenDataRequest.getRequestId(), queryOpenDataRequest.getRequestTime(), "getOrderTravelInsurance", "request",

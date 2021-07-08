@@ -18,11 +18,15 @@ public class UserUrl implements Serializable {
     private Long id;
 
     @Basic
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "authorities")
+    private String authorities;
 
     @Basic
-    @Column(name = "url_id")
-    private Long urlId;
+    @Column(name = "user_name")
+    private String userName;
+
+    @Basic
+    @Column(name = "url_name")
+    private String urlName;
 
 }

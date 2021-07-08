@@ -18,8 +18,8 @@ public class Client implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "client_id_code")
-	private String clientIdCode;
+	@Column(name = "client_id_name")
+	private String clientIdName;
 
 	@Column(name = "secret")
 	@JsonIgnore
