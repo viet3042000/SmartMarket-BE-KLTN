@@ -21,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -77,7 +79,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
             //get url request
             AntPathMatcher matcher = new AntPathMatcher();
-            Set<Url> urlSet = urlService.findUrlByUserIdActive(userToken.getId());
+            Set<Url> urlSet = urlService.findUrlByUserIdActive(userToken.getUserName());
             Url urlMatched = null;
             if (urlSet != null) {
                 for (Url url1 : urlSet) {
@@ -192,14 +194,22 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String token = "" ;
 
         //post get token
-        UserLoginOpenData userLogin = new UserLoginOpenData();
-        userLogin.setUsername(environment.getRequiredProperty("account.openData.username"));
-        userLogin.setPassword(environment.getRequiredProperty("account.openData.password"));
+//        UserLoginOpenData userLogin = new UserLoginOpenData();
+//        userLogin.setUsername(environment.getRequiredProperty("account.openData.username"));
+//        userLogin.setPassword(environment.getRequiredProperty("account.openData.password"));
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        String requestToken = mapper.writeValueAsString(userLogin);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = null;
+        claims = JwtUtils.getClaimsMap(authentication);
+        String userName = (String) claims.get("user_name");
 
-        ObjectMapper mapper = new ObjectMapper();
 
-        String requestToken = mapper.writeValueAsString(userLogin);
-        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginOpenData"), null, requestToken, null, null);
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("username", userName);
+        ResponseEntity<String> jsonResultGetToken = apiUtils.postByFormDataURLEncode(environment.getRequiredProperty("api.loginOpenData"),map);
         if(jsonResultGetToken != null && jsonResultGetToken.getBody() != null){
             //get token from response
             token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));

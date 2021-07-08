@@ -18,7 +18,7 @@ public class SetResponseUtils {
     public BaseResponse setResponseInquery( BaseDetail<QueryOpenDataRequest> queryOpenDataRequest,BaseResponse response,
                                             Object queryOpenDataResponse){
         response.setDetail(queryOpenDataResponse);
-        response.setResponseTime(DateTimeUtils.getCurrentDate() );
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResponseId(queryOpenDataRequest.getRequestTime());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -79,6 +81,30 @@ public class APIUtils {
 //        catch (HttpClientErrorException e){
 //            throw new APIResponseException(requestId, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND,ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,e.getStatusCode(),e.getResponseBodyAsString());
 //        }
+
+        return result;
+    }
+
+    public ResponseEntity<String> postByFormDataURLEncode(String url, MultiValueMap<String, String> map) throws APIAccessException {
+        ResponseEntity<String> result = null;
+
+
+        //set Time out
+//            SimpleClientHttpRequestFactory clientHttpRequestFactory
+//                    = new SimpleClientHttpRequestFactory();
+//            //Connect timeout
+//            clientHttpRequestFactory.setConnectTimeout(10000);
+//            //Read timeout
+//            clientHttpRequestFactory.setReadTimeout(10000);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+        result = restTemplate.postForEntity( url, request , String.class );
 
         return result;
     }

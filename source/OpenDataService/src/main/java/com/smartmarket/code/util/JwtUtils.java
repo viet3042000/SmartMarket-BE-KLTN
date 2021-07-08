@@ -41,8 +41,8 @@ public class JwtUtils {
         JSONObject data = null ;
         String token = null ;
         if(jsonObject != null ){
-            data =  jsonObject.getJSONObject("data") ;
-            token =  data.getString("token") ;
+            token =  jsonObject.getString("token") ;
+//            token =  data.getString("token") ;
         }
         return token ;
     }

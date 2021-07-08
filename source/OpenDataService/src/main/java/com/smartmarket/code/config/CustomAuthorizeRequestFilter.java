@@ -7,12 +7,14 @@ import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.Url;
+import com.smartmarket.code.model.User;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.UrlService;
+import com.smartmarket.code.service.UserService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
@@ -60,6 +62,9 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Autowired
     UrlService urlService ;
 
+    @Autowired
+    UserService userService ;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -86,9 +91,11 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
             if (!authorizationService.validActuator(pathActuator, URLRequest)) {
                 //declare
                 Map<String, Object> claims = null;
-                Set<Url> urlSet = null;
+                Set<Url> urlSetByClient = null;
+                Set<Url> urlSetByUserName = null;
                 claims = JwtUtils.getClaimsMap(authentication);
                 String clientId = null;
+                String userName = null;
 
                 //get clientid from claims
                 if (claims != null) {
@@ -98,20 +105,43 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                //find client by clientName
+                //get clientid from claims
+                if (claims != null) {
+                    userName = (String) claims.get("user_name");
+                } else {
+                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Not found user name in token");
+                    return;
+                }
 
+                //find client by clientName
                 Optional<Client> client = clientService.findByclientName(clientId);
                 if (client.isPresent() == true) {
-                    urlSet = urlService.findUrlByClientId(client.get().getId());
+                    urlSetByClient = urlService.findUrlByClientId(client.get().getClientIdName());
 
                     //check url access
-                    if (urlSet == null) {
+                    if (urlSetByClient == null) {
                         httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id allowed api not found in database");
                         return;
                     }
 
                 } else {
                     httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id not found in database");
+                    return;
+                }
+
+                //find user by userName
+                Optional<User> user = userService.findByUsername(userName);
+                if (user.isPresent() == true) {
+                    urlSetByUserName = urlService.findUrlByUserIdActive(user.get().getUserName());
+
+                    //check url access
+                    if (urlSetByUserName == null) {
+                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "user name allowed api not found in database");
+                        return;
+                    }
+
+                } else {
+                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "user name not found in database");
                     return;
                 }
 
@@ -135,24 +165,42 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                boolean verifyEndpoint = false;
+                boolean verifyEndpointByClient = false;
 
-                if (client.isPresent() == true && urlSet != null) {
-                    for (Url url1 : urlSet) {
+                if (client.isPresent() == true && urlSetByClient != null) {
+                    for (Url url1 : urlSetByClient) {
 
                         String path = url1.getPath();
                         if (matcher.match(path, URLRequest)) {
-                            verifyEndpoint = true;
+                            verifyEndpointByClient = true;
+                            break;
+
+                        }
+                    }
+                }
+                if (verifyEndpointByClient == false) {
+                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API");
+                    return;
+                }
+
+                boolean verifyEndpointByUser = false;
+                if (user.isPresent() == true && urlSetByUserName != null) {
+                    for (Url url1 : urlSetByUserName) {
+
+                        String path = url1.getPath();
+                        if (matcher.match(path, URLRequest)) {
+                            verifyEndpointByUser = true;
                             break;
 
                         }
                     }
                 }
 
-                if (verifyEndpoint == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API");
+                if (verifyEndpointByUser == false) {
+                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "User name is not allowed to access API");
                     return;
                 }
+
             }
 
         }catch (Exception ex){

@@ -27,27 +27,26 @@ public class UrlServiceImpl implements UrlService {
 
 
     @Override
-    @Cacheable(cacheNames = "hoptest"
-            , key = "#userId"
+    @Cacheable(cacheNames = "urllistbyusername", key = "#userName"
     )
-    public Set<Url> findUrlByUserIdActive(Long userId) {
-        return urlRepository.findUrlByUserIdActive(userId);
+    public Set<Url> findUrlByUserIdActive(String userName) {
+        return urlRepository.findUrlByUserIdActive(userName);
     }
 
 
-    @Cacheable(cacheNames = "urllist", key = "#clientId")
-    public Set<Url> findUrlByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
+    @Cacheable(cacheNames = "urllistbyclient", key = "#clientIdName")
+    public Set<Url> findUrlByClientId(String clientIdName) {
+        return urlRepository.findUrlByClientIdActive(clientIdName);
     }
 
-    @CacheEvict(cacheNames = "urllist", key = "#clientId")
-    public void evictSingleClientIdCacheValue(String clientId) {
+    @CacheEvict(cacheNames = "urllistbyclient", key = "#clientIdName")
+    public void evictSingleClientIdCacheValue(String clientIdName) {
     }
 
 
-    @CachePut(cacheNames = "client" , key = "#clientId")
-    public Set<Url> updateClientCacheByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
+    @CachePut(cacheNames = "client" , key = "#clientIdName")
+    public Set<Url> updateClientCacheByClientId(String clientIdName) {
+        return urlRepository.findUrlByClientIdActive(clientIdName);
     }
 
 //    @Caching(
