@@ -143,7 +143,7 @@ public class MapperUtils {
             ordersBIC.setOrdcustmessage(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1());
+            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().equals("") == true ? "Not Address" : orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
