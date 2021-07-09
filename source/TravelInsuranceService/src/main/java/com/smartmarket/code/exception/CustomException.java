@@ -32,35 +32,35 @@ public class CustomException extends RuntimeException {
 
     }
 
-    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC) {
-        this.detailErrorMessage = detailErrorMessage;
-        this.httpStatusDetailCode = httpStatusDetailCode;
-        this.responseId = responseId;
-        this.responseBIC = responseBIC;
-
-    }
-
-
-    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId) {
-        this.detailErrorMessage = detailErrorMessage;
-        this.httpStatusDetailCode = httpStatus;
-        this.responseId = responseId;
-
-    }
-
-    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId,String httpStatusCode, String errorMessage) {
-        this.detailErrorMessage = detailErrorMessage;
-        this.httpStatusDetailCode = httpStatus;
-        this.responseId = responseId;
-        this.httpStatusCode = httpStatusCode;
-        this.errorMessage = errorMessage;
-
-    }
-
-    public CustomException(String detailErrorMessage, HttpStatus httpStatus) {
-        this.detailErrorMessage = detailErrorMessage;
-        this.httpStatusDetailCode = httpStatus;
-    }
+//    public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC) {
+//        this.detailErrorMessage = detailErrorMessage;
+//        this.httpStatusDetailCode = httpStatusDetailCode;
+//        this.responseId = responseId;
+//        this.responseBIC = responseBIC;
+//
+//    }
+//
+//
+//    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId) {
+//        this.detailErrorMessage = detailErrorMessage;
+//        this.httpStatusDetailCode = httpStatus;
+//        this.responseId = responseId;
+//
+//    }
+//
+//    public CustomException(String detailErrorMessage, HttpStatus httpStatus, String responseId,String httpStatusCode, String errorMessage) {
+//        this.detailErrorMessage = detailErrorMessage;
+//        this.httpStatusDetailCode = httpStatus;
+//        this.responseId = responseId;
+//        this.httpStatusCode = httpStatusCode;
+//        this.errorMessage = errorMessage;
+//
+//    }
+//
+//    public CustomException(String detailErrorMessage, HttpStatus httpStatus) {
+//        this.detailErrorMessage = detailErrorMessage;
+//        this.httpStatusDetailCode = httpStatus;
+//    }
 
     public String getDetailErrorMessage() {
         return detailErrorMessage;

@@ -8,6 +8,7 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.APIResponseException;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.exception.InvalidInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -129,9 +130,9 @@ public class APIUtils {
         RestTemplate restTemplate = new RestTemplate();
         String bodyrequest = body;
         ResponseEntity<String> result = null;
-        if (ID == null) {
-            throw new CustomException("Không tìm thấy orderId trong bản tin request!", HttpStatus.BAD_REQUEST, requestId);
-        }
+//        if (ID == null) {
+//            throw new InvalidInputException("orderId is require", requestId);
+//        }
 
         HttpHeaders headers = new HttpHeaders();
 

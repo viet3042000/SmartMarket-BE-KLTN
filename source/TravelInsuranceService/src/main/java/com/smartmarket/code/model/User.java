@@ -19,7 +19,7 @@ public class User implements Serializable {
 	@SequenceGenerator(sequenceName = "user_id_sequence", allocationSize = 1, name = "user_id_seq")
 	private Long id;
 
-	@Column(name = "username")
+	@Column(name = "user_name")
 	private String username;
 
 	@Column(name = "password")

@@ -1,9 +1,14 @@
 package com.smartmarket.code.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Throwables;
 import com.nimbusds.jose.util.IOUtils;
+import com.smartmarket.code.constants.Constant;
+import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
+import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.StartTimeBean;
@@ -69,7 +74,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
                     JSONObject transactionDetail = new JSONObject();
-                    transactionDetail.put("transactionDetail","Format request body is not true ");
+                    transactionDetail.put("transactionDetail","Format request body is not true");
 
                     //logRequest vs Client
                     ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
@@ -83,7 +88,31 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
             }
         } catch (Exception ex) {
-            throw new CustomException(ex.getMessage(), HttpStatus.BAD_REQUEST, "test");
+            throw new CustomException("Error in custom log filter", HttpStatus.BAD_REQUEST, null,null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+//            String logTimestamp = formatter.format(date);
+//
+//            int status = response.getStatus();
+//            String responseStatus = Integer.toString(status);
+//
+//            //logException
+//            ServiceExceptionObject soaExceptionObject =
+//                    new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
+//                            messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
+//                            request.getRemoteHost(), null,null,
+//                            Throwables.getStackTraceAsString(ex),logService.getIp());
+//            logService.createSOALogException(soaExceptionObject);
+//
+//            //get time duration
+//            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
+//            JSONObject transactionDetail = new JSONObject();
+//            transactionDetail.put("transactionDetail","Exception in CustomLogFilter");
+//
+//            //logResponse vs Client
+//            ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
+//                    messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+//                    "response", transactionDetail, responseStatus, null,
+//                    null, logTimestamp, request.getRemoteHost(),logService.getIp());
+//            logService.createSOALog2(soaObject);
         }
 
         chain.doFilter(request, response);
