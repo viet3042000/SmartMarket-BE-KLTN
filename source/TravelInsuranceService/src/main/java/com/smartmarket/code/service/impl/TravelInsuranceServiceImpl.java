@@ -148,7 +148,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), "BIC", "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                                response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
+                                response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request));
                         logService.createSOALog2(soaObject);
 
                     } else {
@@ -176,7 +176,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                                 "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
-                                responseError.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
+                                responseError.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request));
                         logService.createSOALog2(soaObject);
 
 
@@ -354,7 +354,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         ServiceObject soaObject = new ServiceObject("serviceLog", queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                                response.getResultMessage(), logTimestamp, request.getRemoteHost(), logService.getIp());
+                                response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request));
                         logService.createSOALog2(soaObject);
 
                     }
@@ -509,7 +509,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                                response.getResultMessage(), logtimeStamp, request.getRemoteHost(), logService.getIp());
+                                response.getResultMessage(), logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
                         logService.createSOALog2(soaObject);
                     } else {
                         EJson dataResponse = (jsonObjectReponseUpdate.getJSONObject("data"));
@@ -537,7 +537,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                                 "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
-                                responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(), logService.getIp());
+                                responseError.getResultMessage(), logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
                         logService.createSOALog2(soaObject);
 
 

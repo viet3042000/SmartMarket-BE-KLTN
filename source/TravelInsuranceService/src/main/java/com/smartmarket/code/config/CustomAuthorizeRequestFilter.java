@@ -180,7 +180,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                Throwables.getStackTraceAsString(ex),logService.getIp());
+                                Throwables.getStackTraceAsString(ex),Utils.getClientIp(request));
                 logService.createSOALogException(soaExceptionObject);
 
                 String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -189,7 +189,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request));
                 logService.createSOALog2(soaObject);
             }else {
 
@@ -210,7 +210,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                         new ServiceExceptionObject("serviceLog","response",null,null,null,
                                 messageTimestamp, "travelinsuranceservice", request.getRequestURI(),"1",
                                 request.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
-                                Throwables.getStackTraceAsString(ex),logService.getIp());
+                                Throwables.getStackTraceAsString(ex),Utils.getClientIp(request));
                 logService.createSOALogException(soaExceptionObject);
 
                 String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -219,7 +219,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket", "client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),logService.getIp());
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request));
                 logService.createSOALog2(soaObject);
             }
             httpServletResponse.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());

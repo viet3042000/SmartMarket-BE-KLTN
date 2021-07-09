@@ -69,7 +69,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", null,
                             "request", transactionDetail, null, null,
-                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
                     logService.createSOALog2(soaObject);
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -80,7 +80,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", null,
                             "request", transactionDetail, null, null,
-                            null, logtimeStamp, request.getRemoteHost(), logService.getIp());
+                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
                     logService.createSOALog2(soaObject);
                 }
 
