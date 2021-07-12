@@ -58,7 +58,7 @@ public class MapperUtils {
             ordersBIC.setOrdcustmessage(environment.getProperty("createTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().equals("") == true ? "Not Address" : orders.getOrdBillStreet1());
+            ordersBIC.setOrdbillstreet1("No Address");
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
@@ -138,12 +138,12 @@ public class MapperUtils {
 
         if (orders != null) {
             ordersBIC.setOrderReference(orders.getOrderReference());
-            ordersBIC.setOrderid(orders.getOrderId());
+            ordersBIC.setOrderid(Long.parseLong(orders.getOrderId()));
             ordersBIC.setOrdcustid(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustId")));
             ordersBIC.setOrdcustmessage(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().equals("") == true ? "Not Address" : orders.getOrdBillStreet1());
+            ordersBIC.setOrdbillstreet1("No Address");
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
@@ -224,7 +224,7 @@ public class MapperUtils {
         TRV trv = new TRV();
         ArrayList<TRVDetail> trvDetails = new ArrayList<>();
 
-        orders.setOrderId(ordersBIC.getLong("Orderid"));
+        orders.setOrderId(String.valueOf(ordersBIC.getLong("Orderid")));
         orders.setOrderReference(ordersBIC.getString("OrderReference") == null ? null : ordersBIC.getString("OrderReference").toString());
 //                orders.setOrdCustId(ordersBIC.getLong("Ordcustid"));
 //                orders.setOrdCustMessage(ordersBIC.getString("Ordcustmessage") == null ? null : ordersBIC.getString("Ordcustmessage").toString());

@@ -17,7 +17,7 @@ public class Orders implements Serializable {
     @NotNull(message = "orderReference is require")
     private String orderReference ;
 
-    private Long orderId ;
+    private String orderId ;
 
     private Long ordCustId ;
 

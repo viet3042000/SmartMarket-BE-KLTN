@@ -101,7 +101,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
                     ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
                     productId =environment.getRequiredProperty("createTravelBIC.DSVN.order.productId");
-                    customerAddress = createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
+                    customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
                     clientIp = Utils.getClientIp(request) ;
 
                     bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
