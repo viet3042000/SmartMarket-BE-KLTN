@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -192,6 +193,14 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         String token = "" ;
 
+        //SET TIMEOUT
+        //set Time out get token api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryGetToken = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryGetToken.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryGetToken.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
+
         //post get token
         UserLoginBIC userLoginBIC = new UserLoginBIC();
         userLoginBIC.setUsername(environment.getRequiredProperty("account.DSVN.username"));
@@ -201,7 +210,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         ObjectMapper mapper = new ObjectMapper();
 
         String requestToken = mapper.writeValueAsString(userLoginBIC);
-        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null);
+        ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null,clientHttpRequestFactoryGetToken);
         if(jsonResultGetToken != null && jsonResultGetToken.getBody() != null){
             //get token from response
             token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
