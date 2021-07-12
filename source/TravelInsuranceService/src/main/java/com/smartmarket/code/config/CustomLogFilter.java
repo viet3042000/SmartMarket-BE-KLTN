@@ -11,6 +11,7 @@ import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.EJson;
 import com.smartmarket.code.util.StartTimeBean;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -59,10 +60,11 @@ public class CustomLogFilter extends OncePerRequestFilter {
         try {
             if (request.getMethod().equals("POST")) {
                 if(Utils.isJSONValid(jsonString)){
-                    JSONObject requestBody = new JSONObject(jsonString);
+                    JSONObject requestBodyJson = new JSONObject(jsonString);
+                    EJson requestBody = new EJson(jsonString);
                     String requestId = requestBody.getString("requestId");
                     String requestTime = requestBody.getString("requestTime");
-                    String stringRequestBody = requestBody.toString();
+                    String stringRequestBody = requestBodyJson.toString();
                     JSONObject transactionDetail = new JSONObject(stringRequestBody);
 
                     //logRequest vs Client

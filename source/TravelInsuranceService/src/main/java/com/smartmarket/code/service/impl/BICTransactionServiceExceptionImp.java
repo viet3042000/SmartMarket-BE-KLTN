@@ -11,6 +11,7 @@ import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
+import com.smartmarket.code.util.EJson;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             e.printStackTrace();
         }
 
+        String messasgeId = "no requestId" ;
         String orderReference ="-1" ;
         String orderId = "-1";
         String customerName = "-1";
@@ -65,7 +67,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         String type = "unknown" ;
 
         if(Utils.isJSONValid(jsonString)){
-            JSONObject requestBody = new JSONObject(jsonString);
+            EJson requestBody = new EJson(jsonString);
             AntPathMatcher matcher = new AntPathMatcher();
             String URLRequest = request.getRequestURI();
 
@@ -76,13 +78,13 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 }else if (matcher.match(hostConstants.URL_UPDATE, URLRequest)){
                     type = Constant.TYPE_UPDATE ;
                 }
-                String messasgeId = requestBody.getString("requestId");
-                JSONObject detail = (requestBody.getJSONObject("detail"));
+                messasgeId = requestBody.getString("requestId") == null ? "no requestId" : requestBody.getString("requestId");
+                EJson detail = (requestBody.getJSONObject("detail"));
 
 
                 //convert jsonobject to CreateTravelInsuranceBICRequest
                 Gson gson = new Gson(); // Or use new GsonBuilder().create();
-                CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
+                CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.jsonToString(), CreateTravelInsuranceBICRequest.class);
 
                 //set properties detail
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
