@@ -76,7 +76,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
         httpServletResponse.setHeader("Access-Control-Max-Age", "3600");
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
-        String[] pathActuator = {"/actuator/*"} ;
+        String[] pathActuator = {"/actuator/**","/opendata-service/v1/refreshcacheandconfig/**"} ;
 
         try {
 

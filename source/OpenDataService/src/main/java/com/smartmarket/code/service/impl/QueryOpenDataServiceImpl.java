@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -53,6 +54,16 @@ public class QueryOpenDataServiceImpl implements OpenDataService {
     public ResponseEntity<?> queryOpenData(BaseDetail<QueryOpenDataRequest> queryOpenDataRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //time start
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        //SET TIMEOUT
+        //set Time out get token api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryQueryData = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryQueryData.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.queryOpenData")));
+        //Read timeout
+        clientHttpRequestFactoryQueryData.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.queryOpenData")));
+
+
         BaseResponse response = new BaseResponse();
 
         //check validate json request
@@ -80,7 +91,8 @@ public class QueryOpenDataServiceImpl implements OpenDataService {
 
             //get token from database
 //            String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3MmJmNzBlMS1jZTEyLTQyODktYTgyOS1kZjI5ZDgyNjViM2MiLCJyb2xlcyI6WyJhZG1pbiIsInNlYXJjaGVyIl0sImlzcyI6InRvYW5saDQiLCJkYXRhR3JvdXBzIjpbInF1eWV0ZGluaF90b3RyaW5oOkZJUyBGUFMiLCJob3Bkb25nX2hvc29fbmhhbnN1OkZJUyBCT018RklTIEZUUyIsImNvbmd2YW5faG9zb2dpYW9kaWNoOkZJUyBFUlAiXSwiZXhwIjoxNjI1NTUyNjgxLCJkYXRhU291cmNlcyI6WyJob3Bkb25nX2hvc29fbmhhbnN1IiwicXV5ZXRkaW5oX3RvdHJpbmgiLCJjb25ndmFuX2hvc29naWFvZGljaCJdLCJpYXQiOjE2MjU1NTIzODF9.-pQV9DY6U7FI-u1pMfzdtr2C8WtRh0nQx-a0Dj6i9ts";
-            String token = authorizationService.getTokenFromDatabase();
+//            String token = authorizationService.getTokenFromDatabase();
+            String token = authorizationService.getToken();
 
             if (StringUtils.isEmpty(token)) {
                 throw new CustomException("Not found token response from open data", HttpStatus.INTERNAL_SERVER_ERROR, queryOpenDataRequest.getRequestId(),ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -107,7 +119,7 @@ public class QueryOpenDataServiceImpl implements OpenDataService {
                 map.put("rows", rows);
                 map.put("token", token);
                 startTime = System.currentTimeMillis();
-                resultOpenData = apiUtils.getApiWithParam(environment.getRequiredProperty("api.queryOpenData"), map,null, token, queryOpenDataRequest.getRequestId());
+                resultOpenData = apiUtils.getApiWithParam(environment.getRequiredProperty("api.queryOpenData"), map,null, token, queryOpenDataRequest.getRequestId(),clientHttpRequestFactoryQueryData);
                 timeDurationOpenData = DateTimeUtils.getElapsedTimeStr(startTime);
 
             }
