@@ -1,6 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.entitylog.KafkaExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
@@ -27,6 +28,11 @@ public class LogServiceImpl  {
     //  SOA Exception là bảng lưu log giao dịch của client với hệ thống
     public void createSOALogException(ServiceExceptionObject serviceExceptionObject) throws CustomException {
         logger.info(serviceExceptionObject.getStringObject()) ;
+    }
+
+    //  SOA Exception là bảng lưu log giao dịch của client với hệ thống
+    public void createKafkaLogException(KafkaExceptionObject kafkaExceptionObject) throws CustomException {
+        logger.info(kafkaExceptionObject.getStringObject()) ;
     }
 
     public String getIp() {
