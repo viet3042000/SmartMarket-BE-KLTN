@@ -112,7 +112,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
 
             //get token from database
-            String token = authorizationService.getTokenFromDatabase();
+            String token = authorizationService.getToken();
             if (StringUtils.isEmpty(token)) {
                 throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
             }
@@ -208,7 +208,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     logService.createTargetLog(tarObject);
 
 //                    throw new CustomException("",jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-                    throw new CustomException("Đơn hàng đã được tạo trên hệ thống!",HttpStatus.BAD_REQUEST, createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                    throw new CustomException("Đơn hàng đã được tạo trên hệ thống!",jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
                 }
             } else {
                 //logResponse vs BIC
@@ -310,7 +310,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             transactionDetail.put("orderRef", orderReference);
 
             //get token from database
-            String token = authorizationService.getTokenFromDatabase();
+            String token = authorizationService.getToken();
 
             if (StringUtils.isEmpty(token)) {
                 throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
@@ -487,7 +487,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     transactionDetail, logtimeStamp, messageTimestamp, null);
             logService.createTargetLog(tarObjectRequest);
 
-            String token = authorizationService.getTokenFromDatabase();
+            String token = authorizationService.getToken();
             if (StringUtils.isEmpty(token)) {
                 throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
             }

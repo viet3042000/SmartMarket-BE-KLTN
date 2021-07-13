@@ -152,8 +152,8 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         String token = "" ;
         if (Integer.parseInt(environment.getRequiredProperty("getToken.mode")) == 1){
             token = getTokenFromCache() ;
-        }else if (Integer.parseInt(environment.getRequiredProperty("getToken.mode")) == 2){
-            token = getTokenFromDatabase() ;
+        }else {
+            token = getTokenOncePerRequest() ;
         }
         return token ;
     }
@@ -308,7 +308,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 //    }
 
     // load token from BIC
-    public String getTokenFromDatabase() throws JsonProcessingException, APIAccessException {
+    public String getTokenOncePerRequest() throws JsonProcessingException, APIAccessException {
 
         String token = "" ;
 
