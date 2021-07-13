@@ -30,7 +30,6 @@ public class LogServiceImpl  {
         logger.info(serviceExceptionObject.getStringObject()) ;
     }
 
-    //  SOA Exception là bảng lưu log giao dịch của client với hệ thống
     public void createKafkaLogException(KafkaExceptionObject kafkaExceptionObject) throws CustomException {
         logger.info(kafkaExceptionObject.getStringObject()) ;
     }
