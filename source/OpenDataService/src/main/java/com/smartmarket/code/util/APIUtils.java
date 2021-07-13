@@ -85,7 +85,7 @@ public class APIUtils {
         return result;
     }
 
-    public ResponseEntity<String> postByFormDataURLEncode(String url, MultiValueMap<String, String> map) throws APIAccessException {
+    public ResponseEntity<String> postByFormDataURLEncode(String url, MultiValueMap<String, String> map,SimpleClientHttpRequestFactory clientHttpRequestFactory) throws APIAccessException {
         ResponseEntity<String> result = null;
 
 
@@ -97,7 +97,7 @@ public class APIUtils {
 //            //Read timeout
 //            clientHttpRequestFactory.setReadTimeout(10000);
 
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -110,8 +110,8 @@ public class APIUtils {
     }
 
 
-    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token, String requestId) throws APIAccessException {
-        RestTemplate restTemplate = new RestTemplate();
+    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token, String requestId,SimpleClientHttpRequestFactory clientHttpRequestFactory) throws APIAccessException {
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<String> result = null;
 

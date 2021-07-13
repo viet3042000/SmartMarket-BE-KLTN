@@ -3,6 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
+import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -71,10 +73,23 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
 
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        //SET TIMEOUT
+        //set Time out get create api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryCreateBIC = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryCreateBIC.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.createTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryCreateBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.createTravelBIC")));
+
+
         BaseResponse response = new BaseResponse();
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
+
+        String clientIp =  Utils.getClientIp(request) ;
+        String typeTransaction = Constant.TYPE_CREATE;
 
         try {
             //check validate json request
@@ -104,7 +119,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId());
+            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
@@ -134,7 +149,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString());
+                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponse vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","response",
@@ -162,7 +177,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString());
+                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponseError vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC", "response",
@@ -261,6 +276,15 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     public ResponseEntity<?> getTravelBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //time start
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        //SET TIMEOUT
+        //set Time out get create api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryGetOrderBIC = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryGetOrderBIC.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.getTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryGetOrderBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.getTravelBIC")));
+
         BaseResponse response = new BaseResponse();
 
         //check validate json request
@@ -307,7 +331,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     if (orderId != null) {
                         map.put("id", orderId);
                         startTime = System.currentTimeMillis();
-                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOrderId"), null, map, token, queryTravelInsuranceBICRequest.getRequestId());
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOrderId"), null, map, token, queryTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryGetOrderBIC);
                         timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
                     }
                 }
@@ -316,7 +340,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     if (orderReference != null) {
                         map.put("id", orderReference);
                         startTime = System.currentTimeMillis();
-                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOderReference"), null, map, token, queryTravelInsuranceBICRequest.getRequestId());
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOderReference"), null, map, token, queryTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryGetOrderBIC);
                         timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
                     }
 
@@ -429,9 +453,20 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         //start time
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
+        //SET TIMEOUT
+        //set Time out get create api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryUpdateBIC = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryUpdateBIC.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.updateTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryUpdateBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.updateTravelBIC")));
+
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
         ObjectMapper mapper = new ObjectMapper();
         BaseResponse response = new BaseResponse();
+
+        String clientIp =  Utils.getClientIp(request) ;
+        String typeTransaction = Constant.TYPE_CREATE;
 
         try {
             //check validate json request
@@ -465,7 +500,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId());
+            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
 
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -491,7 +526,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                                 createTravelInsuranceBICResponse, jsonResultPutBIC);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultPutBIC.getStatusCode().toString());
+                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //log properties
                         String responseBody = mapper.writeValueAsString(response);
@@ -523,7 +558,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString());
+                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponseError vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","response",

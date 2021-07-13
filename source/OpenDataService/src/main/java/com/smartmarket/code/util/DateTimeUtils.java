@@ -21,6 +21,13 @@ public class DateTimeUtils {
         return System.currentTimeMillis();
     }
 
+    public static Long getCurrenEpochTime() {
+
+//        return System.currentTimeMillis() / 1000L;
+        Long EpochTime = Instant.now().toEpochMilli();
+        return Instant.now().getEpochSecond();
+    }
+
     public static Long getCurrentTimeRaw(){
         return getCurrenTime() + tz.getRawOffset();
     }

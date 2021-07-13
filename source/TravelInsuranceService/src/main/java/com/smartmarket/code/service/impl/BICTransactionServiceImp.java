@@ -7,6 +7,7 @@ import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.util.EJson;
+import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +16,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Service
@@ -55,7 +57,8 @@ public class BICTransactionServiceImp implements BICTransactionService {
     @Override
     public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
                                                                        EJson jsonObjectReponseCreate,
-                                                                       String resultCode, String bicResultCode) {
+                                                                       String resultCode, String bicResultCode ,
+                                                                       String clientIp, String typeTransaction) {
         BICTransaction bicTransaction = new BICTransaction();
 
         //check
@@ -70,7 +73,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setBicResultCode(bicResultCode);
             bicTransaction.setConsumerId("DSVN");
             bicTransaction.setCustomerName("DSVN");
-            bicTransaction.setCustomerAddress("default");
+            bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : object.getDetail().getOrders().getOrdBillStreet1());
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setFromDate(object.getDetail().getTrv().getFromDate());
             bicTransaction.setResultCode(resultCode);
@@ -82,7 +85,9 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setRequestId(object.getRequestId());
             bicTransaction.setToDate(object.getDetail().getTrv().getToDate());
             bicTransaction.setOrdDate(object.getDetail().getOrders().getOrdDate());
-            bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId") );
+            bicTransaction.setType(typeTransaction);
+            bicTransaction.setClientIp(clientIp);
+            bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
         }
 
         return bicTransactionRepository.save(bicTransaction);
@@ -101,7 +106,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setBicResultCode(bicResultCode);
         bicTransaction.setConsumerId("DSVN");
         bicTransaction.setCustomerName("DSVN");
-        bicTransaction.setCustomerAddress("default");
+        bicTransaction.setCustomerAddress(customerAddress);
         bicTransaction.setEmail(email);
         bicTransaction.setFromDate(fromDate);
         bicTransaction.setResultCode(resultCode);

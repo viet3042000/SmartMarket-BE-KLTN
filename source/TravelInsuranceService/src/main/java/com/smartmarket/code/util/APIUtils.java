@@ -34,19 +34,13 @@ import java.util.Map;
 public class APIUtils {
     private Logger LOGGER = LoggerFactory.getLogger(APIUtils.class);
 
-    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token, String requestId) throws APIAccessException {
+    public ResponseEntity<String> postDataByApiBody(String url, EJson headerParam, String body, String token, String requestId , SimpleClientHttpRequestFactory clientHttpRequestFactory) throws APIAccessException {
         ResponseEntity<String> result = null;
 
 
-        //set Time out
-//            SimpleClientHttpRequestFactory clientHttpRequestFactory
-//                    = new SimpleClientHttpRequestFactory();
-//            //Connect timeout
-//            clientHttpRequestFactory.setConnectTimeout(10000);
-//            //Read timeout
-//            clientHttpRequestFactory.setReadTimeout(10000);
 
-        RestTemplate restTemplate = new RestTemplate();
+
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
 
         String bodyrequest = body;
 
@@ -84,8 +78,10 @@ public class APIUtils {
     }
 
 
-    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token, String requestId) throws APIAccessException {
-        RestTemplate restTemplate = new RestTemplate();
+    public ResponseEntity<String> getApiWithParam(String url, Map<String, Object> param, Map<String, Object> pathVariable, String token, String requestId,SimpleClientHttpRequestFactory clientHttpRequestFactory) throws APIAccessException {
+
+
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<String> result = null;
 
@@ -126,8 +122,10 @@ public class APIUtils {
         return result;
     }
 
-    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token, String requestId) throws APIAccessException {
-        RestTemplate restTemplate = new RestTemplate();
+    public ResponseEntity<String> putDataByApiBody(String ID, String url, EJson headerParam, String body, String token, String requestId,SimpleClientHttpRequestFactory clientHttpRequestFactory) throws APIAccessException {
+
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
+
         String bodyrequest = body;
         ResponseEntity<String> result = null;
 //        if (ID == null) {

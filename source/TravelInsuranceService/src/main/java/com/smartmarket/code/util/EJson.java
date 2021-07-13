@@ -75,6 +75,10 @@ public class EJson {
 		return BigDecimal.valueOf(hasValue(key) ? json.getAsJsonObject().get(key).getAsBoolean() == true ? 1 : 0 : 0);
 	}
 
+	public String jsonToString() {
+		return json.toString();
+	}
+
 	public String getString(String key) {
 		return hasValue(key) ? json.getAsJsonObject().get(key).getAsString() : null;
 	}
@@ -160,5 +164,7 @@ public class EJson {
 		JsonElement element = gson.toJsonTree(value);
 		json.getAsJsonObject().add(key, element);
 	}
+
+
 
 }
