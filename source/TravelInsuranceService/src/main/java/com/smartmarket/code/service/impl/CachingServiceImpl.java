@@ -37,6 +37,12 @@ public class CachingServiceImpl {
         Object o = cacheManager.getCache(cacheName).get(key);
         return o;
     }
+
+
+    public Object getFromCacheString(String cacheName, String key) {
+        Object o =  cacheManager.getCache(cacheName).get(key) == null  ? null : cacheManager.getCache(cacheName).get(key).get();
+        return o;
+    }
 //
     @CacheEvict(value = "first", key = "#cacheKey")
     public void evictSingleCacheValue(String cacheKey) {
