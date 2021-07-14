@@ -39,7 +39,6 @@ public class KafkaConsumerConfig{
         Map<String, Object> props = new HashMap<>();
 //        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getRequiredProperty("kafka.bootrapServer.local"));
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
 //        The maximum number of records returned in a single call to poll()
