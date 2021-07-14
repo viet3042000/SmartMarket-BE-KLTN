@@ -5,5 +5,5 @@ import java.util.Set;
 
 public interface UrlService {
     Set<Url> findUrlByUserIdActive(Long userId);
-    public Set<Url> findUrlByClientId(Long clientId) ;
+    public Set<Url> findUrlByClientName(String clientId) ;
 }

@@ -35,19 +35,19 @@ public class UrlServiceImpl implements UrlService {
     }
 
 
-    @Cacheable(cacheNames = "urllist", key = "#clientId")
-    public Set<Url> findUrlByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
+    @Cacheable(cacheNames = "urllist", key = "#clientIdName")
+    public Set<Url> findUrlByClientName(String clientIdName) {
+        return urlRepository.findUrlByClientNameActive(clientIdName);
     }
+
 
     @CacheEvict(cacheNames = "urllist", key = "#clientId")
-    public void evictSingleClientIdCacheValue(String clientId) {
+        public void evictSingleClientIdCacheValue(String clientId) {
     }
 
-
     @CachePut(cacheNames = "client" , key = "#clientId")
-    public Set<Url> updateClientCacheByClientId(Long clientId) {
-        return urlRepository.findUrlByClientIdActive(clientId);
+    public Set<Url> updateClientCacheByClientId(String clientIdName) {
+        return urlRepository.findUrlByClientNameActive(clientIdName);
     }
 
 //    @Caching(
