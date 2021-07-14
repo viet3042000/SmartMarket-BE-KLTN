@@ -22,6 +22,9 @@ public class Client implements Serializable {
 	@Column(name = "client_id_code")
 	private String clientIdCode;
 
+	@Column(name = "client_id_name")
+	private String clientIdName;
+
 	@Column(name = "secret")
 	@JsonIgnore
 	private String secret;
@@ -38,12 +41,5 @@ public class Client implements Serializable {
 	@Column(name = "client_id_sync")
 	private Long clientIdSync;
 
-	@Column(name = "client_user_name_bic")
-	private String clientUserNameBic;
 
-	@Column(name = "client_password_bic")
-	private String clientPasswordBic;
-
-	@Column(name = "client_domain_name_bic")
-	private String clientDomainNameBic;
 }
