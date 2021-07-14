@@ -27,9 +27,6 @@ public class User implements Serializable {
 	@JsonIgnore
 	private String password;
 
-	@Column(name = "user_id_sync")
-	private Integer userIdSync;
-
 	@Column(name = "enabled")
 	private Integer enabled;
 

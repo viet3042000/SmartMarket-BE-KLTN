@@ -34,5 +34,4 @@ public class Client implements Serializable {
 	@Column(name = "ip_access")
 	private String ipAccess;
 
-
 }
