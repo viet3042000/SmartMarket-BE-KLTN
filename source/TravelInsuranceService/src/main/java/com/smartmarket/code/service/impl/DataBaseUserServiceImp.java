@@ -29,24 +29,31 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
                 password =(String)  keyPairs.get(k);
             }
             if (k.equals("user_id")) {
-                userIdSync =(Number) keyPairs.get(k);
+//                userIdSync =(Number) keyPairs.get(k);
             }
             if (k.equals("enabled")) {
 //                    userIdSync =(Number) keyPairs.get(k);
             }
         }
 
-        userKafkaServiceImp.updateUserKafka(userIdSync,username,password);
+        userKafkaServiceImp.updateUserKafka(username,password);
     }
     public void deleteDatabaseUser(String table, Map<String, Object> keyPairs){
-        Number userId = 0;
+//        Number userId = 0;
+//
+//        for (String k : keyPairs.keySet()) {
+//            if (k.equals("user_id")) {
+//                userId = (Number) keyPairs.get(k);
+//            }
+//        }
 
+        String username = "";
         for (String k : keyPairs.keySet()) {
-            if (k.equals("user_id")) {
-                userId = (Number) keyPairs.get(k);
+            if (k.equals("username")) {
+                username = (String)  keyPairs.get(k);
             }
         }
-        userKafkaServiceImp.deleteUserKafka(userId);
+        userKafkaServiceImp.deleteUserKafka(username);
     }
 
     public void truncateDatabaseUser(String table){

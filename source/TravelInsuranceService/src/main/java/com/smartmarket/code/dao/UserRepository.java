@@ -24,13 +24,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 	@Modifying(clearAutomatically = true)
 	// Đây là Native SQL --> dùng tên biến theo DB
-	@Query(value = "UPDATE users set user_name =:user_name, password =:password where user_id_sync = :userIdSync",nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("userIdSync") Number userIdSync, @Param("user_name") String username,
-										 @Param("password") String password) ;
+	@Query(value = "UPDATE users set password =:password where user_name = :user_name",nativeQuery = true)
+	public int updateConsumerClientKafka(@Param("user_name") String username,@Param("password") String password) ;
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM users where user_id_sync =:userIdSync", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("userIdSync") Number userIdSync) ;
+	@Query(value = "DELETE FROM users where user_name =:user_name", nativeQuery = true)
+	public int deleteConsumerClientKafka(@Param("user_name") String username) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE users",  nativeQuery = true)

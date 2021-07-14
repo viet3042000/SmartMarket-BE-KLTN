@@ -19,7 +19,7 @@ public class ConsumerKafkaServiceImp implements ConsumerKafkaService {
 
     public Consumers createConsumerKafka(Map<String, Object> keyPairs) throws ParseException {
         Consumers consumers = new Consumers();
-//        2021-06-10T10:44:46.296034Z
+        // 2021-06-10T10:44:46.296034Z
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
 
         for (String k : keyPairs.keySet()) {
@@ -29,19 +29,18 @@ public class ConsumerKafkaServiceImp implements ConsumerKafkaService {
             }
             if (k.equals("consumerId")) {
                 consumers.setId((String) keyPairs.get(k));
-                consumers.setConsumerIdSync((String) keyPairs.get(k));
             }
         }
         return consumerRepository.save(consumers);
 
     }
 
-    public int updateConsumerKafka(String consumerIdSync,Date createAt){
-        return consumerRepository.updateConsumerClientKafka(consumerIdSync,createAt);
+    public int updateConsumerKafka(String consumerId,Date createAt){
+        return consumerRepository.updateConsumerClientKafka(consumerId,createAt);
     }
 
-    public int deleteConsumerKafka(String consumerIdSync){
-        return consumerRepository.deleteConsumerClientKafka(consumerIdSync);
+    public int deleteConsumerKafka(String consumerId){
+        return consumerRepository.deleteConsumerClientKafka(consumerId);
     }
 
     public int truncateConsumerKafka(){

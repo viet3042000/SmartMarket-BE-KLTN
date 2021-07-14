@@ -28,19 +28,19 @@ public class UserKafkaServiceImp implements UserKafkaService {
                 user.setEnabled(Integer.parseInt((String) keyPairs.get(k)));
             }
             if (k.equals("user_id")) {
-                user.setUserIdSync((Integer) keyPairs.get(k));
+//                user.setUserIdSync((Integer) keyPairs.get(k));
             }
 
         }
         return userRepository.save(user);
     }
 
-    public int updateUserKafka(Number userIdSync,String username,String password) {
-        return userRepository.updateConsumerClientKafka(userIdSync,username, password);
+    public int updateUserKafka(String username,String password) {
+        return userRepository.updateConsumerClientKafka(username, password);
     }
 
-    public int deleteUserKafka(Number userIdSync) {
-        return userRepository.deleteConsumerClientKafka(userIdSync);
+    public int deleteUserKafka(String username) {
+        return userRepository.deleteConsumerClientKafka(username);
     }
 
     public int truncateUserKafka() {

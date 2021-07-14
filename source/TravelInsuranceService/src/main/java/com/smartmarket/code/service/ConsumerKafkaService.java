@@ -13,9 +13,9 @@ public interface ConsumerKafkaService {
 
     public Consumers createConsumerKafka(Map<String, Object> keyPairs) throws ParseException;
 
-    public int updateConsumerKafka(String consumerIdSync, Date createAt) ;
+    public int updateConsumerKafka(String consumerId, Date createAt) ;
 
-    public int deleteConsumerKafka(String consumerIdSync) ;
+    public int deleteConsumerKafka(String consumerId) ;
 
     public int truncateConsumerKafka() ;
 

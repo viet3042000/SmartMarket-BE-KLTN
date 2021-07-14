@@ -25,14 +25,14 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 	// Đây là Native SQL
 	@Query(value = "UPDATE clients set secret =:secret, is_active = :isActive, " +
 			" consumer_id = :consumerId, ip_access = :ipAccess, client_id_code = :clientIdCode " +
-			"where client_id_sync =:clientId", nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("clientId") Long clientId,@Param("clientIdCode") String clientIdCode,
+			"where client_id_name =:client_id_name", nativeQuery = true)
+	public int updateConsumerClientKafka(@Param("client_id_name") String clientIdName,@Param("clientIdCode") String clientIdCode,
 										 @Param("secret") String secret ,@Param("isActive") Long isActive,
 										 @Param("consumerId") String consumerId,@Param("ipAccess") String ipAccess) ;
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM clients where client_id_sync =:clientId", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("clientId") Long clientIdSync) ;
+	@Query(value = "DELETE FROM clients where client_id_name =:client_id_name", nativeQuery = true)
+	public int deleteConsumerClientKafka(@Param("client_id_name") String clientIdName) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE clients",  nativeQuery = true)

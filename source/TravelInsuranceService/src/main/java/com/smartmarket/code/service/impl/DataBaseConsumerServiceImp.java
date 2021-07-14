@@ -18,29 +18,29 @@ public class DataBaseConsumerServiceImp implements DataBaseConsumerService {
         consumerKafkaServiceImp.createConsumerKafka(keyPairs);
     }
     public void updateDatabaseConsumer(String table, Map<String, Object> keyPairs) throws ParseException{
-        String consumerIdSync = "";
+        String consumerId = "";
         String createAt = "";
         //convert string --> date with formart tương ứng
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
         for (String k : keyPairs.keySet()) {
             if (k.equals("consumerId")) {
-                consumerIdSync =(String)keyPairs.get(k);
+                consumerId =(String)keyPairs.get(k);
             }
             if (k.equals("created_at")) {
                 createAt = (String)keyPairs.get(k);
             }
         }
-        consumerKafkaServiceImp.updateConsumerKafka(consumerIdSync, formatter.parse(createAt));
+        consumerKafkaServiceImp.updateConsumerKafka(consumerId, formatter.parse(createAt));
     }
     public void deleteDatabaseConsumer(String table, Map<String, Object> keyPairs){
-        String consumerIdSync = "";
+        String consumerId = "";
 
         for (String k : keyPairs.keySet()) {
             if (k.equals("consumerId")) {
-                consumerIdSync =(String) keyPairs.get(k);
+                consumerId =(String) keyPairs.get(k);
             }
         }
-        consumerKafkaServiceImp.deleteConsumerKafka(consumerIdSync);
+        consumerKafkaServiceImp.deleteConsumerKafka(consumerId);
     }
     public void truncateDatabaseConsumer(String table){
         consumerKafkaServiceImp.truncateConsumerKafka();

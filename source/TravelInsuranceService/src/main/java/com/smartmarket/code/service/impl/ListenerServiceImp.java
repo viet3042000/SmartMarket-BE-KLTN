@@ -96,7 +96,7 @@ public class ListenerServiceImp implements ListenerService {
                                 dataBaseClientServiceImp.updateDatabaseClient(table,keyPairs);
                             }
                             if (op.equals("r")) {
-                                //... by key-value in beforeObj to TravelInsurance DB that match with key-pair in sourceObj
+
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -113,7 +113,7 @@ public class ListenerServiceImp implements ListenerService {
                                 dataBaseClientServiceImp.deleteDatabaseClient(table,keyPairs);
                             }
                         } else {
-//                        System.out.println("beforeObj is null");
+                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
@@ -193,7 +193,8 @@ public class ListenerServiceImp implements ListenerService {
                                 dataBaseUserServiceImp.updateDatabaseUser(table,keyPairs);
                             }
                             if (op.equals("r")) {
-                                //... by key-value in beforeObj to TravelInsurance DB that match with key-pair in sourceObj
+                                // truncate all table
+                                // create table from key-value
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -211,7 +212,7 @@ public class ListenerServiceImp implements ListenerService {
                                 dataBaseUserServiceImp.deleteDatabaseUser(table,keyPairs);
                             }
                         } else {
-//                        System.out.println("beforeObj is null");
+                            System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
@@ -286,15 +287,13 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-//                                dataBaseServiceImp.createDatabase(table, keyPairs);
                                 dataBaseConsumerServiceImp.createDatabaseConsumer(table,keyPairs);
                             }
                             if (op.equals("u")) {
-//                                dataBaseServiceImp.updateDatabase(table, keyPairs);
                                 dataBaseConsumerServiceImp.updateDatabaseConsumer(table,keyPairs);
                             }
                             if (op.equals("r")) {
-                                //... by key-value in beforeObj to TravelInsurance DB that match with key-pair in sourceObj
+
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -312,7 +311,7 @@ public class ListenerServiceImp implements ListenerService {
                                 dataBaseConsumerServiceImp.deleteDatabaseConsumer(table,keyPairs);
                             }
                         } else {
-//                        System.out.println("beforeObj is null");
+                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
