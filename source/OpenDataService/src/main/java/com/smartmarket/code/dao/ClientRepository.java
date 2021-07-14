@@ -13,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
-	@Query(value = "from Client c where c.clientIdName =:clientIdName")
-	public Optional<Client> findByclientName(@Param("clientIdName") String clientIdName);
+	@Query(value = "from Client c where c.clientId =:clientId")
+	public Optional<Client> findByclientName(@Param("clientId") String clientId);
 
-	@Query(value = "select c.client_id_name,c.client_id from clients c where c.client_id_name =:clientIdName" , nativeQuery = true)
-	public Object[] findByclientName2(@Param("clientIdName")String clientIdName);
+	@Query(value = "select c.id,c.client_id from clients c where c.client_id =:clientId" , nativeQuery = true)
+	public Object[] findByclientName2(@Param("clientId")String clientId);
 }

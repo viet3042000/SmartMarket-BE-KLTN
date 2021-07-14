@@ -14,8 +14,8 @@ import java.util.Set;
 @Repository
 public interface UrlRepository extends JpaRepository<Url, Long> {
 
-    @Query(value = "from Url u join ClientUrl cu on cu.urlName = u.urlName where cu.clientIdName = :clientIdName  ")
-    public Set<Url> findUrlByClientIdActive(@Param("clientIdName") String clientIdName);
+    @Query(value = "from Url u join ClientUrl cu on cu.urlName = u.urlName where cu.clientIdName = :clientId  ")
+    public Set<Url> findUrlByClientIdActive(@Param("clientId") String clientId);
 
     @Query(value = "from Url u join UserUrl uu on uu.urlName = u.urlName where uu.userName = :userName  ")
     public Set<Url> findUrlByUserIdActive(@Param("userName") String userName);

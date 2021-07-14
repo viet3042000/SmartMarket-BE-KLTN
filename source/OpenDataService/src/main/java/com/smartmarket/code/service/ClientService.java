@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ClientService {
-    public Optional<Client> findByclientName(String clientIdCode);
+    public Optional<Client> findByclientName(String clientId);
 
     public List<Client> getAllCacheListClient() ;
 }
