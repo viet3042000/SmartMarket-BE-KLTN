@@ -31,6 +31,9 @@ public class ClientDetail implements Serializable {
 	@Column(name = "domain_name_bic")
 	private String domainNameBic;
 
+	@Column(name = "ip_access")
+	private String ipAccess;
+
 	@Column(name = "is_active")
 	private Long isActive;
 

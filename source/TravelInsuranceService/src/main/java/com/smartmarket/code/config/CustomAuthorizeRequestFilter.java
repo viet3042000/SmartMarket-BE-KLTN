@@ -6,11 +6,13 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UrlRepository;
 import com.smartmarket.code.model.Client;
+import com.smartmarket.code.model.ClientDetail;
 import com.smartmarket.code.model.Url;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.AuthorizationService;
+import com.smartmarket.code.service.ClientDetailService;
 import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.UrlService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
@@ -58,6 +60,9 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     ClientService clientService ;
 
     @Autowired
+    ClientDetailService clientDetailService ;
+
+    @Autowired
     UrlService urlService ;
 
     @Override
@@ -101,7 +106,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 //find client by clientName
 
                 Optional<Client> client = clientService.findByclientName(clientId);
-                if (client.isPresent() == true) {
+                Optional<ClientDetail> clientDetail = clientDetailService.findByclientIdName(clientId) ;
+                if (client.isPresent() == true && clientDetail.isPresent() == true ) {
                     urlSet = urlService.findUrlByClientName(client.get().getClientId());
 
                     //check url access
@@ -118,7 +124,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 //verify ip
                 boolean verifyIp = false;
-                String[] ipAccessArr = Utils.getArrayIP(client.get().getIpAccess());
+                String[] ipAccessArr = Utils.getArrayIP(clientDetail.get().getIpAccess());
                 for (int i = 0; i < ipAccessArr.length; i++) {
                     if (ipAccessArr[0].equalsIgnoreCase("ALL")) {
                         verifyIp = true;
