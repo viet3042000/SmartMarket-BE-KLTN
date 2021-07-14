@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface ClientRepository extends JpaRepository<Client, Long> {
+public interface ClientRepository extends JpaRepository<Client, String> {
 
 	@Query(value = "from Client c where c.clientId =:clientId")
 	public Optional<Client> findByclientName(@Param("clientId") String clientId);
@@ -23,16 +23,15 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
 	@Modifying(clearAutomatically = true)
 	// Đây là Native SQL
-	@Query(value = "UPDATE clients set secret =:secret, is_active = :isActive, " +
-			" consumer_id = :consumerId, ip_access = :ipAccess, client_id_code = :clientIdCode " +
-			"where client_id_name =:client_id_name", nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("client_id_name") String clientIdName,@Param("clientIdCode") String clientIdCode,
-										 @Param("secret") String secret ,@Param("isActive") Long isActive,
-										 @Param("consumerId") String consumerId,@Param("ipAccess") String ipAccess) ;
+	@Query(value = "UPDATE clients set client_secret =:secret, id =:id, " +
+			" consumer_id = :consumerId " +
+			"where client_id =:clientId", nativeQuery = true)
+	public int updateConsumerClientKafka(@Param("id") Long id, @Param("clientId") String clientId,
+										 @Param("secret") String secret ,@Param("consumerId") String consumerId) ;
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM clients where client_id_name =:client_id_name", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("client_id_name") String clientIdName) ;
+	@Query(value = "DELETE FROM clients where client_id =:clientId", nativeQuery = true)
+	public int deleteConsumerClientKafka(@Param("clientId") String clientId) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE clients",  nativeQuery = true)

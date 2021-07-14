@@ -208,7 +208,6 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-//                                dataBaseServiceImp.deleteDatabase(table, keyPairs);
                                 dataBaseUserServiceImp.deleteDatabaseUser(table,keyPairs);
                             }
                         } else {

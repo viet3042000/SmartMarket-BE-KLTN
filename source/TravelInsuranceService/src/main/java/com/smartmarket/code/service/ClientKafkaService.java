@@ -7,10 +7,9 @@ import java.util.Map;
 public interface ClientKafkaService {
     public Client createConsumerClientKafka(Map<String, Object> keyPairs) ;
 
-    public int updateConsumerClientKafka(String clientIdName,String clientIdCode, String secret ,Long isActive,
-                                         String consumerId,String ipAccess) ;
+    public int updateConsumerClientKafka(Long id,String clientId,String secret,String consumerId) ;
 
-    public int deleteConsumerClientKafka(String clientIdName) ;
+    public int deleteConsumerClientKafka(String clientId) ;
 
     public int truncateConsumerClientKafka() ;
 }

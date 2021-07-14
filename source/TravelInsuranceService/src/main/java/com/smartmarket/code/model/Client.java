@@ -13,21 +13,18 @@ import java.io.Serializable;
 @Setter
 public class Client implements Serializable {
 
-	@Id
 	@Column(name = "id")
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_id_seq")
 //	@SequenceGenerator(sequenceName = "client_id_sequence", allocationSize = 1, name = "client_id_seq")
 	private Long id;
 
+	@Id
 	@Column(name = "client_id")
 	private String clientId;
 
-	@Column(name = "secret")
+	@Column(name = "client_secret")
 	@JsonIgnore
 	private String secret;
-
-	@Column(name = "is_active")
-	private Long isActive;
 
 	@Column(name = "consumer_id")
 	private String consumerId;

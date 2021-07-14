@@ -18,57 +18,41 @@ public class DataBaseClientServiceImp implements DataBaseClientService {
     }
 
     public void updateDatabaseClient(String table, Map<String, Object> keyPairs) throws ParseException{
-        Long clientId = 0L;
-        String clientIdCode = "";
+        Long id = 0L;
+        String clientId = "";
         String secret = "";
-        Long isActive = 0L;
         String consumerId = "";
-        String ipAccess = "";
-        String clientIdName = "";
 
         for (String k : keyPairs.keySet()) {
+            if (k.equals("id")) {
+                id = ((Number)keyPairs.get(k)).longValue();
+            }
             if (k.equals("client_id")) {
-//                clientId =((Number)keyPairs.get(k)).longValue();
+                clientId =(String) keyPairs.get(k);
             }
-            if (k.equals("client_id_code")) {
-                clientIdCode =(String) keyPairs.get(k);
-            }
-            if (k.equals("secret")) {
+            if (k.equals("client_secret")) {
                 secret =(String) keyPairs.get(k);
-            }
-            if (k.equals("is_active")) {
-                isActive = ((Number)keyPairs.get(k)).longValue();
             }
             if (k.equals("consumer_id")) {
                 consumerId =(String) keyPairs.get(k);
             }
-            if (k.equals("ip_access")) {
-                ipAccess = (String)  keyPairs.get(k);
+            if (k.equals("consumer_id")) {
+                consumerId =(String) keyPairs.get(k);
             }
-            if (k.equals("client_id_name")) {
-                clientIdName = (String)  keyPairs.get(k);
-            }
+
         }
-        clientKafkaServiceImp.updateConsumerClientKafka(clientIdName,clientIdCode,secret ,
-                isActive,consumerId, ipAccess);
+        clientKafkaServiceImp.updateConsumerClientKafka(id,clientId,secret,consumerId);
     }
 
     public void deleteDatabaseClient(String table, Map<String, Object> keyPairs){
-//        Long clientId = 0L;
-//
-//        for (String k : keyPairs.keySet()) {
-//            if (k.equals("client_id")) {
-//                clientId =((Number)keyPairs.get(k)).longValue();
-//            }
-//        }
+        String clientId = "";
 
-        String clientIdName = "";
         for (String k : keyPairs.keySet()) {
-            if (k.equals("client_id_name")) {
-                clientIdName = (String)  keyPairs.get(k);
+            if (k.equals("client_id")) {
+                clientId =(String) keyPairs.get(k);
             }
         }
-        clientKafkaServiceImp.deleteConsumerClientKafka(clientIdName);
+        clientKafkaServiceImp.deleteConsumerClientKafka(clientId);
     }
 
     public void truncateDatabaseClient(String table){

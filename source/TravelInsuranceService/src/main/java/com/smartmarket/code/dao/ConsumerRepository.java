@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Transactional
 @Repository
-public interface ConsumerRepository extends JpaRepository<Consumers, Integer> {
+public interface ConsumerRepository extends JpaRepository<Consumers, String> {
 
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL

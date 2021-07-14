@@ -18,35 +18,27 @@ public class ClientKafkaServiceImp implements ClientKafkaService {
 
         for (String k : keyPairs.keySet()) {
             if (k.equals("id")) {
-//                client.setClientIdSync(((Number)keyPairs.get(k)).longValue());
+                client.setId(((Number)keyPairs.get(k)).longValue());
             }
             if (k.equals("client_id")) {
                 client.setClientId( (String) keyPairs.get(k));
             }
-            if (k.equals("secret")) {
+            if (k.equals("client_secret")) {
                 client.setSecret( (String) keyPairs.get(k));
-            }
-            if (k.equals("is_active")) {
-                client.setIsActive(((Number)keyPairs.get(k)).longValue());
             }
             if (k.equals("consumer_id")) {
                 client.setConsumerId((String) keyPairs.get(k));
             }
-            if (k.equals("ip_access")) {
-                client.setIpAccess((String) keyPairs.get(k));
-            }
-
         }
         return clientRepository.save(client);
     }
 
-    public int updateConsumerClientKafka(String clientIdName, String clientIdCode, String secret ,
-                                         Long isActive,String consumerId,String ipAccess) {
-        return clientRepository.updateConsumerClientKafka(clientIdName,clientIdCode,secret, isActive,consumerId,ipAccess);
+    public int updateConsumerClientKafka(Long id,String clientId,String secret,String consumerId) {
+        return clientRepository.updateConsumerClientKafka(id,clientId,secret,consumerId);
     }
 
-    public int deleteConsumerClientKafka(String clientIdName) {
-        return clientRepository.deleteConsumerClientKafka(clientIdName);
+    public int deleteConsumerClientKafka(String clientId) {
+        return clientRepository.deleteConsumerClientKafka(clientId);
     }
 
     public int truncateConsumerClientKafka() {

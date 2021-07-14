@@ -18,16 +18,16 @@ public class UserKafkaServiceImp implements UserKafkaService {
         User user = new User();
 
         for (String k : keyPairs.keySet()) {
-            if (k.equals("username")) {
+            if (k.equals("user_name")) {
                 user.setUsername((String) keyPairs.get(k));
             }
-            if (k.equals("password")) {
+            if (k.equals("user_password")) {
                 user.setPassword((String) keyPairs.get(k));
             }
             if (k.equals("enabled")) {
-                user.setEnabled(Integer.parseInt((String) keyPairs.get(k)));
+                user.setEnabled(((Number)keyPairs.get(k)).longValue());
             }
-            if (k.equals("user_id")) {
+            if (k.equals("id")) {
                 user.setId(((Number)keyPairs.get(k)).longValue());
             }
 
@@ -35,8 +35,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
         return userRepository.save(user);
     }
 
-    public int updateUserKafka(String username,String password) {
-        return userRepository.updateConsumerClientKafka(username, password);
+    public int updateUserKafka(String username,String password,Long enabled) {
+        return userRepository.updateConsumerClientKafka(username, password,enabled);
     }
 
     public int deleteUserKafka(String username) {

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, String> {
 
 	// Đây là JPQL (Hibernate) --> dùng tên biến của User
 	@Query(value = "from User u where u.username =:username")
@@ -24,8 +24,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 	@Modifying(clearAutomatically = true)
 	// Đây là Native SQL --> dùng tên biến theo DB
-	@Query(value = "UPDATE users set password =:password where user_name = :user_name",nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("user_name") String username,@Param("password") String password) ;
+	@Query(value = "UPDATE users set user_password =:password, enabled =:enabled where user_name = :user_name",nativeQuery = true)
+	public int updateConsumerClientKafka(@Param("user_name") String username,@Param("password") String password,
+										 @Param("enabled") Long enabled) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "DELETE FROM users where user_name =:user_name", nativeQuery = true)

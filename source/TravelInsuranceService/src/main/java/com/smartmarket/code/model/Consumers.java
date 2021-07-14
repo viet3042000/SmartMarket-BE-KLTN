@@ -21,7 +21,4 @@ public class Consumers implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createAt;
 
-	@Column(name = "consumer_id_sync")
-	private String consumerIdSync;
-
 }

@@ -17,39 +17,28 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
         userKafkaServiceImp.createUserKafka(keyPairs);
     }
     public void updateDatabaseUser(String table, Map<String, Object> keyPairs) throws ParseException{
-        Number userIdSync = 0;
         String username = "";
         String password = "";
+        Long enabled = 0L;
 
         for (String k : keyPairs.keySet()) {
-            if (k.equals("username")) {
+            if (k.equals("user_name")) {
                 username =(String)  keyPairs.get(k);
             }
-            if (k.equals("password")) {
+            if (k.equals("user_password")) {
                 password =(String)  keyPairs.get(k);
             }
-            if (k.equals("user_id")) {
-//                userIdSync =(Number) keyPairs.get(k);
-            }
             if (k.equals("enabled")) {
-//                    userIdSync =(Number) keyPairs.get(k);
+                enabled = (((Number)keyPairs.get(k)).longValue());
             }
         }
 
-        userKafkaServiceImp.updateUserKafka(username,password);
+        userKafkaServiceImp.updateUserKafka(username,password,enabled);
     }
     public void deleteDatabaseUser(String table, Map<String, Object> keyPairs){
-//        Number userId = 0;
-//
-//        for (String k : keyPairs.keySet()) {
-//            if (k.equals("user_id")) {
-//                userId = (Number) keyPairs.get(k);
-//            }
-//        }
-
         String username = "";
         for (String k : keyPairs.keySet()) {
-            if (k.equals("username")) {
+            if (k.equals("user_name")) {
                 username = (String)  keyPairs.get(k);
             }
         }
