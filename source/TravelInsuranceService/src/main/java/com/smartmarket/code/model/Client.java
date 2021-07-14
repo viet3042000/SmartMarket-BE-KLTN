@@ -15,8 +15,8 @@ public class Client implements Serializable {
 
 	@Id
 	@Column(name = "client_id")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_id_seq")
-	@SequenceGenerator(sequenceName = "client_id_sequence", allocationSize = 1, name = "client_id_seq")
+//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_id_seq")
+//	@SequenceGenerator(sequenceName = "client_id_sequence", allocationSize = 1, name = "client_id_seq")
 	private Long id;
 
 	@Column(name = "client_id_code")
