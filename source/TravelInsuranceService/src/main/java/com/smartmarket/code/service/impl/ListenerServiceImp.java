@@ -54,16 +54,16 @@ public class ListenerServiceImp implements ListenerService {
 
 
     //published when the consumer appears to be blocked in the poll method.
-    @EventListener
-    public void handleNonResponsiveConsumerEvent(NonResponsiveConsumerEvent event) {
-        System.out.println("ERROR_KAFKA_NONRESPONSIVECONSUMEREVENT " + event.getListenerId() + " LOG_MSG_DELIMITER " + event.toString());
-//        event.getConsumer().paused();
-    }
-
-    @EventListener
-    public void handleContextRefreshed(ContextRefreshedEvent event) throws InterruptedException {
-        System.out.println("Cannot connect to Kafka");
-    }
+//    @EventListener
+//    public void handleNonResponsiveConsumerEvent(NonResponsiveConsumerEvent event) {
+//        System.out.println("ERROR_KAFKA_NONRESPONSIVECONSUMEREVENT " + event.getListenerId() + " LOG_MSG_DELIMITER " + event.toString());
+////        event.getConsumer().paused();
+//    }
+//
+//    @EventListener
+//    public void handleContextRefreshed(ContextRefreshedEvent event) throws InterruptedException {
+//        System.out.println("Cannot connect to Kafka");
+//    }
 
     // can designate multi topic , partition , concurrency,...
     //Each function is marked by @KafkaListener = 1 consumer
