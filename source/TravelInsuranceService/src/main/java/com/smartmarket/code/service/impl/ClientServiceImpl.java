@@ -34,20 +34,20 @@ public class ClientServiceImpl implements ClientService {
 //    }
 
     @Override
-    @Cacheable(cacheNames = "client", key = "#clientIdCode")
-    public Optional<Client> findByclientName(String clientIdCode) {
-        return clientRepository.findByclientName(clientIdCode);
+    @Cacheable(cacheNames = "client", key = "#clientId")
+    public Optional<Client> findByclientName(String clientId) {
+        return clientRepository.findByclientName(clientId);
     }
 
 
-    @CacheEvict(cacheNames = "client", key = "#clientIdCode")
-    public void evictSingleClientNameCacheValue(String clientIdCode) {
+    @CacheEvict(cacheNames = "client", key = "#clientId")
+    public void evictSingleClientNameCacheValue(String clientId) {
     }
 
 
-    @CachePut(cacheNames = "client" , key = "#clientIdCode")
-    public Optional<Client> updateClientCacheByClientIdCode(String clientIdCode) {
-        return clientRepository.findByclientName(clientIdCode);
+    @CachePut(cacheNames = "client" , key = "#clientId")
+    public Optional<Client> updateClientCacheByClientIdCode(String clientId) {
+        return clientRepository.findByclientName(clientId);
     }
 
     @Override

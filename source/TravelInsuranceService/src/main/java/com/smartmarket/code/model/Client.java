@@ -14,16 +14,13 @@ import java.io.Serializable;
 public class Client implements Serializable {
 
 	@Id
-	@Column(name = "client_id")
+	@Column(name = "id")
 //	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_id_seq")
 //	@SequenceGenerator(sequenceName = "client_id_sequence", allocationSize = 1, name = "client_id_seq")
 	private Long id;
 
-	@Column(name = "client_id_code")
-	private String clientIdCode;
-
-	@Column(name = "client_id_name")
-	private String clientIdName;
+	@Column(name = "client_id")
+	private String clientId;
 
 	@Column(name = "secret")
 	@JsonIgnore
@@ -37,9 +34,5 @@ public class Client implements Serializable {
 
 	@Column(name = "ip_access")
 	private String ipAccess;
-
-	@Column(name = "client_id_sync")
-	private Long clientIdSync;
-
 
 }

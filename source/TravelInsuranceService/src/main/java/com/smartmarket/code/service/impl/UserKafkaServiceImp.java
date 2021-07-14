@@ -28,7 +28,7 @@ public class UserKafkaServiceImp implements UserKafkaService {
                 user.setEnabled(Integer.parseInt((String) keyPairs.get(k)));
             }
             if (k.equals("user_id")) {
-//                user.setUserIdSync((Integer) keyPairs.get(k));
+                user.setId(((Number)keyPairs.get(k)).longValue());
             }
 
         }

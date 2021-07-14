@@ -102,7 +102,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
                 Optional<Client> client = clientService.findByclientName(clientId);
                 if (client.isPresent() == true) {
-                    urlSet = urlService.findUrlByClientName(client.get().getClientIdName());
+                    urlSet = urlService.findUrlByClientName(client.get().getClientId());
 
                     //check url access
                     if (urlSet == null) {

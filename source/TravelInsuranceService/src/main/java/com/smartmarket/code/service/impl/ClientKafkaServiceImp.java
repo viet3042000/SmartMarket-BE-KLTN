@@ -17,11 +17,11 @@ public class ClientKafkaServiceImp implements ClientKafkaService {
         Client client = new Client();
 
         for (String k : keyPairs.keySet()) {
-            if (k.equals("client_id")) {
+            if (k.equals("id")) {
 //                client.setClientIdSync(((Number)keyPairs.get(k)).longValue());
             }
-            if (k.equals("client_id_code")) {
-                client.setClientIdCode( (String) keyPairs.get(k));
+            if (k.equals("client_id")) {
+                client.setClientId( (String) keyPairs.get(k));
             }
             if (k.equals("secret")) {
                 client.setSecret( (String) keyPairs.get(k));
@@ -35,9 +35,7 @@ public class ClientKafkaServiceImp implements ClientKafkaService {
             if (k.equals("ip_access")) {
                 client.setIpAccess((String) keyPairs.get(k));
             }
-            if (k.equals("client_id_name")) {
-                client.setClientIdName((String) keyPairs.get(k));
-            }
+
         }
         return clientRepository.save(client);
     }
