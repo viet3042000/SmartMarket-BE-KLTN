@@ -83,7 +83,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         try {
             //find user by name
             User userToken =
-                    userService.findByUsername(userName).orElseThrow(() -> new CustomException("Vui lòng kiểm tra lại Token",HttpStatus.BAD_REQUEST,null,null,null,null));
+                    userService.findByUsername(userName).orElseThrow(() -> new CustomException("Vui lòng kiểm tra lại Token",HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST));
 
             //get url request
             AntPathMatcher matcher = new AntPathMatcher();
@@ -101,7 +101,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                     }
                 }
             } else {
-                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null) ;
+                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
             }
 
             // get list accessUser
@@ -109,7 +109,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             if (urlMatched != null && userToken != null && userId != null ) {
                 accessUserSetCheck = accesUserService.checkAccessUser(userToken.getId(), urlMatched.getId(),userId);
             } else {
-                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null) ;
+                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
             }
 
             if(accessUserSetCheck != null && accessUserSetCheck.size() > 0){
@@ -117,7 +117,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             }
 
         }catch (Exception ex){
-            throw new CustomException(ex.getMessage() , HttpStatus.BAD_REQUEST,null,null,null,null) ;
+            throw new CustomException(ex.getMessage() , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
         }
 
         return false;

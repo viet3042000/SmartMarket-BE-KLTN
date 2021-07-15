@@ -90,7 +90,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
             }
         } catch (Exception ex) {
-            throw new CustomException("Error in custom log filter", HttpStatus.BAD_REQUEST, null,null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+            throw new CustomException("Error in custom log filter", HttpStatus.BAD_REQUEST, null,null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG, HttpStatus.BAD_REQUEST);
 //            String logTimestamp = formatter.format(date);
 //
 //            int status = response.getStatus();

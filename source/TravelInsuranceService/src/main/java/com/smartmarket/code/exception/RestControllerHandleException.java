@@ -108,7 +108,7 @@ public class RestControllerHandleException {
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request));
         logService.createSOALog2(soaObject);
 
-        return new ResponseEntity<>(response, ex.getHttpStatusDetailCode());
+        return new ResponseEntity<>(response, ex.getHttpStatusHeader());
     }
 
 

@@ -114,7 +114,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //get token from database
             String token = authorizationService.getToken();
             if (StringUtils.isEmpty(token)) {
-                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             long startTime = System.currentTimeMillis();
@@ -208,7 +208,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     logService.createTargetLog(tarObject);
 
 //                    throw new CustomException("",jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
-                    throw new CustomException("Đơn hàng đã được tạo trên hệ thống!",jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                    throw new CustomException("Đơn hàng đã được tạo trên hệ thống!",jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
                 }
             } else {
                 //logResponse vs BIC
@@ -218,7 +218,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         logTimestamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
-                throw new CustomException("", jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("", jsonResultCreateBIC.getStatusCode(), createTravelInsuranceBICRequest.getRequestId(), null, ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
             }
             //check format reponse from BIC
 
@@ -256,7 +256,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode().toString());
-                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage(),customException.getHttpStatusHeader());
                 }else {
                     bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
                     throw ex ;
@@ -313,7 +313,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String token = authorizationService.getToken();
 
             if (StringUtils.isEmpty(token)) {
-                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             //logRequest vs BIC
@@ -391,7 +391,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     TargetObject tarObject = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","response", jsonObjectResultBICLog,
                             logTimestamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
-                    throw new CustomException("Not found order",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                    throw new CustomException("Not found order",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
                 }
             } else {
                 //logResponse vs BIC
@@ -401,7 +401,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         logTimestamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
-                throw new CustomException("", resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("", resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
             }
 
         } catch (Exception ex) {
@@ -432,7 +432,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
-                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage(),customException.getHttpStatusHeader());
                 } else {
                     throw ex ;
                 }
@@ -489,7 +489,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             String token = authorizationService.getToken();
             if (StringUtils.isEmpty(token)) {
-                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
             //getOrderId to request BIC
@@ -586,7 +586,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance", "updateTravelBIC","response", responseBodyFromBIC,
                             logtimeStamp, messageTimestamp, timeDurationBIC);
                     logService.createTargetLog(tarObject);
-                    throw new CustomException("",jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                    throw new CustomException("",jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
 
                 }
             } else {
@@ -597,7 +597,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         logtimeStamp, messageTimestamp, timeDurationBIC);
                 logService.createTargetLog(tarObject);
 
-                throw new CustomException("", jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG);
+                throw new CustomException("", jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
             }
 
         } catch (Exception ex) {
@@ -634,7 +634,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 } else if (ex instanceof CustomException){
                     CustomException customException = (CustomException) ex;
                     bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode());
-                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage(),customException.getHttpStatusHeader());
                 }
                 else {
                     bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;

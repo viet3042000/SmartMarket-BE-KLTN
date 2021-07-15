@@ -20,15 +20,17 @@ public class CustomException extends RuntimeException {
     private String errorMessage;
     private String responseId;
     private JSONObject responseBIC;
+    private HttpStatus  httpStatusHeader;
 
     public CustomException(String detailErrorMessage, HttpStatus httpStatusDetailCode, String responseId, JSONObject responseBIC
-                            , String httpStatusCode, String errorMessage ) {
+                            , String httpStatusCode, String errorMessage ,HttpStatus httpStatusHeader) {
         this.detailErrorMessage = detailErrorMessage;
         this.httpStatusDetailCode = httpStatusDetailCode;
         this.responseId = responseId;
         this.responseBIC = responseBIC;
         this.httpStatusCode = httpStatusCode;
         this.errorMessage = errorMessage;
+        this.httpStatusHeader = httpStatusHeader ;
 
     }
 
@@ -61,6 +63,15 @@ public class CustomException extends RuntimeException {
 //        this.detailErrorMessage = detailErrorMessage;
 //        this.httpStatusDetailCode = httpStatus;
 //    }
+
+
+    public HttpStatus getHttpStatusHeader() {
+        return httpStatusHeader;
+    }
+
+    public void setHttpStatusHeader(HttpStatus httpStatusHeader) {
+        this.httpStatusHeader = httpStatusHeader;
+    }
 
     public String getDetailErrorMessage() {
         return detailErrorMessage;
