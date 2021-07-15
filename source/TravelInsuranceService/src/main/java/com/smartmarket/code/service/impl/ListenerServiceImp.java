@@ -67,7 +67,7 @@ public class ListenerServiceImp implements ListenerService {
 
     // can designate multi topic , partition , concurrency,...
     //Each function is marked by @KafkaListener = 1 consumer
-    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
+//    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
     public void listenClient(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -164,7 +164,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -263,7 +263,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
+//    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
     public void listenConsumer(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
