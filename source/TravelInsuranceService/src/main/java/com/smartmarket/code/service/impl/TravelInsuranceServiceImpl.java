@@ -195,7 +195,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         logService.createSOALog2(soaObject);
 
 
-                        return new ResponseEntity<>(responseError, HttpStatus.OK);
+                        return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                     }
                 } else {
 
@@ -576,7 +576,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         logService.createSOALog2(soaObject);
 
 
-                        return new ResponseEntity<>(responseError, HttpStatus.OK);
+                        return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                     }
                 } else {
                     //logResponse vs BIC

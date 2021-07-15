@@ -1,6 +1,7 @@
 package com.smartmarket.code.request.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.smartmarket.code.annotation.ValidDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,9 +37,11 @@ public class TRV implements Serializable {
     private String periodTime;
 
     @NotNull(message = "fromDate is require")
+    @ValidDate(message = "fromDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String fromDate;
 
     @NotNull(message = "toDate is require")
+    @ValidDate(message = "toDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String toDate;
 
     private String issueDate;

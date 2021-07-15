@@ -1,6 +1,7 @@
 package com.smartmarket.code.request.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.smartmarket.code.annotation.ValidDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +37,7 @@ public class Orders implements Serializable {
     private String ordBillEmail;
 
     @NotNull(message = "ordDate is require")
+    @ValidDate(message = "ordDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String ordDate;
 
     @NotNull(message = "ordStatus is require")
