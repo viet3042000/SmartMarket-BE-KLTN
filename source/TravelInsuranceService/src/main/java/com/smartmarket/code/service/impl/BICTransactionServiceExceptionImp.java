@@ -1,6 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.nimbusds.jose.util.IOUtils;
 import com.smartmarket.code.config.RequestWrapper;
 import com.smartmarket.code.constants.Constant;
@@ -81,10 +82,19 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 messasgeId = requestBody.getString("requestId") == null ? "no requestId" : requestBody.getString("requestId");
                 EJson detail = (requestBody.getJSONObject("detail"));
 
-
                 //convert jsonobject to CreateTravelInsuranceBICRequest
                 Gson gson = new Gson(); // Or use new GsonBuilder().create();
-                CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = gson.fromJson(detail.jsonToString(), CreateTravelInsuranceBICRequest.class);
+                CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = null ;
+                try{
+                    createTravelInsuranceBICRequest = gson.fromJson(detail.jsonToString(), CreateTravelInsuranceBICRequest.class) ;
+                }catch (JsonSyntaxException ex){
+                    clientIp = Utils.getClientIp(request) ;
+                    bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
+                            phoneNumber, email, ordPaidMoney, consumerId,
+                            fromDate, toDate, new Date(), resultCode, bicResultCode,
+                            ordDate, productId, customerAddress,clientIp,type);
+                    return bicTransaction ;
+                }
 
                 //set properties detail
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
@@ -111,6 +121,33 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                             fromDate, toDate, new Date(), resultCode, bicResultCode,
                             ordDate, productId, customerAddress,clientIp,type);
                 }
+
+//                if (detail != null) {
+//
+//                    orderReference = detail.getString("orderReference") == null ? "-1" : detail.getString("orderReference");
+//                    orderId = "-1";
+//                    customerName = detail.getString("ordBillFirstName") == null ? "-1" : detail.getString("ordBillFirstName");
+//                    phoneNumber = detail.getString("ordBillMobile") == null ? "-1" : detail.getString("ordBillMobile");
+//                    email = detail.getString("ordBillEmail") == null ? "-1" : detail.getString("ordBillEmail");
+//                    ordPaidMoney = detail.getBigDecimal("ordBillEmail") == null ? "-1" : detail.getBigDecimal("ordBillEmail") .toString();
+//                    consumerId = "DSVN";
+//
+//                    if (createTravelInsuranceBICRequest.getTrv() != null) {
+//                        fromDate = detail.getBigDecimal("fromDate")  == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getFromDate();
+//                        toDate =detail.getBigDecimal("toDate") == null ? "-1" : createTravelInsuranceBICRequest.getTrv().getToDate();
+//                    }
+//
+//                    ordDate = createTravelInsuranceBICRequest.getOrders().getOrdDate() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdDate();
+//                    productId =environment.getRequiredProperty("createTravelBIC.DSVN.order.productId");
+//                    customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
+//                    clientIp = Utils.getClientIp(request) ;
+//
+//                    bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
+//                            phoneNumber, email, ordPaidMoney, consumerId,
+//                            fromDate, toDate, new Date(), resultCode, bicResultCode,
+//                            ordDate, productId, customerAddress,clientIp,type);
+//                }
+
             }
         }else {
             clientIp = Utils.getClientIp(request) ;

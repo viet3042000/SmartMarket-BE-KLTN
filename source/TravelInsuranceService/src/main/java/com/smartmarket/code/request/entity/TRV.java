@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -32,6 +33,7 @@ public class TRV implements Serializable {
     private Long promotion;
 
     @NotNull(message = "promotionAddress is require")
+    @Size(max =255, message = "promotionAddress should be less than or equal to 255 characters")
     private String promotionAddress;
 
     private String periodTime;

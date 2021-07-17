@@ -1,5 +1,6 @@
 package com.smartmarket.code.util;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.BaseDetail;
@@ -147,6 +148,17 @@ public class SetResponseUtils {
             response.setDetailErrorMessage("Format body is not JSON !");
             return response ;
         }
+    //      HttpMessageNotReadableException
+    public ResponseError setResponseInvalidFormatJsonException(ResponseError response, InvalidFormatException ex){
+        response.setResultCode(ResponseCode.CODE.INVALID_INPUT_DATA);
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultMessage(ResponseCode.MSG.INVALID_INPUT_DATA_MSG);
+        response.setDetailErrorCode(HttpStatus.BAD_REQUEST.toString());
+        response.setDetailErrorMessage(ex.getMessage());
+        return response ;
+    }
+
+
 
 //      Exception
         public ResponseError setResponseException(ResponseError response, Exception ex){

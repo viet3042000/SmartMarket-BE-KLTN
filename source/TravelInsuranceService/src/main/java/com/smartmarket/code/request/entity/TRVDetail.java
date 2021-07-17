@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,6 +19,7 @@ public class TRVDetail implements Serializable {
     private Long trvId;
 
     @NotNull(message = "fullName is require")
+    @Size(max =255, message = "fullName should be less than or equal to 255 characters")
     private String fullName;
 
     @NotNull(message = "gender is require")
@@ -27,6 +29,7 @@ public class TRVDetail implements Serializable {
     private String dateOfBirth;
 
     @NotNull(message = "passportCard is require")
+    @Size(max =63, message = "passportCard should be less than or equal to 63 characters")
     private String passportCard;
 
 
