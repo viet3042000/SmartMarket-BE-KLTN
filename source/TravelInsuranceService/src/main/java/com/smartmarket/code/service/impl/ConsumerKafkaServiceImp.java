@@ -27,7 +27,7 @@ public class ConsumerKafkaServiceImp implements ConsumerKafkaService {
                 String createAt = (String)keyPairs.get(k);
                 consumers.setCreateAt(formatter.parse(createAt));
             }
-            if (k.equals("consumerId")) {
+            if (k.equals("consumer_id")) {
                 consumers.setId((String) keyPairs.get(k));
             }
         }

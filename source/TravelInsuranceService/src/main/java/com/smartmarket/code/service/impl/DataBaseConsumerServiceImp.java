@@ -23,7 +23,7 @@ public class DataBaseConsumerServiceImp implements DataBaseConsumerService {
         //convert string --> date with formart tương ứng
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
         for (String k : keyPairs.keySet()) {
-            if (k.equals("consumerId")) {
+            if (k.equals("consumer_id")) {
                 consumerId =(String)keyPairs.get(k);
             }
             if (k.equals("created_at")) {
@@ -36,7 +36,7 @@ public class DataBaseConsumerServiceImp implements DataBaseConsumerService {
         String consumerId = "";
 
         for (String k : keyPairs.keySet()) {
-            if (k.equals("consumerId")) {
+            if (k.equals("consumer_id")) {
                 consumerId =(String) keyPairs.get(k);
             }
         }
