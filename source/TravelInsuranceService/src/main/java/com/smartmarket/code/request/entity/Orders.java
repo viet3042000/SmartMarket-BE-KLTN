@@ -58,7 +58,7 @@ public class Orders implements Serializable {
     private String productId;
 
     @NotNull(message = "ordTotalQty is require")
-    @ValidTypeField(typeField = Long.class)
+    @Min(value = 0)
     private Long ordTotalQty;
 
     @NotNull(message = "orderPaymentMethod is require")
@@ -71,11 +71,13 @@ public class Orders implements Serializable {
     private String ordToken;
 
     @NotNull(message = "ordPaidMoney is require")
+    @Min(value = 0)
     private BigDecimal ordPaidMoney ;
 
     private BigDecimal ordTotal ;
 
     @NotNull(message = "ordDiscountAmount is require")
+    @Min(value = 0)
     private BigDecimal ordDiscountAmount ;
 
     @Size(max =50, message = "ordSource should be less than or equal to 50 characters")

@@ -3,6 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
+import com.google.gson.Gson;
 import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.constants.ResponseCode;
@@ -102,7 +103,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //Create BIC
             CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
             String responseCreate = null;
-            responseCreate = mapper.writeValueAsString(createTravelInsuranceToBIC);
+            Gson gson = new Gson();
+            responseCreate = gson.toJson(createTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs BIC
@@ -479,7 +481,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //Update BIC
             CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
             String responseCreate = null;
-            responseCreate = mapper.writeValueAsString(updateTravelInsuranceToBIC);
+            Gson gson = new Gson();
+            responseCreate = gson.toJson(updateTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs BIC
