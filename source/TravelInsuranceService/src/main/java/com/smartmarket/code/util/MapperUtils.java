@@ -58,7 +58,7 @@ public class MapperUtils {
             ordersBIC.setOrdcustmessage(environment.getProperty("createTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1("No Address");
+            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().trim().equals("") ? "No Address" : orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
@@ -143,7 +143,7 @@ public class MapperUtils {
             ordersBIC.setOrdcustmessage(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
-            ordersBIC.setOrdbillstreet1("No Address");
+            ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().trim().equals("") ? "No Address" : orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
             ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());

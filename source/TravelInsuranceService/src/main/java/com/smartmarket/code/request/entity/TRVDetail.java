@@ -25,7 +25,7 @@ public class TRVDetail implements Serializable {
     @NotNull(message = "gender is require")
     private Long gender;
 
-    @ValidDate(formatDate = "dd/MM/yyyy" ,message = "dateOfBirth is invalid date format (dd/MM/yyyy)" , blank = true)
+    @ValidDate(formatDate = "yyyy-MM-dd" ,message = "dateOfBirth is invalid date format (yyyy-MM-dd)" , blank = true)
     private String dateOfBirth;
 
     @NotNull(message = "passportCard is require")

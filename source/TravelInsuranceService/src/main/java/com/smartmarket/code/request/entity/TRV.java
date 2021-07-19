@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.smartmarket.code.annotation.ValidDate;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -20,9 +22,11 @@ public class TRV implements Serializable {
     private String orderId;
 
     @NotNull(message = "amountPersons is require")
+    @Range(min= 1, max= 100)
     private Long amountPersons;
 
     @NotNull(message = "amountDays is require")
+    @Min(value = 0)
     private Long amountDays;
 
     private BigDecimal si;
