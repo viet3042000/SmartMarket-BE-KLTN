@@ -5,6 +5,7 @@ import com.smartmarket.code.annotation.ValidDate;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,7 +19,7 @@ public class TRVDetail implements Serializable {
     private Long id;
     private Long trvId;
 
-    @NotNull(message = "fullName is require")
+    @NotBlank(message = "fullName is require")
     @Size(max =255, message = "fullName should be less than or equal to 255 characters")
     private String fullName;
 
@@ -28,7 +29,7 @@ public class TRVDetail implements Serializable {
     @ValidDate(formatDate = "yyyy-MM-dd" ,message = "dateOfBirth is invalid date format (yyyy-MM-dd)" , blank = true)
     private String dateOfBirth;
 
-    @NotNull(message = "passportCard is require")
+    @NotBlank(message = "passportCard is require")
     @Size(max =63, message = "passportCard should be less than or equal to 63 characters")
     private String passportCard;
 

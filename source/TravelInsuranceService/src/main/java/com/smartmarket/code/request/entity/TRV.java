@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -42,11 +39,11 @@ public class TRV implements Serializable {
 
     private String periodTime;
 
-    @NotNull(message = "fromDate is require")
+    @NotBlank(message = "fromDate is require")
     @ValidDate(message = "fromDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String fromDate;
 
-    @NotNull(message = "toDate is require")
+    @NotBlank(message = "toDate is require")
     @ValidDate(message = "toDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String toDate;
 

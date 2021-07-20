@@ -27,12 +27,12 @@ public class Orders implements Serializable {
 
     private String ordCustMessage;
 
-    @NotNull(message = "ordBillFirstName is require")
+    @NotBlank(message = "ordBillFirstName is require")
     @Size(max = 255, message = "ordBillFirstName should be less than or equal to 255 characters")
 //    @JsonDeserialize(using = StringOnlyDeserializer.class)
     private String ordBillFirstName;
 
-    @NotNull(message = "ordBillMobile is require")
+    @NotBlank(message = "ordBillMobile is require")
     @Size(max = 50, message = "ordBillMobile should be less than or equal to 50 characters")
     @Pattern(regexp="(^$|[0-9]{9,12})")
     private String ordBillMobile;
@@ -41,12 +41,12 @@ public class Orders implements Serializable {
     @Size(max = 255, message = "ordBillStreet1 should be less than or equal to 255 characters")
     private String ordBillStreet1;
 
-    @NotNull(message = "ordBillEmail is require")
+    @NotBlank(message = "ordBillEmail is require")
     @Size(max =250, message = "ordBillEmail should be less than or equal to 250 characters")
     @Email
     private String ordBillEmail;
 
-    @NotNull(message = "ordDate is require")
+    @NotBlank(message = "ordDate is require")
     @ValidDate(message = "ordDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String ordDate;
 
