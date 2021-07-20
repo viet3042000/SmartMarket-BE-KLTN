@@ -55,24 +55,25 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
+        httpServletRequest = new RequestWrapper(httpServletRequest);
+        String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
+
         try {
             ResponseError responseError = new ResponseError();
-            responseError =  setResponseUtils.setResponseCustomEntryPoint(responseError) ;
             response.addHeader("WWW-Authenticate", "Authorized failed ");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE+ ";"+ "charset=UTF-8" );
-            response.getOutputStream()
-                    .println(objectMapper.writeValueAsString(responseError));
-            ObjectMapper mapper = new ObjectMapper();
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
-            httpServletRequest = new RequestWrapper(httpServletRequest);
-            String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
+            ObjectMapper mapper = new ObjectMapper();
+
             if(Utils.isJSONValid(jsonString)){
                 JSONObject requestBody = new JSONObject(jsonString);
                 String requestId = requestBody.getString("requestId");
                 String requestTime = requestBody.getString("requestTime");
+                responseError =  setResponseUtils.setResponseCustomEntryPoint(responseError,requestId) ;
+
+                String responseBody = mapper.writeValueAsString(responseError);
+                JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -91,17 +92,35 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                         "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
                         responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest));
                 logService.createSOALog2(soaObject);
+
+                response.getOutputStream()
+                        .println(objectMapper.writeValueAsString(responseError));
+            }else{
+                response.getOutputStream()
+                        .println(objectMapper.writeValueAsString(responseError));
             }
+
         }
-        catch (IOException ex) {
+        catch (Exception ex) {
+
+
+            String requestId = "cannot get requestId";
+            if(Utils.isJSONValid(jsonString)){
+                JSONObject requestBody = new JSONObject(jsonString);
+                 requestId = requestBody.getString("requestId");
+            }
 
             //set response to client
             ResponseError res = new ResponseError();
+            res.setResponseId(requestId);
             res.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
             res.setResponseTime(DateTimeUtils.getCurrentDate());
             res.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);
             res.setDetailErrorCode(HttpStatus.UNAUTHORIZED.toString());
-            res.setDetailErrorMessage("Token is wrong");
+            res.setDetailErrorMessage("Authorized failed");
+
+            response.getOutputStream()
+                    .println(objectMapper.writeValueAsString(res));
 
             ObjectMapper mapper = new ObjectMapper();
             String responseBody = mapper.writeValueAsString(res);

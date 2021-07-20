@@ -181,7 +181,8 @@ public class SetResponseUtils {
         }
 
 //      CustomEntryPoint
-        public ResponseError setResponseCustomEntryPoint(ResponseError responseError){
+        public ResponseError setResponseCustomEntryPoint(ResponseError responseError,String requestId){
+            responseError.setResponseId(requestId);
             responseError.setResultCode(ResponseCode.CODE.AUTHORIZED_FAILED);
             responseError.setResponseTime(DateTimeUtils.getCurrentDate());
             responseError.setResultMessage(ResponseCode.MSG.AUTHORIZED_FAILED_MSG);

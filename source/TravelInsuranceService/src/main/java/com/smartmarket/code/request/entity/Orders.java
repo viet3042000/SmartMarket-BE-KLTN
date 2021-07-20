@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 @Setter
 public class Orders implements Serializable {
 
-    @NotNull(message = "orderReference is require")
+    @NotBlank(message = "orderReference is require")
     @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
     private String orderReference ;
 
