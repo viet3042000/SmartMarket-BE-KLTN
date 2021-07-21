@@ -19,6 +19,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -271,7 +272,7 @@ public class MapperUtils {
         for (int i = 0; i < trvDetailsBIC.size(); i++) {
             EJson trvDetailBIC = trvDetailsBIC.get(i);
             TRVDetail trvDetail = new TRVDetail();
-            trvDetail.setDateOfBirth(trvDetailBIC.getString("DateofBirth"));
+            trvDetail.setDateOfBirth(convertDOB(trvDetailBIC.getString("DateofBirth")));
             trvDetail.setFullName(trvDetailBIC.getString("FullName"));
             trvDetail.setGender(trvDetailBIC.getLong("Gender"));
             trvDetail.setId(trvDetailBIC.getLong("ID"));
@@ -303,6 +304,16 @@ public class MapperUtils {
             return 0L;
         }
         return null;
+    }
+
+
+    public static String convertDOB(String DOB){
+        String DOBResponse = "" ;
+        if (!StringUtils.isEmpty(DOB)){
+            DOBResponse = DOB.substring(0,DOB.indexOf("T")) ;
+            return DOBResponse ;
+        }
+        return DOBResponse ;
     }
 
 }
