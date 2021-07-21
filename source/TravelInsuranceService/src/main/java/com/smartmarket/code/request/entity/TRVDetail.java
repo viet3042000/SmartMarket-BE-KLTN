@@ -29,7 +29,7 @@ public class TRVDetail implements Serializable {
     @ValidDate(formatDate = "yyyy-MM-dd" ,message = "dateOfBirth is invalid date format (yyyy-MM-dd)" , blank = true)
     private String dateOfBirth;
 
-    @NotBlank(message = "passportCard is require")
+    @NotNull(message = "passportCard is require")
     @Size(max =63, message = "passportCard should be less than or equal to 63 characters")
     private String passportCard;
 
