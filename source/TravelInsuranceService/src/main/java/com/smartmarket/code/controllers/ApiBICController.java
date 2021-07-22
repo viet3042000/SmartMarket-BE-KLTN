@@ -5,6 +5,7 @@ import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.TravelInsuranceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -41,7 +42,7 @@ public class ApiBICController {
     }
 
     @PostMapping(value = "/change-bic-travel-insurance", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateTravelBIC(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> updateTravelBIC(@Valid @RequestBody BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         return travelInsuranceService.updateTravelBIC(updateTravelInsuranceBICRequest,request,responseSelvet) ;
     }
 

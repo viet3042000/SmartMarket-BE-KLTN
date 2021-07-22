@@ -153,7 +153,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
             bicTransaction.setPhoneNumber(object.getDetail().getOrders().getOrdBillMobile());
             bicTransaction.setRequestId(object.getRequestId());
-            
+
         }
 
         return bicTransactionRepository.save(bicTransaction);
