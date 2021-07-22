@@ -4,6 +4,7 @@ import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import org.springframework.util.StringUtils;
 
 public class ValidateRequest {
@@ -22,7 +23,7 @@ public class ValidateRequest {
     }
 
 
-    public static void checkValidUpdate(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
+    public static void checkValidUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
         //validate
         if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
             throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
@@ -36,8 +37,8 @@ public class ValidateRequest {
 
         if (updateTravelInsuranceBICRequest.getDetail() != null &&
                 updateTravelInsuranceBICRequest.getDetail().getTrv() != null) {
-            if (updateTravelInsuranceBICRequest.getDetail().getTrv().getStatus() == null) {
-                throw new InvalidInputException("status is require", updateTravelInsuranceBICRequest.getRequestId());
+            if (updateTravelInsuranceBICRequest.getDetail().getTrv().getDestroy() == null) {
+                throw new InvalidInputException("destroy is require", updateTravelInsuranceBICRequest.getRequestId());
             }
             if (updateTravelInsuranceBICRequest.getDetail().getTrv().getTrvId() == null) {
                 throw new InvalidInputException("trvId is require", updateTravelInsuranceBICRequest.getRequestId());

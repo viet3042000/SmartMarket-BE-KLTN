@@ -5,6 +5,7 @@ import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public interface TravelInsuranceService {
                                           HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;
 
-    public ResponseEntity<?> updateTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
+    public ResponseEntity<?> updateTravelBIC(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
                                              HttpServletRequest request,
                                              HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;

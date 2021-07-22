@@ -13,7 +13,9 @@ import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
+import com.smartmarket.code.request.entityBIC.UpdateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
 import com.smartmarket.code.response.ResponseError;
@@ -151,7 +153,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
+                        bicTransactionService.createBICTransactionFromCreateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponse vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","response",
@@ -179,7 +181,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
+                        bicTransactionService.createBICTransactionFromCreateTravel(createTravelInsuranceBICRequest, jsonObjectReponseCreate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultCreateBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponseError vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC", "response",
@@ -451,7 +453,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     }
 
     @Override
-    public ResponseEntity<?> updateTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> updateTravelBIC(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //start time
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
@@ -479,7 +481,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String messageTimestamp = logtimeStamp;
 
             //Update BIC
-            CreateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
+            UpdateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
             String responseCreate = null;
             Gson gson = new Gson();
             responseCreate = gson.toJson(updateTravelInsuranceToBIC);
@@ -525,11 +527,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                             && jsonObjectReponseUpdate.getBoolean("succeeded") == true) {
 
                         //set response client
-                        response = setResponseUtils.setResponse(response, updateTravelInsuranceBICRequest,
+                        response = setResponseUtils.setResponseUpdate(response, updateTravelInsuranceBICRequest,
                                 createTravelInsuranceBICResponse, jsonResultPutBIC);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
+                        bicTransactionService.createBICTransactionFromUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.TRANSACTION_SUCCESSFUL, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //log properties
                         String responseBody = mapper.writeValueAsString(response);
@@ -553,7 +555,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         EJson dataResponse = (jsonObjectReponseUpdate.getJSONObject("data"));
 
                         //set data reponse error
-                        ResponseError responseError = setResponseUtils.setResponseError(updateTravelInsuranceBICRequest,
+                        ResponseError responseError = setResponseUtils.setResponseUpdateError(updateTravelInsuranceBICRequest,
                                 jsonResultPutBIC, dataResponse);
 
                         //set properties to log
@@ -561,7 +563,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
                         //create BICTransaction
-                        bicTransactionService.createBICTransactionFromCreateorUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
+                        bicTransactionService.createBICTransactionFromUpdateTravel(updateTravelInsuranceBICRequest, jsonObjectReponseUpdate, ResponseCode.CODE.ERROR_IN_BACKEND, jsonResultPutBIC.getStatusCode().toString(),clientIp,typeTransaction);
 
                         //logResponseError vs BIC
                         TargetObject tarObject = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","response",

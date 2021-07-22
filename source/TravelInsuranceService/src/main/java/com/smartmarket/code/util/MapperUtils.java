@@ -7,13 +7,9 @@ import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.entity.Orders;
-import com.smartmarket.code.request.entity.TRV;
-import com.smartmarket.code.request.entity.TRVDetail;
-import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
-import com.smartmarket.code.request.entityBIC.OrdersBIC;
-import com.smartmarket.code.request.entityBIC.trvBIC;
-import com.smartmarket.code.request.entityBIC.trvDetailBIC;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.entity.*;
+import com.smartmarket.code.request.entityBIC.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
@@ -126,89 +122,50 @@ public class MapperUtils {
     }
 
 
-    public CreateTravelInsuranceToBIC mapUpdateObjectToBIC(CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest) {
-        CreateTravelInsuranceToBIC createTravelInsuranceToBIC = new CreateTravelInsuranceToBIC();
+    public UpdateTravelInsuranceToBIC mapUpdateObjectToBIC(UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest) {
+        UpdateTravelInsuranceToBIC updateTravelInsuranceToBIC = new UpdateTravelInsuranceToBIC();
 
-        Orders orders = createTravelInsuranceBICRequest.getOrders();
-        TRV trv = createTravelInsuranceBICRequest.getTrv();
-        ArrayList<TRVDetail> trvDetails = createTravelInsuranceBICRequest.getTrvDetails();
+        OrderUpdate orders = updateTravelInsuranceBICRequest.getOrders();
+        TRVUpdate trv = updateTravelInsuranceBICRequest.getTrv();
+        ArrayList<TRVDetailUpdate> trvDetails = updateTravelInsuranceBICRequest.getTrvDetails();
 
-        OrdersBIC ordersBIC = new OrdersBIC();
-        trvBIC trvBIC = new trvBIC();
-        ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
+        OrdersUpdateBIC ordersBIC = new OrdersUpdateBIC();
+        trvUpdateBIC trvBIC = new trvUpdateBIC();
+        ArrayList<trvDetailUpdateBIC> trvDetailsBICs = new ArrayList<>();
 
         if (orders != null) {
             ordersBIC.setOrderReference(orders.getOrderReference());
             ordersBIC.setOrderid(Long.parseLong(orders.getOrderId()));
-            ordersBIC.setOrdcustid(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustId")));
-            ordersBIC.setOrdcustmessage(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordCustMessage"));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
             ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().trim().equals("") ? "No Address" : orders.getOrdBillStreet1());
             ordersBIC.setOrdbillemail(orders.getOrdBillEmail());
-            ordersBIC.setOrddate(orders.getOrdDate());
             ordersBIC.setOrdstatus(orders.getOrdStatus());
-            ordersBIC.setProductId(environment.getRequiredProperty("updateTravelBIC.DSVN.order.productId"));
-            ordersBIC.setOrdtotalqty(orders.getOrdTotalQty());
-            ordersBIC.setOrderpaymentmethod(orders.getOrderPaymentMethod());
-            ordersBIC.setOrdershipmodule(environment.getProperty("updateTravelBIC.DSVN.order.orderShipModule"));
-            ordersBIC.setOrdisdigital(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordIsDigital")));
-            ordersBIC.setOrdtoken(environment.getRequiredProperty("updateTravelBIC.DSVN.order.ordToken"));
-            ordersBIC.setOrdpaidmoney(orders.getOrdPaidMoney());
-            ordersBIC.setOrdtotal(orders.getOrdPaidMoney());
-            ordersBIC.setOrddiscountamount(orders.getOrdDiscountAmount());
-            ordersBIC.setUserId(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.order.userId")));
-            ordersBIC.setOrdsource(environment.getRequiredProperty("createTravelBIC.DSVN.order.ordSource"));
         }
-
 
         if (trv != null) {
             trvBIC.setTRVID(trv.getTrvId());
             trvBIC.setOrderid(Long.parseLong(trv.getOrderId()));
-            trvBIC.setAmountPersons(trv.getAmountPersons());
-            trvBIC.setAmountDays(trv.getAmountDays());
-            trvBIC.setSI(new BigDecimal(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.si")));
-            trvBIC.setPremium(orders.getOrdPaidMoney());
-            trvBIC.setPromotion(getBool(trv.getPromotion()));
-            trvBIC.setPromotionAddress(trv.getPromotionAddress());
-            trvBIC.setPeriodTime(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.periodTime")));
-            trvBIC.setFromDate(trv.getFromDate());
-            trvBIC.setToDate(trv.getToDate());
-            trvBIC.setIssueDate(trv.getIssueDate());
-            trvBIC.setIncludePayer(getBool(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.includePayer"))));
-            trvBIC.setEndorsement(environment.getProperty("updateTravelBIC.DSVN.trv.endorsement"));
-            trvBIC.setUserID(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.userID")));
-            trvBIC.setUserUpproveID(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.userUpproveID")));
             trvBIC.setDestroy(getBool(trv.getDestroy()));
-            trvBIC.setStatus(getBool(trv.getStatus()));
-            trvBIC.setWriteByHand(getBool(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.writeByHand"))));
-            trvBIC.setPrintedPaperNo(environment.getProperty("updateTravelBIC.DSVN.trv.printedPaperNo"));
-            trvBIC.setCertificateForm(environment.getProperty("updateTravelBIC.DSVN.trv.certificateForm"));
-            trvBIC.setModuleid(Long.parseLong(environment.getRequiredProperty("updateTravelBIC.DSVN.trv.moduleId")));
-            trvBIC.setFromZoneGuid(environment.getProperty("createTravelBIC.DSVN.trv.fromZoneGuid"));
-            trvBIC.setToZoneGuid(environment.getProperty("createTravelBIC.DSVN.trv.toZoneGuid"));
-
         }
 
         if (trvDetails != null && trvDetails.size() > 0) {
-            for (TRVDetail trvDetail : trvDetails) {
-                trvDetailBIC trvDetailBIC = new trvDetailBIC();
+            for (TRVDetailUpdate trvDetail : trvDetails) {
+                trvDetailUpdateBIC trvDetailBIC = new trvDetailUpdateBIC();
                 trvDetailBIC.setDateofBirth(trvDetail.getDateOfBirth() == null ? "" : trvDetail.getDateOfBirth());
                 trvDetailBIC.setFullName(trvDetail.getFullName());
                 trvDetailBIC.setGender(trvDetail.getGender());
-                trvDetailBIC.setID(trvDetail.getId());
                 trvDetailBIC.setTRVID(trvDetail.getTrvId());
                 trvDetailBIC.setPassportCard(trvDetail.getPassportCard());
                 trvDetailsBICs.add(trvDetailBIC);
             }
         }
 
-        createTravelInsuranceToBIC.setOrders(ordersBIC);
-        createTravelInsuranceToBIC.setTRV(trvBIC);
-        createTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
+        updateTravelInsuranceToBIC.setOrders(ordersBIC);
+        updateTravelInsuranceToBIC.setTRV(trvBIC);
+        updateTravelInsuranceToBIC.setTRVDetail(trvDetailsBICs);
 
-
-        return createTravelInsuranceToBIC;
+        return updateTravelInsuranceToBIC;
     }
 
 

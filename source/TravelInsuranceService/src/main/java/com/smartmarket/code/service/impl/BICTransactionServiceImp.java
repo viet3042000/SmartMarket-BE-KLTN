@@ -5,6 +5,7 @@ import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.util.EJson;
 import com.smartmarket.code.util.Utils;
@@ -55,10 +56,10 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
 
     @Override
-    public BICTransaction createBICTransactionFromCreateorUpdateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
-                                                                       EJson jsonObjectReponseCreate,
-                                                                       String resultCode, String bicResultCode ,
-                                                                       String clientIp, String typeTransaction) {
+    public BICTransaction createBICTransactionFromCreateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
+                                                               EJson jsonObjectReponseCreate,
+                                                               String resultCode, String bicResultCode ,
+                                                               String clientIp, String typeTransaction) {
         BICTransaction bicTransaction = new BICTransaction();
 
         //check
@@ -124,6 +125,39 @@ public class BICTransactionServiceImp implements BICTransactionService {
         return bicTransactionRepository.save(bicTransaction);
     }
 
+
+    @Override
+    public BICTransaction createBICTransactionFromUpdateTravel(BaseDetail<UpdateTravelInsuranceBICRequest> object,
+                                                               EJson jsonObjectReponseCreate,
+                                                               String resultCode, String bicResultCode ,
+                                                               String clientIp, String typeTransaction) {
+        BICTransaction bicTransaction = new BICTransaction();
+
+        //check
+        if (object != null && object.getDetail() != null) {
+            Long orderIdResponse = null;
+            EJson jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
+            if (jsonObjectData != null && jsonObjectData.getString("type").equalsIgnoreCase("200") ) {
+                orderIdResponse = jsonObjectReponseCreate.getLong("orderId");
+            }else {
+                orderIdResponse = -1L ;
+            }
+            bicTransaction.setBicResultCode(bicResultCode);
+            bicTransaction.setConsumerId("DSVN");
+            bicTransaction.setCustomerName("DSVN");
+            bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : object.getDetail().getOrders().getOrdBillStreet1());
+            bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
+            bicTransaction.setResultCode(resultCode);
+            bicTransaction.setLogTimestamp(new Date());
+            bicTransaction.setOrderId(orderIdResponse == null ? "-1" : String.valueOf(orderIdResponse));
+            bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
+            bicTransaction.setPhoneNumber(object.getDetail().getOrders().getOrdBillMobile());
+            bicTransaction.setRequestId(object.getRequestId());
+            
+        }
+
+        return bicTransactionRepository.save(bicTransaction);
+    }
 
 
 }
