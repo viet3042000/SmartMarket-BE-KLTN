@@ -57,6 +57,7 @@ public class TRV implements Serializable {
 
     private Long userUpproveID;
 
+    @Range(min= 0, max= 1)
     private Long destroy;
 
     private Long status;
