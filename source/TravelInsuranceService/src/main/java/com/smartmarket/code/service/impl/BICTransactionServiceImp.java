@@ -149,10 +149,12 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setResultCode(resultCode);
             bicTransaction.setLogTimestamp(new Date());
-            bicTransaction.setOrderId(orderIdResponse == null ? "-1" : String.valueOf(orderIdResponse));
+            bicTransaction.setOrderId(orderIdResponse == null ? "-1" : String.valueOf(object.getDetail().getOrders().getOrderId()));
             bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
             bicTransaction.setPhoneNumber(object.getDetail().getOrders().getOrdBillMobile());
             bicTransaction.setRequestId(object.getRequestId());
+            bicTransaction.setType(typeTransaction);
+            bicTransaction.setClientIp(clientIp);
 
         }
 
