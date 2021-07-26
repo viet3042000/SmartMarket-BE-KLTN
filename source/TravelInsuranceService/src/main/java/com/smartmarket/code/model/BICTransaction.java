@@ -74,5 +74,8 @@ public class BICTransaction implements Serializable {
 	@Column(name = "type")
 	private String type;
 
+    @Column(name = "destroy")
+    private Long destroy;
+
 
 }

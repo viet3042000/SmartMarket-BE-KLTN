@@ -11,7 +11,7 @@ import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.OrdersServiceEntity;
-import com.smartmarket.code.model.OutBox;
+import com.smartmarket.code.model.OrderOutbox;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.BaseDetail;
@@ -28,7 +28,6 @@ import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.TravelInsuranceService;
 import com.smartmarket.code.util.*;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -670,11 +668,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     }
 
 
-    public String test(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException {
 
         OrdersServiceEntity orders = new OrdersServiceEntity();
-        OutBox outBox = new OutBox();
+        OrderOutbox outBox = new OrderOutbox();
 
         try {
             Gson gson = new Gson();

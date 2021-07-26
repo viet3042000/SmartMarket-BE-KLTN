@@ -6,13 +6,13 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "outbox")
+@Table(name = "travelinsurance_outbox")
 @Getter
 @Setter
-public class OutBox {
+public class TravelinsuranceOutbox {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outbox_seq")
-    @SequenceGenerator(sequenceName = "outbox_sequence", allocationSize = 1, name = "outbox_seq")
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outbox_seq")
+//    @SequenceGenerator(sequenceName = "outbox_sequence", allocationSize = 1, name = "outbox_seq")
     @Column(name = "id")
     private Long id;
 
@@ -24,6 +24,9 @@ public class OutBox {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "payload")
     private String payload;

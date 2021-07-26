@@ -11,7 +11,7 @@
     <groupId>com.laurentiuspilca</groupId>
     <artifactId>TravelInsuranceService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>TravelInsuranceService</name>
+    <name>OrderService</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

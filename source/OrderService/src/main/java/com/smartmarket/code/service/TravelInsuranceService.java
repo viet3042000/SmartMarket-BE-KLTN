@@ -27,7 +27,7 @@ public interface TravelInsuranceService {
                                              HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;
 
-    public String test(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;
 
 }

@@ -66,6 +66,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         String customerAddress = "-1";
         String clientIp = "unknown" ;
         String type = "unknown" ;
+        Long destroy = null ;
 
         if(Utils.isJSONValid(jsonString)){
             EJson requestBody = new EJson(jsonString);
@@ -92,7 +93,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
                             phoneNumber, email, ordPaidMoney, consumerId,
                             fromDate, toDate, new Date(), resultCode, bicResultCode,
-                            ordDate, productId, customerAddress,clientIp,type);
+                            ordDate, productId, customerAddress,clientIp,type,destroy);
                     return bicTransaction ;
                 }
 
@@ -115,11 +116,12 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     productId =environment.getRequiredProperty("createTravelBIC.DSVN.order.productId");
                     customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
                     clientIp = Utils.getClientIp(request) ;
+                    destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy();
 
                     bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
                             phoneNumber, email, ordPaidMoney, consumerId,
                             fromDate, toDate, new Date(), resultCode, bicResultCode,
-                            ordDate, productId, customerAddress,clientIp,type);
+                            ordDate, productId, customerAddress,clientIp,type,destroy);
                 }
 
 //                if (detail != null) {
@@ -154,7 +156,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
                     phoneNumber, email, ordPaidMoney, consumerId,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
-                    ordDate, productId, customerAddress,clientIp,type);
+                    ordDate, productId, customerAddress,clientIp,type,destroy);
         }
 
         return bicTransaction ;

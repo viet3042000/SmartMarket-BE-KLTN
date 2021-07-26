@@ -5,7 +5,7 @@ import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.OutboxRepository;
-import com.smartmarket.code.model.OutBox;
+import com.smartmarket.code.model.TravelinsuranceOutbox;
 import com.smartmarket.code.model.entitylog.KafkaExceptionObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
@@ -86,7 +86,7 @@ public class ListenerServiceImp implements ListenerService {
 
     // can designate multi topic , partition , concurrency,...
     //Each function is marked by @KafkaListener = 1 consumer
-    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
+//    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
     public void listenClient(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -187,7 +187,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -292,7 +292,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
+//    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
     public void listenConsumer(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -395,10 +395,10 @@ public class ListenerServiceImp implements ListenerService {
 
     //outbox table only insert --> only crete/read
 //    @KafkaListener(id = "${kafka.groupID.outbox}",topics = "${kafka.topic.outbox}")
-    @KafkaListener(id = "kafka.groupID.outbox",topics = "orderservicedb.public.outbox")
-    public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
+//    @KafkaListener(id = "kafka.groupID.outbox",topics = "orderservicedb.public.order_outbox")
+        public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
-        OutBox outBox = new OutBox();
+        TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
         Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {
