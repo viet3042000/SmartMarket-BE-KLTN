@@ -27,8 +27,8 @@ public interface TravelInsuranceService {
                                              HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;
 
-    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest)
-            throws JsonProcessingException, APIAccessException, Exception;
+    public String test(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+            throws JsonProcessingException, APIAccessException;
 
 }
 
