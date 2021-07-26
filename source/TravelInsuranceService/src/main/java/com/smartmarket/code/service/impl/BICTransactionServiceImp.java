@@ -89,7 +89,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setType(typeTransaction);
             bicTransaction.setClientIp(clientIp);
             bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
-            bicTransaction.setDestroy(object.getDetail().getTrv().getDestroy());
+            bicTransaction.setDestroy(0L);
         }
 
         return bicTransactionRepository.save(bicTransaction);

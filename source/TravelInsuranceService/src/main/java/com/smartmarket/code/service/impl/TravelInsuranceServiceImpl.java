@@ -467,7 +467,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         BaseResponse response = new BaseResponse();
 
         String clientIp =  Utils.getClientIp(request) ;
-        String typeTransaction = Constant.TYPE_CREATE;
+        String typeTransaction = Constant.TYPE_UPDATE;
 
         try {
             //check validate json request

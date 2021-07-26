@@ -75,13 +75,17 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
             if (matcher.match(hostConstants.URL_CREATE, URLRequest) || matcher.match(hostConstants.URL_UPDATE, URLRequest)) {
 
-                if(matcher.match(hostConstants.URL_CREATE, URLRequest)){
-                    type = Constant.TYPE_CREATE ;
-                }else if (matcher.match(hostConstants.URL_UPDATE, URLRequest)){
-                    type = Constant.TYPE_UPDATE ;
-                }
+
                 messasgeId = requestBody.getString("requestId") == null ? "no requestId" : requestBody.getString("requestId");
                 EJson detail = (requestBody.getJSONObject("detail"));
+
+                if(matcher.match(hostConstants.URL_CREATE, URLRequest)){
+                    type = Constant.TYPE_CREATE ;
+//                    destroy =  0L ;
+                }else if (matcher.match(hostConstants.URL_UPDATE, URLRequest)){
+                    type = Constant.TYPE_UPDATE ;
+//                    destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy() ;
+                }
 
                 //convert jsonobject to CreateTravelInsuranceBICRequest
                 Gson gson = new Gson(); // Or use new GsonBuilder().create();
@@ -97,8 +101,17 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     return bicTransaction ;
                 }
 
+
+
                 //set properties detail
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
+
+                    if(type.equals(Constant.TYPE_CREATE)){
+                        destroy =  0L ;
+                    }else if (type.equals(Constant.TYPE_UPDATE)){
+                        destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy() ;
+                    }
+
                     orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
                     orderId = "-1";
                     customerName = createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName();
@@ -116,7 +129,6 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     productId =environment.getRequiredProperty("createTravelBIC.DSVN.order.productId");
                     customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
                     clientIp = Utils.getClientIp(request) ;
-                    destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy();
 
                     bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
                             phoneNumber, email, ordPaidMoney, consumerId,
