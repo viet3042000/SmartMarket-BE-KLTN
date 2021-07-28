@@ -98,7 +98,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -147,7 +147,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -198,7 +198,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -245,7 +245,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -301,7 +301,7 @@ public class RestControllerHandleException {
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                            messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                            messageTimestamp, "travelinsuranceservice", operationName, "1",
                             request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                             Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
             logService.createSOALogException(soaExceptionObject);
@@ -321,7 +321,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -388,7 +388,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -437,7 +437,7 @@ public class RestControllerHandleException {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                                messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                                messageTimestamp, "travelinsuranceservice", operationName, "1",
                                 request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                                 Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
                 logService.createSOALogException(soaExceptionObject);
@@ -465,7 +465,7 @@ public class RestControllerHandleException {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                                messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                                messageTimestamp, "travelinsuranceservice", operationName, "1",
                                 request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                                 Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
                 logService.createSOALogException(soaExceptionObject);
@@ -488,7 +488,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
@@ -531,7 +531,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex),Utils.getClientIp(request), messageTimestamp);
         logService.createSOALogException(soaExceptionObject);
@@ -588,7 +588,7 @@ public class RestControllerHandleException {
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                            messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                            messageTimestamp, "travelinsuranceservice", operationName, "1",
                             request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                             Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
             logService.createSOALogException(soaExceptionObject);
@@ -608,7 +608,7 @@ public class RestControllerHandleException {
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
