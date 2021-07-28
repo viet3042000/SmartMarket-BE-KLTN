@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,6 +38,9 @@ public class CustomLogFilter extends OncePerRequestFilter {
 
     @Autowired
     LogServiceImpl logService;
+
+    @Autowired
+    ConfigurableEnvironment environment;
 
 
     @Override
@@ -57,6 +61,10 @@ public class CustomLogFilter extends OncePerRequestFilter {
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
 
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
+
         try {
             if (request.getMethod().equals("POST")) {
                 if(Utils.isJSONValid(jsonString)){
@@ -71,7 +79,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime,null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", null,
                             "request", transactionDetail, null, null,
-                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
+                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request),operationName);
                     logService.createSOALog2(soaObject);
                 }else {
                     String timeDuration = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -82,7 +90,7 @@ public class CustomLogFilter extends OncePerRequestFilter {
                     ServiceObject soaObject = new ServiceObject("serviceLog", null,null, null, "client", "smartMarket",
                             messageTimestamp, "travelinsuranceservice", "1", null,
                             "request", transactionDetail, null, null,
-                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request));
+                            null, logtimeStamp, request.getRemoteHost(), Utils.getClientIp(request),operationName);
                     logService.createSOALog2(soaObject);
                 }
 

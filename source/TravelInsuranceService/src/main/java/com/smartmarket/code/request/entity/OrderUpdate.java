@@ -39,7 +39,7 @@ public class OrderUpdate {
     private String ordBillEmail;
 
     @Range(min= 1, max= 2)
-    @NotNull(message = "ordStatus is require")
+    @NotBlank(message = "ordStatus is require")
     private Long ordStatus;
 
 }

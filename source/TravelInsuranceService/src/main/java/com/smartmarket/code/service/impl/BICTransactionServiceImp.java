@@ -3,22 +3,28 @@ package com.smartmarket.code.service.impl;
 import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.model.BICTransaction;
+import com.smartmarket.code.model.Client;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionService;
+import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.util.EJson;
+import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -32,6 +38,9 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
     @Autowired
     private FieldsConstants fieldsConstants;
+
+    @Autowired
+    ClientService clientService ;
 
     @Override
     public BICTransaction create(BICTransaction object) {
@@ -62,6 +71,10 @@ public class BICTransactionServiceImp implements BICTransactionService {
                                                                String clientIp, String typeTransaction) {
         BICTransaction bicTransaction = new BICTransaction();
 
+        String clientId = JwtUtils.getClientId() ;
+        Optional<Client> client = clientService.findByclientName(clientId);
+
+
         //check
         if (object != null && object.getDetail() != null) {
             Long orderIdResponse = null;
@@ -72,8 +85,8 @@ public class BICTransactionServiceImp implements BICTransactionService {
                 orderIdResponse = -1L ;
             }
             bicTransaction.setBicResultCode(bicResultCode);
-            bicTransaction.setConsumerId("DSVN");
-            bicTransaction.setCustomerName("DSVN");
+            bicTransaction.setConsumerId(client.get().getConsumerId());
+            bicTransaction.setCustomerName(object.getDetail().getOrders().getOrdBillFirstName());
             bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : object.getDetail().getOrders().getOrdBillStreet1());
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setFromDate(object.getDetail().getTrv().getFromDate());
@@ -104,10 +117,14 @@ public class BICTransactionServiceImp implements BICTransactionService {
                                                         String customerAddress , String clientIp,String type, Long destroy) {
         BICTransaction bicTransaction = new BICTransaction();
 
+
+        String clientId = JwtUtils.getClientId() ;
+        Optional<Client> client = clientService.findByclientName(clientId);
+
         bicTransaction.setOrderId(orderId);
         bicTransaction.setBicResultCode(bicResultCode);
-        bicTransaction.setConsumerId("DSVN");
-        bicTransaction.setCustomerName("DSVN");
+        bicTransaction.setConsumerId(client.get().getConsumerId());
+        bicTransaction.setCustomerName(customerName);
         bicTransaction.setCustomerAddress(customerAddress);
         bicTransaction.setEmail(email);
         bicTransaction.setFromDate(fromDate);
@@ -134,6 +151,8 @@ public class BICTransactionServiceImp implements BICTransactionService {
                                                                String resultCode, String bicResultCode ,
                                                                String clientIp, String typeTransaction) {
         BICTransaction bicTransaction = new BICTransaction();
+        String clientId = JwtUtils.getClientId() ;
+        Optional<Client> client = clientService.findByclientName(clientId);
 
         //check
         if (object != null && object.getDetail() != null) {
@@ -145,8 +164,8 @@ public class BICTransactionServiceImp implements BICTransactionService {
                 orderIdResponse = -1L ;
             }
             bicTransaction.setBicResultCode(bicResultCode);
-            bicTransaction.setConsumerId("DSVN");
-            bicTransaction.setCustomerName("DSVN");
+            bicTransaction.setConsumerId(client.get().getConsumerId());
+            bicTransaction.setCustomerName(object.getDetail().getOrders().getOrdBillFirstName());
             bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : object.getDetail().getOrders().getOrdBillStreet1());
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setResultCode(resultCode);

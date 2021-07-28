@@ -23,6 +23,7 @@ import com.smartmarket.code.util.Utils;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,10 +66,14 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
     @Autowired
     UrlService urlService ;
 
+    @Autowired
+    ConfigurableEnvironment environment;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
@@ -77,6 +82,9 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
         String[] pathActuator = {"/actuator/*"} ;
+
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         try {
 
@@ -195,7 +203,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request));
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
                 logService.createSOALog2(soaObject);
             }else {
 
@@ -225,7 +233,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket", "client",
                         messageTimestamp, "travelinsuranceservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request));
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
                 logService.createSOALog2(soaObject);
             }
             httpServletResponse.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
