@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 
@@ -72,5 +73,20 @@ public class JwtUtils {
         }
         return dateExpireLong ;
     }
+
+    public static String getClientId(){
+        //get clientid from claims
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);
+        String clientId = null;
+
+        if (claims != null) {
+            clientId = (String) claims.get("client_id");
+        }
+
+        return  clientId ;
+    }
+
+
 
 }
