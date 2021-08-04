@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.text.ParseException;
 
 
 //@RefreshScope
@@ -25,7 +26,7 @@ public class OrderController {
 
 
     @PostMapping(value = "/createorder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public String createOrder(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public String createOrder(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         return travelInsuranceService.createOrder(createTravelInsuranceBICRequestBaseDetail, request, responseSelvet);
     }
 
@@ -40,8 +41,8 @@ public class OrderController {
     }
 
     @PostMapping(value = "/getallorders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public String getAllOrder(@Valid @RequestBody BaseRequest baseRequest, HttpServletRequest request, HttpServletResponse responseSelvet) {
-        return travelInsuranceService.getAllOrder(baseRequest,request,responseSelvet);
+    public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) {
+        return travelInsuranceService.getAllOrder(queryAllOrdersOfUserRequest,request,responseSelvet);
     }
 
 }

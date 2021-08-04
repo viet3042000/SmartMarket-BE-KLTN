@@ -7,10 +7,11 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.ParseException;
 
 public interface TravelInsuranceService {
     public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APIAccessException;
+            throws JsonProcessingException, APIAccessException, ParseException;
 
     public String updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
                                              HttpServletRequest request,
@@ -22,9 +23,9 @@ public interface TravelInsuranceService {
                                           HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException;
 
-    public String getAllOrder(BaseRequest baseRequest,
-                                   HttpServletRequest request,
-                                   HttpServletResponse responseSelvet);
+    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
+                                                     HttpServletRequest request,
+                                                     HttpServletResponse responseSelvet);
 }
 
 
