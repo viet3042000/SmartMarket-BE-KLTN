@@ -87,7 +87,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setBicResultCode(bicResultCode);
             bicTransaction.setConsumerId(client.get().getConsumerId());
             bicTransaction.setCustomerName(object.getDetail().getOrders().getOrdBillFirstName());
-            bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "-1" : object.getDetail().getOrders().getOrdBillStreet1());
+            bicTransaction.setCustomerAddress((object.getDetail().getOrders().getOrdBillStreet1() == null || object.getDetail().getOrders().getOrdBillStreet1().equals("") == true) ? "no address" : object.getDetail().getOrders().getOrdBillStreet1());
             bicTransaction.setEmail(object.getDetail().getOrders().getOrdBillEmail());
             bicTransaction.setFromDate(object.getDetail().getTrv().getFromDate());
             bicTransaction.setResultCode(resultCode);
