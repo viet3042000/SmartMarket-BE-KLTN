@@ -793,4 +793,243 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    @Override
+    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest) throws JsonProcessingException, APIAccessException {
+
+        //SET TIMEOUT
+        //set Time out get create api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryUpdateBIC = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryUpdateBIC.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.updateTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryUpdateBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.updateTravelBIC")));
+
+        CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
+        BaseResponse response = new BaseResponse();
+
+        try {
+            //check validate json request
+            ValidateRequest.checkValidUpdate(updateTravelInsuranceBICRequest);
+
+            //Update BIC
+            UpdateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
+            String responseCreate = null;
+            Gson gson = new Gson();
+            responseCreate = gson.toJson(updateTravelInsuranceToBIC);
+
+            String token = authorizationService.getToken();
+            if (StringUtils.isEmpty(token)) {
+                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, updateTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            //getOrderId to request BIC
+            String orderID = null;
+            if (updateTravelInsuranceToBIC.getOrders().getOrderid() != null) {
+                orderID = updateTravelInsuranceToBIC.getOrders().getOrderid().toString();
+            }
+
+            //post Data to BIC
+            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+
+            if (jsonResultPutBIC != null && jsonResultPutBIC.getBody() != null) {
+                EJson jsonObjectReponseUpdate = new EJson(jsonResultPutBIC.getBody());
+                JSONObject responseBodyFromBIC = new JSONObject(jsonResultPutBIC.getBody());
+
+                boolean isValidFormatResponse = CheckFormatUtils.checkFormat(jsonObjectReponseUpdate);
+
+                //check format reponse from BIC
+                if (isValidFormatResponse) {
+                    if (jsonResultPutBIC.getStatusCode() == HttpStatus.OK
+                            && jsonObjectReponseUpdate != null
+                            && jsonObjectReponseUpdate.getBoolean("succeeded") == true) {
+
+                        //set response client
+                        response = setResponseUtils.setResponseUpdate(response, updateTravelInsuranceBICRequest,
+                                createTravelInsuranceBICResponse, jsonResultPutBIC);
+
+                    } else {
+                        EJson dataResponse = (jsonObjectReponseUpdate.getJSONObject("data"));
+
+                        ResponseError responseError = setResponseUtils.setResponseUpdateError(updateTravelInsuranceBICRequest,
+                                jsonResultPutBIC, dataResponse);
+
+                        return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
+                    }
+                } else {
+                    throw new CustomException("",jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), responseBodyFromBIC , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
+
+                }
+            } else {
+                throw new CustomException("", jsonResultPutBIC.getStatusCode(), updateTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (Exception ex) {
+
+            try {
+                //catch truong hop chua goi dc sang BIC
+                if (ex instanceof ResourceAccessException) {
+                    ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
+                    if (resourceAccessException.getCause() instanceof ConnectException) {
+//                        bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
+                        throw new APIAccessException(updateTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    } else {
+//                        bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
+                        throw new APIAccessException(updateTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    }
+                }
+
+                //catch truong hop goi dc sang BIC nhưng loi
+                else if (ex instanceof HttpClientErrorException) {
+                    HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
+//                    bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, httpClientErrorException.getStatusCode().toString());
+                    throw new APIResponseException(updateTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                }
+
+                //catch invalid input exception
+                else if (ex instanceof InvalidInputException) {
+//                    bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
+                    throw new InvalidInputException(ex.getMessage(), updateTravelInsuranceBICRequest.getRequestId());
+                }
+
+                //catch truong hop loi kết nối database
+                else if (ex.getCause() instanceof JDBCConnectionException) {
+                    throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                } else if (ex instanceof CustomException){
+                    CustomException customException = (CustomException) ex;
+//                    bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_IN_BACKEND, customException.getHttpStatusCode());
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage(),customException.getHttpStatusHeader());
+                }
+                else {
+//                    bicTransactionExceptionService.createBICTransactionFromRequest(request , ResponseCode.CODE.GENERAL_ERROR , HttpStatus.BAD_REQUEST.toString()) ;
+                    throw ex ;
+                }
+            } catch (JDBCConnectionException jdbcConnect) {
+                throw new ConnectDataBaseException(jdbcConnect.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest)
+            throws JsonProcessingException, APIAccessException{
+
+        //SET TIMEOUT
+        //set Time out get create api BIC
+        SimpleClientHttpRequestFactory clientHttpRequestFactoryGetOrderBIC = new SimpleClientHttpRequestFactory();
+        //Connect timeout
+        clientHttpRequestFactoryGetOrderBIC.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.getTravelBIC")));
+        //Read timeout
+        clientHttpRequestFactoryGetOrderBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.getTravelBIC")));
+
+        BaseResponse response = new BaseResponse();
+
+        //check validate json request
+
+        try {
+
+            ValidateRequest.checkValidInquire(queryTravelInsuranceBICRequest);
+            //delcare used value
+            CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse = null;
+
+            //properties log
+            String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+
+
+            //get token from database
+            String token = authorizationService.getToken();
+
+            if (StringUtils.isEmpty(token)) {
+                throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            Map<String, Object> map = new HashMap<>();
+            ResponseEntity<String> resultBIC = null;
+            if (queryTravelInsuranceBICRequest.getDetail() != null) {
+                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L)) {
+                    String orderId = queryTravelInsuranceBICRequest.getDetail().getOrderId();
+                    if (orderId != null) {
+                        map.put("id", orderId);
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOrderId"), null, map, token, queryTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryGetOrderBIC);
+                    }
+                }
+                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L)) {
+                    orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+                    if (orderReference != null) {
+                        map.put("id", orderReference);
+                        resultBIC = apiUtils.getApiWithParam(environment.getRequiredProperty("api.getTravelBICByOderReference"), null, map, token, queryTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryGetOrderBIC);
+                    }
+
+                }
+            }
+
+            if (resultBIC != null && resultBIC.getBody() != null) {
+                EJson jsonObjectResultBIC = new EJson(resultBIC.getBody());
+                JSONObject jsonObjectResultBICLog = new JSONObject(resultBIC.getBody());
+
+                //check valid response
+                boolean isValidFormatResponse = CheckFormatUtils.checkFormat(jsonObjectResultBIC);
+
+                if (!isValidFormatResponse) {
+                    if (resultBIC.getStatusCode() == HttpStatus.OK && resultBIC.getBody() != null) {
+                        createTravelInsuranceBICResponse = mapperUtils.queryCreateObjectToBIC(queryTravelInsuranceBICRequest, resultBIC, token, queryTravelInsuranceBICRequest.getRequestId());
+
+                        //set response to client
+                        response = setResponseUtils.setResponseInquery(response, createTravelInsuranceBICResponse,queryTravelInsuranceBICRequest);
+
+                    }
+                } else {
+                    throw new CustomException("Not found order",resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), jsonObjectResultBICLog , ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
+                }
+            } else {
+                throw new CustomException("", resultBIC.getStatusCode(), queryTravelInsuranceBICRequest.getRequestId(), null,  ResponseCode.CODE.ERROR_IN_BACKEND, ResponseCode.MSG.ERROR_IN_BACKEND_MSG,HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (Exception ex) {
+            try {
+                //catch truong hop chua goi dc sang BIC
+                if (ex instanceof ResourceAccessException) {
+                    ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
+                    if (resourceAccessException.getCause() instanceof ConnectException) {
+                        throw new APIAccessException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    } else {
+                        throw new APIAccessException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    }
+                }
+
+                //catch truong hop goi dc sang BIC nhưng loi
+                else if (ex instanceof HttpClientErrorException) {
+                    HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
+                    throw new APIResponseException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                }
+
+                //catch invalid input exception
+                else if (ex instanceof InvalidInputException) {
+                    throw new InvalidInputException(ex.getMessage(), queryTravelInsuranceBICRequest.getRequestId());
+                }
+
+                //catch truong hop loi kết nối database
+                else if (ex.getCause() instanceof JDBCConnectionException) {
+                    throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                } else if (ex instanceof CustomException){
+                    CustomException customException = (CustomException) ex;
+                    throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode() , customException.getErrorMessage(),customException.getHttpStatusHeader());
+                } else {
+                    throw ex ;
+                }
+
+            } catch (JDBCConnectionException jdbcConnect) {
+                if (ex.getCause() instanceof JDBCConnectionException) {
+                    throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

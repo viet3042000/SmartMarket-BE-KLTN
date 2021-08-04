@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -81,7 +82,7 @@ public class ListenerServiceImp implements ListenerService {
 //    }
 
 
-//    @KafkaListener(id = "kafka.groupID.travelinsurance.outbox", topics = "travelinsurance.public.travelinsurance_outbox")
+    @KafkaListener(id = "kafka.groupID.travelinsurance.outbox", topics = "travelinsurance.public.travelinsurance_outbox")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
         UUID orderId = UUID.randomUUID();
