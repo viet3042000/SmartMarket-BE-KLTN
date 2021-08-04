@@ -1,0 +1,21 @@
+server.port=8082
+server.error.include-message = always
+
+
+spring.datasource.url=jdbc:postgresql://10.14.101.204:5432/travelinsurance
+spring.datasource.username=travelinsuranceuser
+spring.datasource.password=travelinsuranceuser
+spring.jpa.hibernate.ddl-auto=none
+
+#cache
+#spring.cache.jcache.config=classpath:ehcache.xml
+#spring.cache.jcache.provider=org.ehcache.jsr107.EhcacheCachingProvider
+#debug=true
+
+
+#publicKey=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmc/v6F2EojB+4zzMkTOQbNXWJ2W9eHys98rbGhqKahqvOXV4PsjxkYB4ergZGiccE+hK/HgqLvH26m7GtocrK6p5AWJED0wZ46W7R6Z7tmmVoSAzNN0W3mQdHKul9V1Enq9CRyRbPxBj+MvLRXkUxoP6OyMJJXUdtQTmOU1QB0EDnx2TiAOLUSfFHHw/1j1R07B2Pc2KltYxSeItDf8k85z8WdeEGuHv6TuTzhduiHLRqg5QjKlNga+Rlg91dJYviwLzrcZfRxjLVhf3nmD05R7kNs0LsdBa1fUB+PLpbatdo6cSr2LbgXlY37K/NOkuoL3DeAW7tznw4Kt3moYP+QIDAQAB
+
+#log metrics
+#management.endpoints.web.exposure.include=*
+#management.endpoints.jmx.exposure.include=*
+#management.endpoints.jmx.exposure.exclude=
