@@ -1,6 +1,7 @@
 package com.smartmarket.code.dao;
 
 import com.smartmarket.code.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,8 +18,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
 
 	// Đây là JPQL (Hibernate) --> dùng tên biến của User
-	@Query(value = "from User u")
-	public List<User> findAllUser(Pageable pageable);
+	@Query(value = "select * from users u" ,countQuery = "SELECT count(*) FROM USERS" , nativeQuery = true )
+	public Page<User> findAllUser(Pageable pageable);
 
 	// Đây là JPQL (Hibernate) --> dùng tên biến của User
 	@Query(value = "from User u where u.username =:username")

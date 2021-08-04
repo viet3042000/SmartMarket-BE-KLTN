@@ -19,6 +19,7 @@ public class BaseResponsePage implements Serializable {
     private String detailErrorMessage;
     private Long page;
     private Long totalPage;
+    private Long total ;
     private Object detail;
 
 }

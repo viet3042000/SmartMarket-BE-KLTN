@@ -25,8 +25,8 @@ public class BaseRequest implements Serializable {
     @Size(max =10, message = "targetId should be less than or equal to 14 characters")
     private String targetId ;
 
-    private int page ;
-    private int size ;
+    private Long page ;
+    private Long size ;
 
 
 }

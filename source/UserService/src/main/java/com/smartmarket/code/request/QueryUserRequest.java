@@ -11,6 +11,6 @@ import java.util.ArrayList;
 @Setter
 public class QueryUserRequest implements Serializable {
 
-    private int page  ;
-    private int size ;
+    private Long page  ;
+    private Long size ;
 }

@@ -21,6 +21,7 @@ import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -278,14 +279,20 @@ public class UserController {
 
 
     @PostMapping(value = "/getlist-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryUserRequest> deleteUserRequestBaseDetail ,
+    public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
 
 
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
-        Pageable pageable =PageRequest.of(deleteUserRequestBaseDetail.getPage(),deleteUserRequestBaseDetail.getSize());
+        Page<User> pageResult = null;
+        Long total = null ;
+        Long page =  getListUserRequestBaseDetail.getDetail().getPage()  ;
+        Long size =  getListUserRequestBaseDetail.getDetail().getSize()   ;
+        int totalPage = 0 ;
+
+        Pageable pageable =PageRequest.of(page.intValue() - 1 , size.intValue());
 
         BaseResponse response = new BaseResponse();
         // declare value for log
@@ -298,12 +305,18 @@ public class UserController {
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
-
         try {
 
-            List<User> userList = userRepository.findAllUser(pageable);
+            pageResult = userRepository.findAllUser(pageable);
+            total = pageResult.getTotalElements() ;
+            page =  getListUserRequestBaseDetail.getDetail().getPage();
+            totalPage =(int) Math.ceil((double) total/size) ;
             //set response data to client
-            response.setDetail(userList);
+            response.setDetail(pageResult.getContent());
+            response.setPage(page);
+            response.setTotalPage(Long.valueOf(totalPage));
+            response.setTotal(total);
+
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
             response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
@@ -315,7 +328,7 @@ public class UserController {
             //calculate time duration
             String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
             //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog", deleteUserRequestBaseDetail.getRequestId(), deleteUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+            ServiceObject soaObject = new ServiceObject("serviceLog", getListUserRequestBaseDetail.getRequestId(), getListUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
                     messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
                     "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
@@ -326,21 +339,21 @@ public class UserController {
             if (ex instanceof ResourceAccessException) {
                 ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                 if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(deleteUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(getListUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 } else {
-                    throw new APIAccessException(deleteUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(getListUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 }
             }
 
             //catch truong hop goi dc sang BIC nhưng loi
             else if (ex instanceof HttpClientErrorException) {
                 HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(deleteUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                throw new APIResponseException(getListUserRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
             }
 
             //catch invalid input exception
             else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), deleteUserRequestBaseDetail.getRequestId());
+                throw new InvalidInputException(ex.getMessage(), getListUserRequestBaseDetail.getRequestId());
             }
 
             //catch truong hop loi kết nối database
@@ -348,7 +361,7 @@ public class UserController {
                 throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } else if (ex instanceof CustomException) {
                 CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), deleteUserRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), getListUserRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
             } else {
                 throw ex;
             }
@@ -409,7 +422,6 @@ public class UserController {
                 throw ex;
             }
         }
-
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
