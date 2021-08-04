@@ -8,15 +8,19 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class OrderUpdate {
+
+    //map order id in order service
     @NotBlank(message = "orderReference is require")
     @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
     private String orderReference;
 
+    //order id in travelinsuranceservice
     private String orderId;
 
     @NotBlank(message = "ordBillFirstName is require")
