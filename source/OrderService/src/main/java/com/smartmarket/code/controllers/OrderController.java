@@ -39,7 +39,7 @@ public class OrderController {
         return travelInsuranceService.getOrder(queryTravelInsuranceBICRequest,request,responseSelvet);
     }
 
-    @PostMapping(value = "/getallOrders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/getAllOrders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) {
         return travelInsuranceService.getAllOrder(queryAllOrdersOfUserRequest,request,responseSelvet);
     }
