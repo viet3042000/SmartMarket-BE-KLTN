@@ -2,6 +2,7 @@ package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.dao.UserRepository;
+import com.smartmarket.code.dao.UserRoleRepository;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository ;
+
+    @Autowired
+    UserRoleRepository userRoleRepository ;
 
 
     @Override
@@ -43,6 +47,7 @@ public class UserServiceImpl implements UserService {
         User userDelete = userRepository.findByUserId(id).orElse(null);
         if (userDelete != null) {
             userRepository.delete(userDelete);
+            userRoleRepository.deleteUserRoleByUserId(userDelete.getId());
         }
         return userDelete;
     }
@@ -50,6 +55,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public Optional<User> findByUserId(Long userId) {
+        return userRepository.findByUserId(userId);
     }
 
     @Override

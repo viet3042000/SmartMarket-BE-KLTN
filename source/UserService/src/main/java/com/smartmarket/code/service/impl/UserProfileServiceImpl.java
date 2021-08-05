@@ -53,25 +53,34 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfile create(UserProfile object) {
 
         object.setEnabled(Constant.STATUS.ACTIVE);
-        object.setUsername(object.getUsername());
+        object.setUserName(object.getUserName());
         object.setEmail(object.getEmail());
         object.setPhoneNumber(object.getPhoneNumber());
         object.setAddress(object.getAddress());
         object.setGender(object.getGender());
         object.setBirthDate(object.getBirthDate());
         object.setFullName(object.getFullName());
+        object.setIdentifyNumber(object.getIdentifyNumber());
         object.setCreateDate(new Date());
 
         return userProfileRepository.save(object);
     }
 
     @Override
-    public UserProfile update(UserProfile object) {
-        UserProfile userUpdate = userProfileRepository.(object.getId()).orElse(null);
+    public UserProfile update(UserProfile object ,String userNameUpdate) {
+        UserProfile userUpdate = userProfileRepository.findByUsername(userNameUpdate).orElse(null);
         if (userUpdate != null) {
+            object.setId(userUpdate.getId());
             object.setEnabled(object.getEnabled());
-            object.setPassword(object.getPassword());
             object.setUserName(object.getUserName());
+            object.setEmail(object.getEmail());
+            object.setPhoneNumber(object.getPhoneNumber());
+            object.setAddress(object.getAddress());
+            object.setGender(object.getGender());
+            object.setBirthDate(object.getBirthDate());
+            object.setFullName(object.getFullName());
+            object.setIdentifyNumber(object.getIdentifyNumber());
+            object.setCreateDate(new Date());
         }
         userProfileRepository.save(object);
         return userUpdate;
@@ -79,8 +88,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public UserProfile delete(Long id) {
-        UserProfile userDelete = userProfileRepository.findByUserId(id).orElse(null);
+    public UserProfile deleteByUserName(String userName) {
+        UserProfile userDelete = userProfileRepository.findByUsername(userName).orElse(null);
         if (userDelete != null) {
             userProfileRepository.delete(userDelete);
         }
@@ -92,8 +101,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         return userProfileRepository.findByUsername(username);
     }
 
-    @Override
-    public Long findUserIdByUsername(String username) {
-        return userProfileRepository.findUserIdByUsername(username);
-    }
+//    @Override
+//    public Long findUserIdByUsername(String username) {
+//        return userProfileRepository.findUserIdByUsername(username);
+//    }
 }

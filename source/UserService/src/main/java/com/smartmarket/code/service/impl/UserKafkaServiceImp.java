@@ -19,7 +19,7 @@ public class UserKafkaServiceImp implements UserKafkaService {
 
         for (String k : keyPairs.keySet()) {
             if (k.equals("user_name")) {
-                user.setUsername((String) keyPairs.get(k));
+                user.setUserName((String) keyPairs.get(k));
             }
             if (k.equals("user_password")) {
                 user.setPassword((String) keyPairs.get(k));

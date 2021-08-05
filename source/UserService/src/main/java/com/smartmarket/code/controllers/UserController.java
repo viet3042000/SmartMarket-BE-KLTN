@@ -7,11 +7,14 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.User;
+import com.smartmarket.code.model.UserProfile;
 import com.smartmarket.code.model.UserRole;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.response.UserCreateResponse;
 import com.smartmarket.code.service.RoleService;
+import com.smartmarket.code.service.UserProfileService;
 import com.smartmarket.code.service.UserRoleService;
 import com.smartmarket.code.service.UserService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
@@ -40,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 
 //@RefreshScope
@@ -50,6 +54,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    UserProfileService userProfileService;
 
     @Autowired
     LogServiceImpl logService;
@@ -74,13 +81,27 @@ public class UserController {
 
             if(userExist.isPresent()){
                 throw new CustomException("User is exist", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-
             }
 
             User userCreate = new User();
+            UserProfile userProfileCreate = new UserProfile();
+
+
             userCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
             userCreate.setPassword(createUserRequestBaseDetail.getDetail().getUser().getPassword());
+
+            userProfileCreate.setFullName(createUserRequestBaseDetail.getDetail().getUser().getFullName());
+            userProfileCreate.setBirthDate(createUserRequestBaseDetail.getDetail().getUser().getBirthDate());
+            userProfileCreate.setIdentifyNumber(createUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
+            userProfileCreate.setGender(createUserRequestBaseDetail.getDetail().getUser().getGender());
+            userProfileCreate.setAddress(createUserRequestBaseDetail.getDetail().getUser().getAddress());
+            userProfileCreate.setPhoneNumber(createUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
+            userProfileCreate.setEmail(createUserRequestBaseDetail.getDetail().getUser().getEmail());
+            userProfileCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
+
             User userCreated = userService.create(userCreate);
+            UserProfile userProfileCreated = userProfileService.create(userProfileCreate);
+
             ArrayList<Long> roles = createUserRequestBaseDetail.getDetail().getRoles();
 
             if (roles != null && roles.size() > 0) {
@@ -145,17 +166,37 @@ public class UserController {
 
         try {
 
-            Optional<User> userExist = userRepository.checkUserExist(updateUserRequestBaseDetail.getDetail().getUser().getUsername(),updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+            Optional<User> userExist = userRepository.checkUserExist(updateUserRequestBaseDetail.getDetail().getUser().getUserName(),updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
 
             if(userExist.isPresent()){
                 throw new CustomException("User is exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
 
+            Optional<User> userGetById = userRepository.findByUserId(updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+
+            if(!userGetById.isPresent()){
+                throw new CustomException("userGetById is not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
+
             User userUpdate = new User();
-            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUsername());
+            UserProfile userProfileUpdate = new UserProfile();
+
+            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
             userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
             userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
+
+            userProfileUpdate.setFullName(updateUserRequestBaseDetail.getDetail().getUser().getFullName());
+            userProfileUpdate.setBirthDate(updateUserRequestBaseDetail.getDetail().getUser().getBirthDate());
+            userProfileUpdate.setIdentifyNumber(updateUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
+            userProfileUpdate.setGender(updateUserRequestBaseDetail.getDetail().getUser().getGender());
+            userProfileUpdate.setAddress(updateUserRequestBaseDetail.getDetail().getUser().getAddress());
+            userProfileUpdate.setPhoneNumber(updateUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
+            userProfileUpdate.setEmail(updateUserRequestBaseDetail.getDetail().getUser().getEmail());
+            userProfileUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
+            userProfileUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
+
+            UserProfile userProfileUpdated = userProfileService.update(userProfileUpdate,userGetById.get().getUserName());
             User userUpdated = userService.update(userUpdate);
 
             userRoleService.deleteByUserId(updateUserRequestBaseDetail.getDetail().getUser().getId());
@@ -215,6 +256,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional
     @PostMapping(value = "/delete-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //time start
@@ -235,6 +277,8 @@ public class UserController {
         try {
 
             User userDelete = userService.delete(deleteUserRequestBaseDetail.getDetail().getId());
+            UserProfile userProfileDelete = userProfileService.deleteByUserName(userDelete.getUserName());
+
             //set response data to client
             response.setDetail(userDelete);
             response.setResponseId(deleteUserRequestBaseDetail.getRequestId());
@@ -288,7 +332,6 @@ public class UserController {
             }
         }
 
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -302,6 +345,7 @@ public class UserController {
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         Page<User> pageResult = null;
+        Page<UserCreateResponse> userCreateResponsePage = null;
         Long total = null ;
         Long page =  getListUserRequestBaseDetail.getDetail().getPage()  ;
         Long size =  getListUserRequestBaseDetail.getDetail().getSize()   ;
@@ -323,11 +367,37 @@ public class UserController {
         try {
 
             pageResult = userRepository.findAllUser(pageable);
+
+            userCreateResponsePage = pageResult.map(new Function<User, UserCreateResponse>() {
+                @Override
+                public UserCreateResponse apply(User user) {
+                    UserCreateResponse userCreateResponse  = new UserCreateResponse() ;
+                    userCreateResponse.setId(user.getId());
+                    Optional<UserProfile> userProfile = userProfileService.findByUsername(user.getUserName()) ;
+
+                    if(userProfile.isPresent()){
+                        userCreateResponse.setFullName(userProfile.get().getFullName());
+                        userCreateResponse.setBirthDate(userProfile.get().getBirthDate());
+                        userCreateResponse.setIdentifyNumber(userProfile.get().getIdentifyNumber());
+                        userCreateResponse.setGender(userProfile.get().getGender());
+                        userCreateResponse.setAddress(userProfile.get().getAddress());
+                        userCreateResponse.setPhoneNumber(userProfile.get().getPhoneNumber());
+                        userCreateResponse.setEmail(userProfile.get().getEmail());
+                        userCreateResponse.setUserName(userProfile.get().getUserName());
+                        userCreateResponse.setPassword(user.getPassword());
+                        userCreateResponse.setEnabled(userProfile.get().getEnabled());
+                    }
+
+
+                    return userCreateResponse;
+                }
+            });
+
             total = pageResult.getTotalElements() ;
             page =  getListUserRequestBaseDetail.getDetail().getPage();
             totalPage =(int) Math.ceil((double) total/size) ;
             //set response data to client
-            response.setDetail(pageResult.getContent());
+            response.setDetail(userCreateResponsePage.getContent());
             response.setPage(page);
             response.setTotalPage(Long.valueOf(totalPage));
             response.setTotal(total);
@@ -338,7 +408,6 @@ public class UserController {
 
             String responseBody = mapper.writeValueAsString(response);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
 
             //calculate time duration
             String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
@@ -404,11 +473,33 @@ public class UserController {
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
+        UserCreateResponse userCreateResponse = new UserCreateResponse() ;
         try {
 
-            Optional<User> user = userRepository.findByUserId(id);
+            Optional<User> user = userService.findByUserId(id);
+
+            if(!user.isPresent()){
+                throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);
+            }
+
+            Optional<UserProfile> userProfile = userProfileService.findByUsername(user.get().getUserName());
+
+            if(user.isPresent()){
+                userCreateResponse.setId(user.get().getId());
+                userCreateResponse.setFullName(userProfile.get().getFullName());
+                userCreateResponse.setBirthDate(userProfile.get().getBirthDate());
+                userCreateResponse.setIdentifyNumber(userProfile.get().getIdentifyNumber());
+                userCreateResponse.setGender(userProfile.get().getGender());
+                userCreateResponse.setAddress(userProfile.get().getAddress());
+                userCreateResponse.setPhoneNumber(userProfile.get().getPhoneNumber());
+                userCreateResponse.setEmail(userProfile.get().getEmail());
+                userCreateResponse.setUserName(userProfile.get().getUserName());
+                userCreateResponse.setPassword(user.get().getPassword());
+                userCreateResponse.setEnabled(userProfile.get().getEnabled());
+            }
+
             //set response data to client
-            response.setDetail(user.get());
+            response.setDetail(userCreateResponse);
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
             response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);

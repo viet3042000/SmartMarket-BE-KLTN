@@ -16,5 +16,9 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
-	
+
+    // Đây là JPQL (Hibernate) --> dùng tên biến của User
+    @Query(value = "from UserProfile u where u.userName =:userName")
+    public Optional<UserProfile> findByUsername(@Param("userName") String userName);
+
 }

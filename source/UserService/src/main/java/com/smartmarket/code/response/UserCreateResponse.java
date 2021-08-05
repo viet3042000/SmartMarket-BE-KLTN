@@ -1,4 +1,4 @@
-package com.smartmarket.code.request.entity;
+package com.smartmarket.code.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserUpdate {
+public class UserCreateResponse {
 
     private Long id;
 
@@ -29,6 +29,5 @@ public class UserUpdate {
     private String fullName;
 
     private Long enabled;
-
 
 }
