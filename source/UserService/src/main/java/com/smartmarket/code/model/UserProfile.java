@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user_profile")
 @Getter
 @Setter
 public class UserProfile implements Serializable {
@@ -21,7 +21,7 @@ public class UserProfile implements Serializable {
 
 	//@Id la primary key
 	@Column(name = "user_name")
-	private String username;
+	private String userName;
 
 	@Column(name = "email")
 	private String email;

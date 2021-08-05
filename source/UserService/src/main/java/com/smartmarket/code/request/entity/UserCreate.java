@@ -3,10 +3,15 @@ package com.smartmarket.code.request.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import java.util.Date;
+
 
 @Getter
 @Setter
-public class UserUpdate {
+public class UserCreate {
 
     private Long id;
 
@@ -29,6 +34,5 @@ public class UserUpdate {
     private String fullName;
 
     private Long enabled;
-
 
 }

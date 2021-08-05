@@ -9,11 +9,10 @@ public interface UserProfileService {
 
     public UserProfile create(UserProfile object) ;
 
-    public UserProfile update(UserProfile object) ;
+    public UserProfile update(UserProfile object ,String userNameUpdate) ;
 
-    public UserProfile delete(Long id) ;
+    public UserProfile deleteByUserName(String userName) ;
 
     Optional<UserProfile> findByUsername(String username);
 
-    Long findUserIdByUsername(String username);
 }

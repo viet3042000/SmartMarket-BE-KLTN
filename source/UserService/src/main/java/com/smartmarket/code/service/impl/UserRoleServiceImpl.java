@@ -10,6 +10,8 @@ import com.smartmarket.code.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class UserRoleServiceImpl implements UserRoleService {
 
@@ -22,6 +24,7 @@ public class UserRoleServiceImpl implements UserRoleService {
         object.setRoleId(object.getRoleId());
         object.setUserId(object.getUserId());
         object.setEnabled(Constant.STATUS.ACTIVE);
+        object.setCreateDate(new Date());
         return userRoleRepository.save(object);
     }
 

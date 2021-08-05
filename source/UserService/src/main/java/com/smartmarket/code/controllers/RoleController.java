@@ -1,20 +1,28 @@
 package com.smartmarket.code.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.Role;
 import com.smartmarket.code.model.User;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateRoleRequest;
-import com.smartmarket.code.request.DeleteRoleRequest;
-import com.smartmarket.code.request.UpdateRoleRequest;
+import com.smartmarket.code.model.UserProfile;
+import com.smartmarket.code.model.entitylog.ServiceObject;
+import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.response.UserCreateResponse;
 import com.smartmarket.code.service.RoleService;
+import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.Utils;
 import org.hibernate.exception.JDBCConnectionException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.ConnectException;
+import java.util.Optional;
+import java.util.function.Function;
 
 
 //@RefreshScope
@@ -38,6 +48,12 @@ public class RoleController {
 
     @Autowired
     RoleService roleService;
+
+    @Autowired
+    LogServiceImpl logService;
+
+    @Autowired
+    ConfigurableEnvironment environment;
 
     @PostMapping(value = "/create-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createRole(@Valid @RequestBody BaseDetail<CreateRoleRequest> createRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
@@ -200,8 +216,94 @@ public class RoleController {
 
 
     @PostMapping(value = "/getlist-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public String getListRole( HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        return null ;
+    public ResponseEntity<?> getListRole(@Valid @RequestBody BaseDetail<QueryRoleRequest> getListRoleRequestBaseDetail ,
+                              HttpServletRequest request,
+                              HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        Page<Role> pageResult = null;
+        Long total = null ;
+        Long page =  getListRoleRequestBaseDetail.getDetail().getPage()  ;
+        Long size =  getListRoleRequestBaseDetail.getDetail().getSize()   ;
+        int totalPage = 0 ;
+
+        Pageable pageable = PageRequest.of(page.intValue() - 1 , size.intValue());
+
+        BaseResponse response = new BaseResponse();
+        // declare value for log
+        //get time log
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+        ObjectMapper mapper = new ObjectMapper();
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
+        try {
+
+            pageResult = roleService.getList(pageable);
+
+            total = pageResult.getTotalElements() ;
+            page =  getListRoleRequestBaseDetail.getDetail().getPage();
+            totalPage =(int) Math.ceil((double) total/size) ;
+            //set response data to client
+            response.setDetail(pageResult.getContent());
+            response.setPage(page);
+            response.setTotalPage(Long.valueOf(totalPage));
+            response.setTotal(total);
+
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+            String responseBody = mapper.writeValueAsString(response);
+            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+            //calculate time duration
+            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+            //logResponse vs Client
+            ServiceObject soaObject = new ServiceObject("serviceLog", getListRoleRequestBaseDetail.getRequestId(), getListRoleRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                    response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
+            logService.createSOALog2(soaObject);
+
+        } catch (Exception ex) {
+            //catch truong hop chua goi dc sang BIC
+            if (ex instanceof ResourceAccessException) {
+                ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
+                if (resourceAccessException.getCause() instanceof ConnectException) {
+                    throw new APIAccessException(getListRoleRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                } else {
+                    throw new APIAccessException(getListRoleRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                }
+            }
+
+            //catch truong hop goi dc sang BIC nhưng loi
+            else if (ex instanceof HttpClientErrorException) {
+                HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
+                throw new APIResponseException(getListRoleRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+            }
+
+            //catch invalid input exception
+            else if (ex instanceof InvalidInputException) {
+                throw new InvalidInputException(ex.getMessage(), getListRoleRequestBaseDetail.getRequestId());
+            }
+
+            //catch truong hop loi kết nối database
+            else if (ex.getCause() instanceof JDBCConnectionException) {
+                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            } else if (ex instanceof CustomException) {
+                CustomException customException = (CustomException) ex;
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), getListRoleRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+            } else {
+                throw ex;
+            }
+        }
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

@@ -1,0 +1,12 @@
+select * from bic_transaction u WHERE
+CASE type
+	WHEN 'CREATE' THEN result_code = '000' AND consumer_id = 'DSVN' AND log_timestamp >= '2021-08-04 24:00:00.000+07' AND log_timestamp <= '2021-08-06 00:00:00.000+07'
+	WHEN 'UPDATE' THEN (log_timestamp=( 
+			SELECT MAX(log_timestamp) 
+   			FROM bic_transaction z 
+			WHERE z.result_code = '000' AND consumer_id = 'DSVN' AND z.destroy='1' AND z.type='UPDATE' AND z.order_id = u.order_id AND
+			 z.log_timestamp >= '2021-08-04 24:00:00.000+07' AND z.log_timestamp <= '2021-08-06 00:00:00.000+07'
+		)
+    )
+END
+ORDER BY log_timestamp desc;
