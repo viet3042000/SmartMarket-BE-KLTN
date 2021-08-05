@@ -69,8 +69,16 @@ public class UserController {
         BaseResponse response = new BaseResponse();
 
         try {
+
+            Optional<User> userExist = userService.findByUsername(createUserRequestBaseDetail.getDetail().getUser().getUserName()) ;
+
+            if(userExist.isPresent()){
+                throw new CustomException("User is exist", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+
+            }
+
             User userCreate = new User();
-            userCreate.setUsername(createUserRequestBaseDetail.getDetail().getUser().getUsername());
+            userCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
             userCreate.setPassword(createUserRequestBaseDetail.getDetail().getUser().getPassword());
             User userCreated = userService.create(userCreate);
             ArrayList<Long> roles = createUserRequestBaseDetail.getDetail().getRoles();
@@ -136,8 +144,15 @@ public class UserController {
         BaseResponse response = new BaseResponse();
 
         try {
+
+            Optional<User> userExist = userRepository.checkUserExist(updateUserRequestBaseDetail.getDetail().getUser().getUsername(),updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+
+            if(userExist.isPresent()){
+                throw new CustomException("User is exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
+
             User userUpdate = new User();
-            userUpdate.setUsername(updateUserRequestBaseDetail.getDetail().getUser().getUsername());
+            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUsername());
             userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
             userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());

@@ -26,6 +26,7 @@ import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -118,8 +119,14 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
                     if(type.equals(Constant.TYPE_CREATE)){
                         destroy =  0L ;
+                        ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString() ;
                     }else if (type.equals(Constant.TYPE_UPDATE)){
                         destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy() ;
+                        if(destroy.equals(1L) == true ){
+                            BigDecimal zeroDecimal = new BigDecimal("0");
+                            BigDecimal  ordPaidMoneyNegative = zeroDecimal.subtract(createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney())  ;
+                            ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+                        }
                     }
 
                     orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrderReference();
@@ -127,7 +134,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     customerName = (createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName() == null) ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName();
                     phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile();
                     email = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();
-                    ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
+//                    ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString();
 
                     if (createTravelInsuranceBICRequest.getTrv() != null) {
                         fromDate = createTravelInsuranceBICRequest.getTrv().getFromDate() == null ? null : createTravelInsuranceBICRequest.getTrv().getFromDate();

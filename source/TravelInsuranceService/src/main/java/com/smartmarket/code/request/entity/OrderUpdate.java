@@ -42,4 +42,9 @@ public class OrderUpdate {
     @NotNull(message = "ordStatus is require")
     private Long ordStatus;
 
+
+    @NotNull(message = "ordPaidMoney is require")
+    @Min(value = 0)
+    private BigDecimal ordPaidMoney ;
+
 }

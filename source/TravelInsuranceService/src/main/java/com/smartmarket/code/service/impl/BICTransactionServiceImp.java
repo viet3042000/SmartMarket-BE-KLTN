@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -131,6 +132,9 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setResultCode(resultCode);
         bicTransaction.setLogTimestamp(new Date());
         bicTransaction.setOrderReference(orderReference);
+
+
+
         bicTransaction.setOrdPaidMoney(ordPaidMoney);
         bicTransaction.setPhoneNumber(phoneNumber);
         bicTransaction.setRequestId(requestId);
@@ -156,6 +160,10 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
         //check
         if (object != null && object.getDetail() != null) {
+            BigDecimal zeroDecimal = new BigDecimal("0");
+            BigDecimal  ordPaidMoneyNegative = zeroDecimal.subtract(object.getDetail().getOrders().getOrdPaidMoney())  ;
+            String ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+
             Long orderIdResponse = null;
             EJson jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
             if (jsonObjectData != null && jsonObjectData.getString("type").equalsIgnoreCase("200") ) {
@@ -177,6 +185,10 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setType(typeTransaction);
             bicTransaction.setClientIp(clientIp);
             bicTransaction.setDestroy(object.getDetail().getTrv().getDestroy());
+
+            if(object.getDetail().getTrv().getDestroy().equals(1) ==  true ){
+                bicTransaction.setOrdPaidMoney(ordPaidMoney);
+            }
 
         }
 

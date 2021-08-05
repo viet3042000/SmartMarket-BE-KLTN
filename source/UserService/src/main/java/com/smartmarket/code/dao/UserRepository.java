@@ -25,6 +25,10 @@ public interface UserRepository extends JpaRepository<User, String> {
 	@Query(value = "from User u where u.username =:username")
 	public Optional<User> findByUsername(@Param("username") String username);
 
+	// Đây là JPQL (Hibernate) --> dùng tên biến của User
+	@Query(value = "from User u where u.username =:username and u.id <> :idUpdate ")
+	public Optional<User> checkUserExist(@Param("username") String username ,@Param("idUpdate") Long idUpdate);
+
 	@Query(value = "from User u where u.id =:id")
 	public Optional<User> findByUserId(@Param("id") Long id);
 
