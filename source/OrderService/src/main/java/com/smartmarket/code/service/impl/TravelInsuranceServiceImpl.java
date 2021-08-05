@@ -36,6 +36,7 @@ import java.net.ConnectException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -347,13 +348,12 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //find by user name
             Page<OrdersServiceEntity> allOrders =
                     orderRepository.findByUserName(userName, pageable);
-//            List<OrdersServiceEntity> allOrders =
-//                    orderRepository.findByUserName(userName, pageable.next());
+
             if(!allOrders.isEmpty()) {
                 totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
 
                 //set response data to client
-                response.setDetail(allOrders.getContent());
+                response.setDetail(allOrders);
                 response.setPage(page);
                 response.setTotalPage(totalPage);
                 response.setTotal(allOrders.getTotalElements());

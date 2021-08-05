@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.UUID;
 
 @Transactional
@@ -19,6 +21,6 @@ public interface OrderRepository extends JpaRepository<OrdersServiceEntity, Stri
     @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
     public OrdersServiceEntity findByOrderId(@Param("order_id") UUID orderId);
 
-    @Query(value = "SELECT * FROM orders WHERE user_name=:user_name",countQuery = "SELECT count(*) FROM orders WHERE user_name=:user_name", nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE user_name=:user_name",nativeQuery = true)
     public Page<OrdersServiceEntity> findByUserName(@Param("user_name") String userName, Pageable pageable);
 }
