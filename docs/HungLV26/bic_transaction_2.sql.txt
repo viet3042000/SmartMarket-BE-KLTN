@@ -1,0 +1,5 @@
+select * from bic_transaction WHERE result_code  = '000' AND
+CASE type
+	WHEN 'CREATE' THEN ord_date>='2021-08-03T24:00:00' AND ord_date<='2021-08-05T00:00:00'
+	WHEN 'UPDATE' THEN destroy='1' AND log_timestamp >= '2021-08-03 24:00:00.000+07' AND log_timestamp <= '2021-08-05 00:00:00.000+07'
+END;
