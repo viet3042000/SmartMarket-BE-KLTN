@@ -122,7 +122,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                         ordPaidMoney = createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney().toString() ;
                     }else if (type.equals(Constant.TYPE_UPDATE)){
                         destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy() ;
-                        if(destroy.equals(1L) == true ){
+                        if(destroy == 1 ){
                             BigDecimal zeroDecimal = new BigDecimal("0");
                             BigDecimal  ordPaidMoneyNegative = zeroDecimal.subtract(createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney())  ;
                             ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;

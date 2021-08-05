@@ -186,7 +186,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setClientIp(clientIp);
             bicTransaction.setDestroy(object.getDetail().getTrv().getDestroy());
 
-            if(object.getDetail().getTrv().getDestroy().equals(1) ==  true ){
+            if(object.getDetail().getTrv().getDestroy() ==1 ){
                 bicTransaction.setOrdPaidMoney(ordPaidMoney);
             }
 
