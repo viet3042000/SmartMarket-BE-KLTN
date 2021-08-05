@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     public User create(User object) {
         object.setEnabled(Constant.STATUS.ACTIVE);
         object.setPassword(object.getPassword());
-        object.setUsername(object.getUsername());
+        object.setUserName(object.getUserName());
 
         return userRepository.save(object);
     }
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
         if (userUpdate != null) {
             object.setEnabled(object.getEnabled());
             object.setPassword(object.getPassword());
-            object.setUsername(object.getUsername());
+            object.setUserName(object.getUserName());
         }
         userRepository.save(object);
         return userUpdate;
