@@ -16,31 +16,30 @@ import javax.validation.Valid;
 import java.text.ParseException;
 
 
-//@RefreshScope
 @RestController
-@RequestMapping("/insurance/travel-insurance-service/v1/")
+@RequestMapping("/order/order-service/v1/")
 public class OrderController {
 
     @Autowired
     TravelInsuranceService travelInsuranceService ;
 
 
-    @PostMapping(value = "/createorder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/createOrder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public String createOrder(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         return travelInsuranceService.createOrder(createTravelInsuranceBICRequestBaseDetail, request, responseSelvet);
     }
 
-    @PostMapping(value = "/updateorder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/updateOrder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public String updateOrder(@Valid @RequestBody BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         return travelInsuranceService.updateOrder(updateTravelInsuranceBICRequestBaseDetail,request,responseSelvet);
     }
 
-    @PostMapping(value = "/getorder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/getOrder", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public String getOrder(@Valid @RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         return travelInsuranceService.getOrder(queryTravelInsuranceBICRequest,request,responseSelvet);
     }
 
-    @PostMapping(value = "/getallorders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/getallOrders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) {
         return travelInsuranceService.getAllOrder(queryAllOrdersOfUserRequest,request,responseSelvet);
     }
