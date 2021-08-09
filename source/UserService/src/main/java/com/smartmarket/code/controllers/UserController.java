@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.UserRepository;
+import com.smartmarket.code.dao.UserRoleRepository;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.model.UserProfile;
@@ -48,7 +49,7 @@ import java.util.function.Function;
 
 //@RefreshScope
 @RestController
-@RequestMapping("/user-service/v1/")
+@RequestMapping("/user/user-service/v1/")
 public class UserController {
 
 
@@ -63,6 +64,9 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    UserRoleRepository userRoleRepository;
 
     @Autowired
     ConfigurableEnvironment environment;
@@ -374,6 +378,7 @@ public class UserController {
                     UserCreateResponse userCreateResponse  = new UserCreateResponse() ;
                     userCreateResponse.setId(user.getId());
                     Optional<UserProfile> userProfile = userProfileService.findByUsername(user.getUserName()) ;
+                    ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.getId()) ;
 
                     if(userProfile.isPresent()){
                         userCreateResponse.setFullName(userProfile.get().getFullName());
@@ -386,6 +391,8 @@ public class UserController {
                         userCreateResponse.setUserName(userProfile.get().getUserName());
                         userCreateResponse.setPassword(user.getPassword());
                         userCreateResponse.setEnabled(userProfile.get().getEnabled());
+
+                        userCreateResponse.setRoles(roles);
                     }
 
 
@@ -496,6 +503,11 @@ public class UserController {
                 userCreateResponse.setUserName(userProfile.get().getUserName());
                 userCreateResponse.setPassword(user.get().getPassword());
                 userCreateResponse.setEnabled(userProfile.get().getEnabled());
+
+                ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.get().getId()) ;
+
+                userCreateResponse.setRoles(roles);
+
             }
 
             //set response data to client

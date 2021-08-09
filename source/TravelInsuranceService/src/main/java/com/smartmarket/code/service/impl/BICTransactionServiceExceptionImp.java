@@ -44,6 +44,9 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
     BICTransactionService bicTransactionService;
 
     @Autowired
+    private BICTransactionRepository bicTransactionRepository;
+
+    @Autowired
     ClientService clientService ;
 
     @Override
@@ -63,7 +66,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
         String messasgeId = "no requestId" ;
         String orderReference =null ;
-        String orderId = null;
+        String orderId = "-1";
         String customerName = null;
         String phoneNumber =null;
         String email = null;
@@ -124,13 +127,22 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                         destroy =  createTravelInsuranceBICRequest.getTrv().getDestroy() ;
                         if(destroy == 1 ){
                             BigDecimal zeroDecimal = new BigDecimal("0");
-                            BigDecimal  ordPaidMoneyNegative = zeroDecimal.subtract(createTravelInsuranceBICRequest.getOrders().getOrdPaidMoney())  ;
-                            ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+                            if (createTravelInsuranceBICRequest.getOrders().getOrderId() !=  null ){
+                                Optional<BICTransaction> bicTransactionSuccessByOrderID = bicTransactionRepository.findBICTransactionSuccessByOrderID(createTravelInsuranceBICRequest.getOrders().getOrderId()) ;
+
+                                if(bicTransactionSuccessByOrderID.isPresent()){
+                                    BigDecimal bicTransactionSuccessByOrderIDPaidMoney = new BigDecimal(bicTransactionSuccessByOrderID.get().getOrdPaidMoney()) ;
+                                    BigDecimal ordPaidMoneyNegative = zeroDecimal.subtract(bicTransactionSuccessByOrderIDPaidMoney)  ;
+                                    ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+                                }
+
+                            }
+
                         }
                     }
 
                     orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrderReference();
-                    orderId = "-1";
+
                     customerName = (createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName() == null) ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName();
                     phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile();
                     email = createTravelInsuranceBICRequest.getOrders().getOrdBillEmail() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrdBillEmail();

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Transactional
@@ -18,6 +19,9 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
 	@Query(value = "from UserRole u where u.id =:id")
 	public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
+
+	@Query(value = "select u.roleId from UserRole u where u.userId =:userId")
+	public ArrayList<Long> findListRoleByUserId(@Param("userId") Long userId);
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "DELETE FROM user_role where user_id =:userId", nativeQuery = true)

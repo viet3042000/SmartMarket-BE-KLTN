@@ -43,8 +43,4 @@ public class OrderUpdate {
     private Long ordStatus;
 
 
-    @NotNull(message = "ordPaidMoney is require")
-    @Min(value = 0)
-    private BigDecimal ordPaidMoney ;
-
 }

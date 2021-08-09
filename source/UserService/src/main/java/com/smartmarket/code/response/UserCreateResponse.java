@@ -3,6 +3,8 @@ package com.smartmarket.code.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 
 @Getter
 @Setter
@@ -29,5 +31,9 @@ public class UserCreateResponse {
     private String fullName;
 
     private Long enabled;
+
+    private ArrayList<Long> roles ;
+
+
 
 }

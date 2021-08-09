@@ -158,11 +158,21 @@ public class BICTransactionServiceImp implements BICTransactionService {
         String clientId = JwtUtils.getClientId() ;
         Optional<Client> client = clientService.findByclientName(clientId);
 
+        BigDecimal  ordPaidMoneyNegative = null ;
+        String ordPaidMoney = null ;
+
         //check
         if (object != null && object.getDetail() != null) {
             BigDecimal zeroDecimal = new BigDecimal("0");
-            BigDecimal  ordPaidMoneyNegative = zeroDecimal.subtract(object.getDetail().getOrders().getOrdPaidMoney())  ;
-            String ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+            Optional<BICTransaction> bicTransactionSuccessByOrderID = bicTransactionRepository.findBICTransactionSuccessByOrderID(object.getDetail().getOrders().getOrderId()) ;
+
+            if(bicTransactionSuccessByOrderID.isPresent()){
+                BigDecimal bicTransactionSuccessByOrderIDPaidMoney = new BigDecimal(bicTransactionSuccessByOrderID.get().getOrdPaidMoney()) ;
+                ordPaidMoneyNegative = zeroDecimal.subtract(bicTransactionSuccessByOrderIDPaidMoney)  ;
+                ordPaidMoney =String.valueOf(ordPaidMoneyNegative) ;
+
+            }
+
 
             Long orderIdResponse = null;
             EJson jsonObjectData = jsonObjectReponseCreate.getJSONObject("data");
