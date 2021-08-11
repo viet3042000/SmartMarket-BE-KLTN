@@ -25,6 +25,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -77,6 +78,11 @@ public class ListenerServiceImp implements ListenerService {
         String aggregateType = "";
         String type = "";
         String payload = "";
+        String clientIp = "";
+        String clientId = "";
+        Long startTime = 0L;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
         TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
         Gson g = new Gson();
         try {
@@ -121,6 +127,15 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("payload")) {
                                         payload =(String) keyPairs.get(k);
                                     }
+                                    if (k.equals("client_ip")) {
+                                        clientIp =(String) keyPairs.get(k);
+                                    }
+                                    if (k.equals("client_id")) {
+                                        clientId =(String) keyPairs.get(k);
+                                    }
+                                    if (k.equals("start_time")) {
+                                        startTime = ((Number)keyPairs.get(k)).longValue();
+                                    }
                                 }
 
                                 if(type.equals("createTravelInsuranceBIC")){
@@ -132,11 +147,11 @@ public class ListenerServiceImp implements ListenerService {
                                     BaseDetail baseDetail = new BaseDetail();
                                     baseDetail.setDetail(createTravelInsuranceBICRequest);
                                     baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                                    baseDetail.setRequestId(jsonPayload.getString("requestTime"));
+                                    baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.create(baseDetail);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.create(baseDetail,clientIp,clientId, startTime);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
@@ -173,11 +188,11 @@ public class ListenerServiceImp implements ListenerService {
                                     BaseDetail baseDetail = new BaseDetail();
                                     baseDetail.setDetail(updateTravelInsuranceBICRequest);
                                     baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                                    baseDetail.setRequestId(jsonPayload.getString("requestTime"));
+                                    baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.update(baseDetail);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.update(baseDetail,clientIp,clientId,startTime);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
@@ -213,11 +228,11 @@ public class ListenerServiceImp implements ListenerService {
                                     BaseDetail baseDetail = new BaseDetail();
                                     baseDetail.setDetail(queryTravelInsuranceBICRequest);
                                     baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                                    baseDetail.setRequestId(jsonPayload.getString("requestTime"));
+                                    baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.get(baseDetail);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.get(baseDetail,clientIp,clientId,startTime);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);

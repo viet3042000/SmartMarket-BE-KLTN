@@ -80,7 +80,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setResultCode(resultCode);
             bicTransaction.setLogTimestamp(new Date());
             bicTransaction.setOrderId(orderIdResponse == null ? "-1" : String.valueOf(orderIdResponse));
-            bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
+//            bicTransaction.setOrderReference(object.getDetail().getOrders().getOrderReference());
             bicTransaction.setOrdPaidMoney(String.valueOf(object.getDetail().getOrders().getOrdPaidMoney()));
             bicTransaction.setPhoneNumber(object.getDetail().getOrders().getOrdBillMobile());
             bicTransaction.setRequestId(object.getRequestId());

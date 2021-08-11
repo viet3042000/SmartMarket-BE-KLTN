@@ -159,7 +159,7 @@ public class ListenerServiceImp implements ListenerService {
                                         sagaState.setType(type);
                                         sagaState.setStatus("SUCCEEDED");
                                     } else {
-                                        orders.setState("Aborted");
+                                        orders.setState("CreateAborted");
                                         Date date = new Date();
                                         String stringCreateFinish = formatter.format(date);
                                         Date createFinish = formatter.parse(stringCreateFinish);

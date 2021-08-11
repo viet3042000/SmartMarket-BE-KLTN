@@ -9,6 +9,7 @@ import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.request.entity.User;
 import com.smartmarket.code.request.entity.UserLoginBIC;
 import com.smartmarket.code.response.Response;
+//import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.util.APIUtils;

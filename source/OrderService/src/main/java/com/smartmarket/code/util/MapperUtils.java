@@ -49,7 +49,7 @@ public class MapperUtils {
         ArrayList<trvDetailBIC> trvDetailsBICs = new ArrayList<>();
 
         if (orders != null) {
-            ordersBIC.setOrderReference(orders.getOrderReference());
+//            ordersBIC.setOrderReference(orders.getOrderReference());
             ordersBIC.setOrderid(Long.parseLong(environment.getRequiredProperty("createTravelBIC.DSVN.order.orderId")));
             ordersBIC.setOrdcustid(Long.parseLong(environment.getRequiredProperty("createTravelBIC.DSVN.order.ordCustId")));
             ordersBIC.setOrdcustmessage(environment.getProperty("createTravelBIC.DSVN.order.ordCustMessage"));
@@ -183,7 +183,7 @@ public class MapperUtils {
         ArrayList<TRVDetail> trvDetails = new ArrayList<>();
 
         orders.setOrderId(String.valueOf(ordersBIC.getLong("Orderid")));
-        orders.setOrderReference(ordersBIC.getString("OrderReference") == null ? null : ordersBIC.getString("OrderReference").toString());
+//        orders.setOrderReference(ordersBIC.getString("OrderReference") == null ? null : ordersBIC.getString("OrderReference").toString());
 //                orders.setOrdCustId(ordersBIC.getLong("Ordcustid"));
 //                orders.setOrdCustMessage(ordersBIC.getString("Ordcustmessage") == null ? null : ordersBIC.getString("Ordcustmessage").toString());
         orders.setOrdBillFirstName(ordersBIC.getString("Ordbillfirstname") == null ? null : ordersBIC.getString("Ordbillfirstname").toString());

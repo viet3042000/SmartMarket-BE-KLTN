@@ -98,7 +98,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
                 //set properties detail
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
-                    orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
+//                    orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrderReference();
                     orderId = "-1";
                     customerName = createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillFirstName();
                     phoneNumber = createTravelInsuranceBICRequest.getOrders().getOrdBillMobile() == null ? "-1" : createTravelInsuranceBICRequest.getOrders().getOrdBillMobile();

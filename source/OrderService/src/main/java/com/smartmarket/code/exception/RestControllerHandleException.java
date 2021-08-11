@@ -11,8 +11,8 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
-import com.smartmarket.code.service.BICTransactionExceptionService;
-import com.smartmarket.code.service.BICTransactionService;
+//import com.smartmarket.code.service.BICTransactionExceptionService;
+//import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.EJson;
@@ -49,8 +49,8 @@ public class RestControllerHandleException {
     @Autowired
     LogServiceImpl logService;
 
-    @Autowired
-    BICTransactionService bicTransactionService;
+//    @Autowired
+//    BICTransactionService bicTransactionService;
 
     @Autowired
     HostConstants hostConstants;
@@ -58,8 +58,8 @@ public class RestControllerHandleException {
     @Autowired
     SetResponseUtils setResponseUtils;
 
-    @Autowired
-    BICTransactionExceptionService bicTransactionExceptionService;
+//    @Autowired
+//    BICTransactionExceptionService bicTransactionExceptionService;
 
     //Lỗi do nghiệp vụ. VD: sai tên trường.VD: OrderId--> Order
     //                      thiếu trường ID/refCode lúc get.
@@ -274,7 +274,7 @@ public class RestControllerHandleException {
         //add BICTransaction
         try {
             //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
+//            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
         } catch (CannotCreateTransactionException e) {
             //logException
             ServiceExceptionObject soaExceptionObject =
@@ -402,7 +402,7 @@ public class RestControllerHandleException {
             //add BICTransaction
             try {
                 //add BICTransaction
-                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
+//                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
             } catch (CannotCreateTransactionException e) {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -430,7 +430,7 @@ public class RestControllerHandleException {
             //add BICTransaction
             try {
                 //add BICTransaction
-                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
+//                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
             } catch (CannotCreateTransactionException e) {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
@@ -544,7 +544,7 @@ public class RestControllerHandleException {
         //add BICTransaction
         try {
             //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.GENERAL_ERROR, HttpStatus.BAD_REQUEST.toString());
+//            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.GENERAL_ERROR, HttpStatus.BAD_REQUEST.toString());
         } catch (CannotCreateTransactionException e) {
 
             //logException

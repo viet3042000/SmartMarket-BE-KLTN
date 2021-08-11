@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -30,6 +31,15 @@ public class OrderOutbox {
     @Column(name = "payload")
     private String payload;
 
+    @Column(name = "client_id")
+    private String clientId;
+
+    @Column(name = "client_ip")
+    private String clientIp;
+
     @Column(name = "order_id")
     private UUID orderId;
+
+    @Column(name = "start_time")
+    private Long startTime;
 }

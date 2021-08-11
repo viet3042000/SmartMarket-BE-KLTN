@@ -8,14 +8,17 @@ import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.exception.*;
+import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.OrderOutbox;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.TravelInsuranceService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
+import com.smartmarket.code.util.Utils;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -35,10 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.ConnectException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class TravelInsuranceServiceImpl implements TravelInsuranceService {
@@ -52,9 +53,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     SagaStateRepository sagaStateRepository;
 
-
+    @Transactional
     public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         OrdersServiceEntity orders = new OrdersServiceEntity();
         OrderOutbox outBox = new OrderOutbox();
@@ -66,19 +69,18 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String requestBody = gson.toJson(createTravelInsuranceBICRequestBaseDetail);
             JSONObject j = new JSONObject(requestBody);
 
-            j.getJSONObject("detail").getJSONObject("orders").remove("orderReference");
+//            j.getJSONObject("detail").getJSONObject("orders").remove("orderReference");
             UUID orderId = UUID.randomUUID();
             j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderId);
             String payload = j.toString();
-
-//            check orderReference to know order have been created hoặc để cho BIC tự check như hiện tại.
-//            (cần thêm 1 cột orderReference để lưu những order đã tạo)
-//            (order đã mới nếu trùng orderReference của order đã lưu và order đã lưu có trạng thái Aborted)
 
             orders.setOrderId(orderId);
             orders.setPayload(payload);
             orders.setType("createTravelInsuranceBIC");
             orders.setState("Pending");
+
+            //get client Id
+            String clientId = JwtUtils.getClientId() ;
 
             //get user token
             Map<String, Object> claims = null;
@@ -92,7 +94,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             }
             orders.setUserName(userName);
 
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             Date date = new Date();
             String stringCreateAt = formatter.format(date);
             Date createAt = formatter.parse(stringCreateAt);
@@ -112,6 +113,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setAggregateId(createTravelInsuranceBICRequestBaseDetail.getRequestId());
             outBox.setPayload(payload);
             outBox.setType("createTravelInsuranceBIC");
+            outBox.setClientIp(Utils.getClientIp(request));
+            outBox.setClientId(clientId);
+            outBox.setStartTime(startTime);
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -152,6 +156,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
     public String updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException {
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         OrderOutbox outBox = new OrderOutbox();
         Gson gson = new Gson();
         String userName = "";
@@ -159,6 +165,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         try {
             String payload = gson.toJson(updateTravelInsuranceBICRequest);
             String orderReferenceString = updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference();
+
+            //get client Id
+            String clientId = JwtUtils.getClientId() ;
 
             //get user token
             Map<String, Object> claims = null;
@@ -200,6 +209,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
             outBox.setPayload(payload);
             outBox.setType("updateTravelInsuranceBIC");
+            outBox.setClientIp(Utils.getClientIp(request));
+            outBox.setClientId(clientId);
+            outBox.setStartTime(startTime);
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -240,12 +252,17 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
     @Override
     public String getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+
         OrderOutbox outBox = new OrderOutbox();
         String userName = "";
         try {
             Gson gson = new Gson();
             String orderReferenceString = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
             String payload = gson.toJson(queryTravelInsuranceBICRequest);
+
+            //get client Id
+            String clientId = JwtUtils.getClientId() ;
 
             //get user token
             Map<String, Object> claims = null;
@@ -288,7 +305,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
             outBox.setPayload(payload);
             outBox.setType("getTravelInsuranceBIC");
+            outBox.setClientIp(Utils.getClientIp(request));
+            outBox.setClientId(clientId);
+            outBox.setStartTime(startTime);
             outboxRepository.save(outBox);
+
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
             if (ex instanceof ResourceAccessException) {

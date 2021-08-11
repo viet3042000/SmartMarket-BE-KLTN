@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 
 public interface TravelInsuranceService {
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,
@@ -28,14 +29,14 @@ public interface TravelInsuranceService {
             throws JsonProcessingException, APIAccessException;
 
 
-    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest)
+    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, String clientIp, String clientId, Long startTime)
             throws JsonProcessingException, APIAccessException, Exception;
 
 
-    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest)
+    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,String clientIp,String clientId,Long startTime)
             throws JsonProcessingException, APIAccessException;
 
-    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest)
+    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,String clientIp,String clientId,Long startTime)
             throws JsonProcessingException, APIAccessException;
 
 }
