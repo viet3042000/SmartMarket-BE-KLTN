@@ -111,6 +111,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             responseCreate = gson.toJson(createTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
+
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(System.currentTimeMillis());
+
             //logRequest vs BIC
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"BICtravelinsurance","createTravelBIC","request",
                     transactionDetail, logTimestamp, messageTimestamp, null);
@@ -319,6 +322,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, queryTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(System.currentTimeMillis());
+
             //logRequest vs BIC
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","getTravelBIC","request",
                     transactionDetail, logTimestamp, messageTimestamp, null);
@@ -489,6 +494,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             responseCreate = gson.toJson(updateTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
+            String timeDuration = DateTimeUtils.getElapsedTimeStr(System.currentTimeMillis());
             //logRequest vs BIC
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "BICtravelinsurance","updateTravelBIC","request",
                     transactionDetail, logtimeStamp, messageTimestamp, null);
@@ -655,7 +661,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
 
     @Override
-    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, String clientIp, String clientId,Long startTime) throws JsonProcessingException, APIAccessException, Exception {
+    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, String clientIp, String clientId,
+                                    Long startTime,String hostName) throws JsonProcessingException, APIAccessException, Exception {
 
         //SET TIMEOUT
         //set Time out get create api BIC
@@ -672,6 +679,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         String messageTimestamp = logTimestamp;
 
         String typeTransaction = Constant.TYPE_CREATE;
+
+//        String requestURL = request.getRequestURL().toString();
+//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         try {
             //check validate json request
@@ -742,8 +752,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         //logResponse vs Client
                         ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), "BIC", "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                                "response", transactionDetailResponse, "responseStatus", response.getResultCode(),
-                                response.getResultMessage(), logTimestamp, "request.getRemoteHost()", clientIp, "operationName");
+                                "response", transactionDetailResponse, jsonResultCreateBIC.getStatusCode().toString(), response.getResultCode(),
+                                response.getResultMessage(), logTimestamp, hostName, clientIp, "createTravelInsuranceAsync");
                         logService.createSOALog2(soaObject);
 
                     } else {
@@ -770,8 +780,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         //logResponseError vs Client
                         ServiceObject soaObject = new ServiceObject("serviceLog", createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                                "response", transactionDetailResponse, "responseStatus", responseError.getResultCode(),
-                                responseError.getResultMessage(), logTimestamp, "request.getRemoteHost()", clientIp,"operationName");
+                                "response", transactionDetailResponse, jsonResultCreateBIC.getStatusCode().toString(), responseError.getResultCode(),
+                                responseError.getResultMessage(), logTimestamp, hostName, clientIp,"createTravelInsuranceAsync");
                         logService.createSOALog2(soaObject);
 
                         return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -844,7 +854,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
 
     @Override
-    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, String clientIp,String clientId,Long startTime) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, String clientIp,String clientId,
+                                    Long startTime,String hostName) throws JsonProcessingException, APIAccessException {
 
         //SET TIMEOUT
         //set Time out get create api BIC
@@ -857,6 +868,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
         BaseResponse response = new BaseResponse();
         ObjectMapper mapper = new ObjectMapper();
+
+//        String requestURL = request.getRequestURL().toString();
+//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         String typeTransaction = Constant.TYPE_UPDATE;
 
@@ -893,6 +907,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             //post Data to BIC
             ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+//            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,"https://app.bic.vn/EbizApiTest/api/v1/TRV/Upda", null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
 
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -935,8 +950,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         //logResponse vs Client
                         ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                                "response", transactionDetailResponse, "responseStatus", response.getResultCode(),
-                                response.getResultMessage(), logtimeStamp, "request.getRemoteHost()", clientIp,"operationName");
+                                "response", transactionDetailResponse, jsonResultPutBIC.getStatusCode().toString(), response.getResultCode(),
+                                response.getResultMessage(), logtimeStamp, hostName, clientIp,"updateTravelInsuranceAsync");
                         logService.createSOALog2(soaObject);
 
                     } else {
@@ -963,8 +978,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                         //logResponseError vs Client
                         ServiceObject soaObject = new ServiceObject("serviceLog", updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                                "response", transactionDetailResponse, "responseStatus", responseError.getResultCode(),
-                                responseError.getResultMessage(), logtimeStamp, "request.getRemoteHost()", clientIp,"operationName");
+                                "response", transactionDetailResponse, jsonResultPutBIC.getStatusCode().toString(), responseError.getResultCode(),
+                                responseError.getResultMessage(), logtimeStamp, hostName, clientIp,"updateTravelInsuranceAsync");
                         logService.createSOALog2(soaObject);
 
                         return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -1034,7 +1049,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     }
 
 
-    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String clientIp, String clientId,Long startTime)
+    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String clientIp, String clientId,
+                                 Long startTime,String hostName)
             throws JsonProcessingException, APIAccessException{
 
         //SET TIMEOUT
@@ -1047,6 +1063,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
         ObjectMapper mapper = new ObjectMapper();
         BaseResponse response = new BaseResponse();
+
+//        String requestURL = request.getRequestURL().toString();
+//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         //check validate json request
 
@@ -1134,12 +1153,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
                         //calculate time duration
                         String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-
                         //logResponse vs Client
                         ServiceObject soaObject = new ServiceObject("serviceLog", queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), null, "smartMarket", "client",
                                 messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                                "response", transactionDetailResponse, "responseStatus", response.getResultCode(),
-                                response.getResultMessage(), logTimestamp, "request.getRemoteHost()", clientIp,"operationName");
+                                "response", transactionDetailResponse, resultBIC.getStatusCode().toString(), response.getResultCode(),
+                                response.getResultMessage(), logTimestamp, hostName, clientIp,"getTravelInsuranceAsync");
                         logService.createSOALog2(soaObject);
                     }
                 } else {

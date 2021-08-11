@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.model.TravelinsuranceOutbox;
-import com.smartmarket.code.model.entitylog.KafkaExceptionObject;
+import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
@@ -81,6 +81,7 @@ public class ListenerServiceImp implements ListenerService {
         String clientIp = "";
         String clientId = "";
         Long startTime = 0L;
+        String hostName="";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
         TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
@@ -136,6 +137,9 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("start_time")) {
                                         startTime = ((Number)keyPairs.get(k)).longValue();
                                     }
+                                    if (k.equals("host_name")) {
+                                        hostName = (String) keyPairs.get(k);
+                                    }
                                 }
 
                                 if(type.equals("createTravelInsuranceBIC")){
@@ -151,7 +155,7 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.create(baseDetail,clientIp,clientId, startTime);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.create(baseDetail,clientIp,clientId, startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
@@ -192,7 +196,7 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.update(baseDetail,clientIp,clientId,startTime);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.update(baseDetail,clientIp,clientId,startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
@@ -232,7 +236,7 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.get(baseDetail,clientIp,clientId,startTime);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.get(baseDetail,clientIp,clientId,startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
@@ -284,7 +288,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("orderservicedb.public.order_outbox",
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject("orderservicedb.public.order_outbox",
                     "outbox", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -292,7 +296,7 @@ public class ListenerServiceImp implements ListenerService {
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("orderservicedb.public.order_outbox",
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject("orderservicedb.public.order_outbox",
                     "outbox", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -300,7 +304,7 @@ public class ListenerServiceImp implements ListenerService {
         }catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("orderservicedb.public.order_outbox",
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject("orderservicedb.public.order_outbox",
                     "outbox", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);

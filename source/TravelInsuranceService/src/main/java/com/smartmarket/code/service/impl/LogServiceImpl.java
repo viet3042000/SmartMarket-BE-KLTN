@@ -1,7 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.entitylog.KafkaExceptionObject;
+import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
@@ -30,7 +30,7 @@ public class LogServiceImpl  {
         logger.info(serviceExceptionObject.getStringObject()) ;
     }
 
-    public void createKafkaLogException(KafkaExceptionObject kafkaExceptionObject) throws CustomException {
+    public void createKafkaLogException(ListenerExceptionObject kafkaExceptionObject) throws CustomException {
         logger.info(kafkaExceptionObject.getStringObject()) ;
     }
 

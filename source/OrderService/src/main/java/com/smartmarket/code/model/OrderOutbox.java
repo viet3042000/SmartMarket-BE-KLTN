@@ -42,4 +42,7 @@ public class OrderOutbox {
 
     @Column(name = "start_time")
     private Long startTime;
+
+    @Column(name = "host_name")
+    private String hostName;
 }

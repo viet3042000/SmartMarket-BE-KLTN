@@ -12,16 +12,21 @@ import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.OrderOutbox;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
+import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.*;
+import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
+import com.smartmarket.code.request.entityBIC.UpdateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.TravelInsuranceService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
+import com.smartmarket.code.util.MapperUtils;
 import com.smartmarket.code.util.Utils;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,6 +58,15 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     SagaStateRepository sagaStateRepository;
 
+    @Autowired
+    ConfigurableEnvironment environment;
+
+    @Autowired
+    MapperUtils mapperUtils;
+
+    @Autowired
+    LogServiceImpl logService;
+
     @Transactional
     public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
@@ -64,8 +78,25 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         SagaState sagaState = new SagaState();
         String userName = "";
 
+        String hostName = request.getRemoteHost();
+
+        //get time log
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+
         try {
+            //Create BIC
+            CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequestBaseDetail.getDetail());
+            String responseCreate = null;
             Gson gson = new Gson();
+            responseCreate = gson.toJson(createTravelInsuranceToBIC);
+            JSONObject transactionDetail = new JSONObject(responseCreate);
+
+            //logRequest vs TravelInsuranceService
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequestBaseDetail.getRequestId(), createTravelInsuranceBICRequestBaseDetail.getRequestTime(),"TravelInsuranceService","createOrder","request",
+                    transactionDetail, logTimestamp, messageTimestamp, null);
+            logService.createTargetLog(tarObjectRequest);
+
             String requestBody = gson.toJson(createTravelInsuranceBICRequestBaseDetail);
             JSONObject j = new JSONObject(requestBody);
 
@@ -116,6 +147,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setClientIp(Utils.getClientIp(request));
             outBox.setClientId(clientId);
             outBox.setStartTime(startTime);
+            outBox.setHostName(hostName);
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -162,7 +194,24 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         Gson gson = new Gson();
         String userName = "";
 
+        String hostName = request.getRemoteHost();
+
         try {
+            //get log time
+            String logtimeStamp = DateTimeUtils.getCurrentDate();
+            String messageTimestamp = logtimeStamp;
+
+            //Update BIC
+            UpdateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
+            String responseCreate = null;
+            responseCreate = gson.toJson(updateTravelInsuranceToBIC);
+            JSONObject transactionDetail = new JSONObject(responseCreate);
+
+            //logRequest vs TravelInsuranceService
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, updateTravelInsuranceBICRequest.getRequestId(), updateTravelInsuranceBICRequest.getRequestTime(), "TravelInsuranceService","updateOrder","request",
+                    transactionDetail, logtimeStamp, messageTimestamp, null);
+            logService.createTargetLog(tarObjectRequest);
+
             String payload = gson.toJson(updateTravelInsuranceBICRequest);
             String orderReferenceString = updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference();
 
@@ -212,6 +261,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setClientIp(Utils.getClientIp(request));
             outBox.setClientId(clientId);
             outBox.setStartTime(startTime);
+            outBox.setHostName(hostName);
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -256,7 +306,26 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
         OrderOutbox outBox = new OrderOutbox();
         String userName = "";
+
+        String hostName = request.getRemoteHost();
+
         try {
+            //get time log
+            String logTimestamp = DateTimeUtils.getCurrentDate();
+            String messageTimestamp = logTimestamp;
+            //properties log
+            String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
+            String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+            String responseStatus = Integer.toString(responseSelvet.getStatus());
+            org.json.JSONObject transactionDetail = new org.json.JSONObject();
+            transactionDetail.put("orderId", orderID);
+            transactionDetail.put("orderRef", orderReference);
+
+            //logRequest vs TravelInsuranceService
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "TravelInsuranceService","getOrder","request",
+                    transactionDetail, logTimestamp, messageTimestamp, null);
+            logService.createTargetLog(tarObjectRequest);
+
             Gson gson = new Gson();
             String orderReferenceString = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
             String payload = gson.toJson(queryTravelInsuranceBICRequest);
@@ -308,6 +377,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             outBox.setClientIp(Utils.getClientIp(request));
             outBox.setClientId(clientId);
             outBox.setStartTime(startTime);
+            outBox.setHostName(hostName);
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {

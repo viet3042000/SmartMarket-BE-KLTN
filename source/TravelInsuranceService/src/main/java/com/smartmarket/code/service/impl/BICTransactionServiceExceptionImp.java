@@ -333,7 +333,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         JSONObject detail = new JSONObject(responseCreate);
 
         messasgeId = requestUpdateTravelInsuranceBICRequest.getRequestId() == null ? "no requestId" : requestUpdateTravelInsuranceBICRequest.getRequestId();
-        type = Constant.TYPE_CREATE ;
+        type = Constant.TYPE_UPDATE ;
 
         //convert jsonobject to CreateTravelInsuranceBICRequest
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = null ;
