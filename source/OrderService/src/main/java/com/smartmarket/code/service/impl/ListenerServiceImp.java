@@ -63,6 +63,9 @@ public class ListenerServiceImp implements ListenerService {
     @Value("${kafka.topic.consumers}")
     String topicConsumers;
 
+    @Value("${kafka.topic.travelinsuranceoutbox}")
+    String topicTravelInsuranceOutbox;
+
     int countReadOutBox =0;
     int countReadUser = 0;
     int countReadClient =0;
@@ -274,7 +277,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("travelinsurance.public.outbox",
+            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -282,14 +285,14 @@ public class ListenerServiceImp implements ListenerService {
         } catch (KafkaException ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("travelinsurance.public.outbox",
+            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject("travelinsurance.public.outbox",
+            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
