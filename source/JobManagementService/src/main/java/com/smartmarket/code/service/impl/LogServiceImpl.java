@@ -1,10 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
-import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
-import com.smartmarket.code.model.entitylog.ServiceObject;
-import com.smartmarket.code.model.entitylog.TargetObject;
+import com.smartmarket.code.model.entitylog.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,8 +27,12 @@ public class LogServiceImpl  {
         logger.info(serviceExceptionObject.getStringObject()) ;
     }
 
-    public void createKafkaLogException(ListenerExceptionObject kafkaExceptionObject) throws CustomException {
-        logger.info(kafkaExceptionObject.getStringObject()) ;
+    public void createListenerLogExceptionException(ListenerExceptionObject listenerExceptionObject) throws CustomException {
+        logger.info(listenerExceptionObject.getStringObject()) ;
+    }
+
+    public void createJobManagementLogExceptionException(JobManagementExceptionObject jobManagementExceptionObject) throws CustomException {
+        logger.info(jobManagementExceptionObject.getStringObject()) ;
     }
 
     public String getIp() {

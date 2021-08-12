@@ -2,6 +2,7 @@ package com.smartmarket.code.service;
 
 
 import com.smartmarket.code.model.BICTransaction;
+import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
@@ -28,12 +29,26 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy) ;
 
+    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId,
+                                                                      String customerName, String phoneNumber, String email,
+                                                                      String ordPaidMoney, String consumerId, String fromDate,
+                                                                      String toDate, Date logTimestamp, String resultCode,
+                                                                      String bicResultCode, String ordDate, String productId,
+                                                                      String customerAddress , String clientIp, String type, Long destroy) ;
+
     public BICTransaction createBICTransactionParameterOutbox(String requestId, String orderReference, String orderId,
                                                         String customerName, String phoneNumber, String email,
                                                         String ordPaidMoney, String consumerId, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy,String clientId) ;
+
+    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId, String orderReference, String orderId,
+                                                              String customerName, String phoneNumber, String email,
+                                                              String ordPaidMoney, String consumerId, String fromDate,
+                                                              String toDate, Date logTimestamp, String resultCode,
+                                                              String bicResultCode, String ordDate, String productId,
+                                                              String customerAddress , String clientIp,String type,Long destroy,String clientId) ;
 
     public BICTransaction createBICTransactionFromUpdateTravel(BaseDetail<UpdateTravelInsuranceBICRequest> object,
                                                                        EJson jsonObjectReponseCreate,

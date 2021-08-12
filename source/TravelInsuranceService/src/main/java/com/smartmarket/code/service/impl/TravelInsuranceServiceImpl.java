@@ -233,6 +233,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                     if (resourceAccessException.getCause() instanceof ConnectException) {
                         bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
+                        bicTransactionExceptionService.createPendingBICTransactionFromRequest(request, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
                         throw new APIAccessException(createTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                     } else {
                         bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
@@ -618,6 +619,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                     if (resourceAccessException.getCause() instanceof ConnectException) {
                         bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
+                        bicTransactionExceptionService.createPendingBICTransactionFromRequest(request, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
                         throw new APIAccessException(updateTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                     } else {
                         bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString());
@@ -813,6 +815,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                     if (resourceAccessException.getCause() instanceof ConnectException) {
                         bicTransactionExceptionService.createBICTransactionFromRequestCreate(createTravelInsuranceBICRequest, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString(),clientId);
+                        bicTransactionExceptionService.createPendingBICTransactionFromRequestCreate(createTravelInsuranceBICRequest, ResponseCode.CODE.SOA_TIMEOUT_BACKEND, HttpStatus.REQUEST_TIMEOUT.toString(),clientId);
                         throw new APIAccessException(createTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                     } else {
                         bicTransactionExceptionService.createBICTransactionFromRequestCreate(createTravelInsuranceBICRequest, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ex.getMessage(),clientId);
@@ -1007,6 +1010,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                     ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                     if (resourceAccessException.getCause() instanceof ConnectException) {
                         bicTransactionExceptionService.createBICTransactionFromRequestUpdate(updateTravelInsuranceBICRequest, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ex.getMessage(),clientId);
+                        bicTransactionExceptionService.createPendingBICTransactionFromRequestUpdate(updateTravelInsuranceBICRequest, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ex.getMessage(),clientId);
                         throw new APIAccessException(updateTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                     } else {
                         bicTransactionExceptionService.createBICTransactionFromRequestUpdate(updateTravelInsuranceBICRequest, ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ex.getMessage(),clientId);

@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
-import com.smartmarket.code.model.TravelinsuranceOutbox;
+import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
 import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.ListenerService;
 import com.smartmarket.code.util.GetKeyPairUtil;
@@ -47,9 +45,6 @@ public class ListenerServiceImp implements ListenerService {
     TravelInsuranceServiceImpl travelInsuranceService;
 
     @Autowired
-    OutboxRepository outboxRepository;
-
-    @Autowired
     PendingBICTransactionRepository pendingBICTransactionRepository;
 
     @Value("${kafka.topic.travelinsurance.pendingBictransaction}")
@@ -71,7 +66,7 @@ public class ListenerServiceImp implements ListenerService {
         String hostName="";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
+        PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
         Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -127,7 +122,7 @@ public class ListenerServiceImp implements ListenerService {
                                     }
                                 }
 
-                                if(type.equals("createTravelInsuranceBIC")){
+                                if(type.equals("CREATE")){
                                     //convert payload--> BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest
                                     JSONObject jsonPayload = new JSONObject(payload);
                                     JSONObject detail = jsonPayload.getJSONObject("detail");
@@ -146,28 +141,20 @@ public class ListenerServiceImp implements ListenerService {
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
-                                    //insert to outbox
+                                    //insert to pendingBICTransaction
                                     if(statusCodeValue == 200){
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
-                                    }else {
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
+//                                        outBox.setId(id);
+//                                        outBox.setOrderId(orderId);
+//                                        outBox.setAggregateId(aggregateId);
+//                                        outBox.setAggregateType("OrderService");
+//                                        outBox.setType(type);
+//                                        outBox.setStatus("success");
+//                                        outBox.setPayload(responseBody);
                                     }
-                                    outboxRepository.save(outBox);
+                                    pendingBICTransactionRepository.save(pendingBICTransaction);
                                 }
 
-                                if(type.equals("updateTravelInsuranceBIC")){
+                                if(type.equals("UPDATE")){
                                     //convert payload--> BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest
                                     JSONObject jsonPayload = new JSONObject(payload);
                                     JSONObject detail = jsonPayload.getJSONObject("detail");
@@ -188,70 +175,21 @@ public class ListenerServiceImp implements ListenerService {
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                     //insert to outbox
-                                    if(statusCodeValue == 200){
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
-                                    }else {
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
+                                    if(statusCodeValue == 200) {
+//                                        outBox.setId(id);
+//                                        outBox.setOrderId(orderId);
+//                                        outBox.setAggregateId(aggregateId);
+//                                        outBox.setAggregateType("OrderService");
+//                                        outBox.setType(type);
+//                                        outBox.setStatus("success");
+//                                        outBox.setPayload(responseBody);
                                     }
-                                    outboxRepository.save(outBox);
-                                }
-
-                                if(type.equals("getTravelInsuranceBIC")){
-                                    JSONObject jsonPayload = new JSONObject(payload);
-                                    JSONObject detail = jsonPayload.getJSONObject("detail");
-
-                                    String d = detail.toString();
-                                    QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
-                                    BaseDetail baseDetail = new BaseDetail();
-                                    baseDetail.setDetail(queryTravelInsuranceBICRequest);
-                                    baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                                    baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
-                                    baseDetail.setTargetId(jsonPayload.getString("targetId"));
-
-                                    // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.get(baseDetail,clientIp,clientId,startTime,hostName);
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    String responseBody = mapper.writeValueAsString(responseEntity);
-                                    JSONObject jsonBody = new JSONObject(responseBody);
-                                    int statusCodeValue = jsonBody.getInt("statusCodeValue");
-
-                                    //insert to outbox
-                                    if(statusCodeValue == 200){
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
-                                    }else {
-                                        outBox.setId(id);
-                                        outBox.setOrderId(orderId);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
-                                        outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
-                                    }
-                                    outboxRepository.save(outBox);
+                                    pendingBICTransactionRepository.save(pendingBICTransaction);
                                 }
 
                             }
                             if (op.equals("r")) {
 //                                countReadOutBox ++;
-
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -273,36 +211,36 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
                     "outbox", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(listenerExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
                     "outbox", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(listenerExceptionObject);
 
         }catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelinsurancePendingBictransaction,
                     "outbox", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(listenerExceptionObject);
 
 //            insert into travelinsurance_outbox table
-            outBox.setId(id);
-            outBox.setOrderId(orderId);
-            outBox.setAggregateId(aggregateId);
-            outBox.setAggregateType("TravelInsuranceService");
-            outBox.setType(type);
-            outBox.setStatus("failure");
-            outBox.setPayload("Exception in JobManagementService");
-            outboxRepository.save(outBox);
+//            outBox.setId(id);
+//            outBox.setOrderId(orderId);
+//            outBox.setAggregateId(aggregateId);
+//            outBox.setAggregateType("TravelInsuranceService");
+//            outBox.setType(type);
+//            outBox.setStatus("failure");
+//            outBox.setPayload("Exception in JobManagementService");
+//            outboxRepository.save(outBox);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we leave.

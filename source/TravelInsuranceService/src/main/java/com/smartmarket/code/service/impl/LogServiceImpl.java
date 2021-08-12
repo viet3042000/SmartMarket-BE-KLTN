@@ -30,8 +30,8 @@ public class LogServiceImpl  {
         logger.info(serviceExceptionObject.getStringObject()) ;
     }
 
-    public void createKafkaLogException(ListenerExceptionObject kafkaExceptionObject) throws CustomException {
-        logger.info(kafkaExceptionObject.getStringObject()) ;
+    public void createListenerLogExceptionException(ListenerExceptionObject listenerExceptionObject) throws CustomException {
+        logger.info(listenerExceptionObject.getStringObject()) ;
     }
 
     public String getIp() {
