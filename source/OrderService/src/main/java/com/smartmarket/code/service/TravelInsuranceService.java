@@ -25,7 +25,7 @@ public interface TravelInsuranceService {
 
     public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
                                                      HttpServletRequest request,
-                                                     HttpServletResponse responseSelvet);
+                                                     HttpServletResponse responseSelvet) throws JsonProcessingException;
 }
 
 

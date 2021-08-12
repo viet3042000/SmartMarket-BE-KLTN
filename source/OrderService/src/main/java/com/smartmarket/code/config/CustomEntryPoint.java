@@ -14,6 +14,7 @@ import com.smartmarket.code.util.SetResponseUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
@@ -38,6 +39,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
     @Autowired
     SetResponseUtils setResponseUtils ;
 
+    @Autowired
+    ConfigurableEnvironment environment;
+
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                          AuthenticationException e) throws IOException, ServletException {
@@ -57,6 +61,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
         httpServletRequest = new RequestWrapper(httpServletRequest);
         String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
+
+//        String requestURL = httpServletRequest.getRequestURL().toString();
+//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         try {
             ResponseError responseError = new ResponseError();
@@ -78,7 +85,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                 //logException
                 ServiceExceptionObject soaExceptionObject =
                         new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",requestId,requestTime,null,
-                                messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                                messageTimestamp, "orderservice", httpServletRequest.getRequestURI(),"1",
                                 httpServletRequest.getRemoteHost(), responseError.getResultMessage(),responseError.getResultCode(),
                                 responseError.getDetailErrorMessage(),Utils.getClientIp(httpServletRequest));
                 logService.createSOALogException(soaExceptionObject);
@@ -88,9 +95,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
                 //logResponse vs Client
                 ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "smartMarket", "client",
-                        messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                        messageTimestamp, "orderservice ", "1", timeDuration,
                         "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
-                        responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest));
+                        responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),"operationName");
                 logService.createSOALog2(soaObject);
 
                 response.getOutputStream()
@@ -129,7 +136,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             //logException
             ServiceExceptionObject soaExceptionObject =
                     new ServiceExceptionObject(Constant.EXCEPTION_LOG,"response",null,null,null,
-                            messageTimestamp, "travelinsuranceservice", httpServletRequest.getRequestURI(),"1",
+                            messageTimestamp, "orderservice", httpServletRequest.getRequestURI(),"1",
                             httpServletRequest.getRemoteHost(), res.getResultMessage(),res.getResultCode(),
                             Throwables.getStackTraceAsString(ex),Utils.getClientIp(httpServletRequest));
             logService.createSOALogException(soaExceptionObject);
@@ -139,9 +146,9 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
 
             //logResponse vs Client
             ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice ", "1", timeDuration,
+                    messageTimestamp, "orderservice ", "1", timeDuration,
                     "response", transactionDetailResponse, responseStatus, res.getResultCode(),
-                    res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest));
+                    res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),"operationName");
             logService.createSOALog2(soaObject);
         }
     }

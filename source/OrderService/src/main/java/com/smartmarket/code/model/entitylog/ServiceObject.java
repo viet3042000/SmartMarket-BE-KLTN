@@ -16,6 +16,7 @@ public class ServiceObject {
     String serviceName;
     String serviceVersion;
     String timeDuration;
+    String operationName ;
     String logType;
     JSONObject transactionDetail;
     String responseStatus;//httpcode
@@ -26,9 +27,9 @@ public class ServiceObject {
     String clientIp;
 
     public ServiceObject(String logName, String requestId, String requestTime, String transactionId,
-            String sourceId, String targetId,String messageTimestamp,String serviceName, String serviceVersion,
-            String timeDuration,String logType, JSONObject transactionDetail, String responseStatus,
-            String errorCode,String errorMsg,String logTimestamp, String hostName,String clientIp){
+                         String sourceId, String targetId,String messageTimestamp,String serviceName, String serviceVersion,
+                         String timeDuration,String logType, JSONObject transactionDetail, String responseStatus,
+                         String errorCode,String errorMsg,String logTimestamp, String hostName,String clientIp,String operationName){
 
         this.logName= logName;
         this.requestId= requestId;
@@ -48,6 +49,7 @@ public class ServiceObject {
         this.logTimestamp= logTimestamp;
         this.hostName= hostName;
         this.clientIp= clientIp;
+        this.operationName = operationName ;
     }
 
 
@@ -71,6 +73,7 @@ public class ServiceObject {
         json.put("logTimestamp", logTimestamp);
         json.put("hostName", hostName);
         json.put("clientIp", clientIp);
+        json.put("operationName", operationName);
 
         return json.toString();
     }

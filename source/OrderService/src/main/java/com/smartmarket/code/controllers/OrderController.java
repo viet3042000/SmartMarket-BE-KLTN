@@ -40,7 +40,7 @@ public class OrderController {
     }
 
     @PostMapping(value = "/get-all-orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) {
+    public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         return travelInsuranceService.getAllOrder(queryAllOrdersOfUserRequest,request,responseSelvet);
     }
 

@@ -1,6 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
@@ -12,6 +13,7 @@ import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.OrderOutbox;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
+import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
@@ -417,10 +419,13 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
 
     @Override
-    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet){
+    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         String userName = "";
         int totalPage = 0 ;
         BaseResponse response = new BaseResponse();
+        ObjectMapper mapper = new ObjectMapper();
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        String hostName = request.getRemoteHost();
         try {
             int page =  queryAllOrdersOfUserRequest.getDetail().getPage()  ;
             int size =  queryAllOrdersOfUserRequest.getDetail().getSize()   ;
@@ -452,12 +457,50 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 response.setResponseTime(DateTimeUtils.getCurrentDate());
                 response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
                 response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+                String responseBody = mapper.writeValueAsString(response);
+                JSONObject transactionDetailResponse = new JSONObject(responseBody);
+                //get time log
+                String logTimestamp = DateTimeUtils.getCurrentDate();
+                String messageTimestamp = logTimestamp;
+
+                //calculate time duration
+                String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+
+                int status = responseSelvet.getStatus();
+                String responseStatus = Integer.toString(status);
+
+                ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                        "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                        response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+                logService.createSOALog2(soaObject);
+
             }else{
 //                return "User has no orders";
                 //set response data to client
                 response.setResponseTime(DateTimeUtils.getCurrentDate());
                 response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
                 response.setResultMessage("User has no orders");
+
+                String responseBody = mapper.writeValueAsString(response);
+                JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+                //get time log
+                String logTimestamp = DateTimeUtils.getCurrentDate();
+                String messageTimestamp = logTimestamp;
+
+                int status = responseSelvet.getStatus();
+                String responseStatus = Integer.toString(status);
+
+                //calculate time duration
+                String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+
+                ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
+                        messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                        "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                        response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+                logService.createSOALog2(soaObject);
             }
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
