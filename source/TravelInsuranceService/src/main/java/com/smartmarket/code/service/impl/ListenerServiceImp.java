@@ -68,8 +68,8 @@ public class ListenerServiceImp implements ListenerService {
 
 
     //outbox table only insert --> only crete/read
-//    @KafkaListener(id = "${kafka.groupID.outbox}",topics = "${kafka.topic.outbox}")
-    @KafkaListener(id = "kafka.groupID.outbox",topics = "orderservicedb.public.order_outbox")
+//    @KafkaListener(id = "kafka.groupID.outbox",topics = "orderservicedb.public.order_outbox")
+    @KafkaListener(id = "${kafka.groupID.orderoutbox}",topics = "${kafka.topic.orderoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
         UUID orderId = UUID.randomUUID();

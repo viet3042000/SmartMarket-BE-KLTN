@@ -62,8 +62,8 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
         httpServletRequest = new RequestWrapper(httpServletRequest);
         String jsonString = IOUtils.readInputStreamToString(httpServletRequest.getInputStream());
 
-//        String requestURL = httpServletRequest.getRequestURL().toString();
-//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+        String requestURL = httpServletRequest.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf("v1" + "/") + 3, requestURL.length());
 
         try {
             ResponseError responseError = new ResponseError();
@@ -97,7 +97,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                 ServiceObject soaObject = new ServiceObject("serviceLog",requestId, requestTime, null, "smartMarket", "client",
                         messageTimestamp, "orderservice ", "1", timeDuration,
                         "response", transactionDetailResponse, responseStatus, responseError.getResultCode(),
-                        responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),"operationName");
+                        responseError.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),operationName);
                 logService.createSOALog2(soaObject);
 
                 response.getOutputStream()
@@ -148,7 +148,7 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
             ServiceObject soaObject = new ServiceObject("serviceLog",null, null, null, "smartMarket", "client",
                     messageTimestamp, "orderservice ", "1", timeDuration,
                     "response", transactionDetailResponse, responseStatus, res.getResultCode(),
-                    res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),"operationName");
+                    res.getResultMessage(), logTimestamp, httpServletRequest.getRemoteHost(),Utils.getClientIp(httpServletRequest),operationName);
             logService.createSOALog2(soaObject);
         }
     }

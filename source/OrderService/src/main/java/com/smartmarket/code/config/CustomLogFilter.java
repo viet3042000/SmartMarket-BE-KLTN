@@ -61,8 +61,9 @@ public class CustomLogFilter extends OncePerRequestFilter {
         request = new RequestWrapper(request);
         String jsonString = IOUtils.readInputStreamToString(request.getInputStream());
 
-//        String requestURL = request.getRequestURL().toString();
+        String requestURL = request.getRequestURL().toString();
 //        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+        String operationName = requestURL.substring(requestURL.indexOf("v1" + "/") + 3, requestURL.length());
 
         try {
             if (request.getMethod().equals("POST")) {

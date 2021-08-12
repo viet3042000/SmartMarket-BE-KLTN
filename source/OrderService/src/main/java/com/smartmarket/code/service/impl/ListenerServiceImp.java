@@ -82,7 +82,8 @@ public class ListenerServiceImp implements ListenerService {
 //    }
 
 
-    @KafkaListener(id = "kafka.groupID.travelinsurance.outbox", topics = "travelinsurance.public.travelinsurance_outbox")
+//    @KafkaListener(id = "kafka.groupID.travelinsurance.outbox", topics = "travelinsurance.public.travelinsurance_outbox")
+    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
         UUID orderId = UUID.randomUUID();

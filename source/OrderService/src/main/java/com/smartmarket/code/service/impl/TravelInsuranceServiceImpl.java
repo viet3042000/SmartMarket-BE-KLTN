@@ -318,7 +318,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //properties log
             String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
             String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
-            String responseStatus = Integer.toString(responseSelvet.getStatus());
             org.json.JSONObject transactionDetail = new org.json.JSONObject();
             transactionDetail.put("orderId", orderID);
             transactionDetail.put("orderRef", orderReference);

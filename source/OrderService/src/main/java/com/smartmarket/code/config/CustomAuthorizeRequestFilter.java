@@ -82,8 +82,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
 
         String[] pathActuator = {"/actuator/*"} ;
 
-//        String requestURL = request.getRequestURL().toString();
-//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf("v1" + "/") + 3, requestURL.length());
 
         try {
 
@@ -202,7 +202,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket","client",
                         messageTimestamp, "orderservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),"operationName");
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
                 logService.createSOALog2(soaObject);
             }else {
 
@@ -232,7 +232,7 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 ServiceObject soaObject = new ServiceObject("serviceLog",null, null, "BIC", "smartMarket", "client",
                         messageTimestamp, "orderservice", "1", timeDuration,
                         "response", transactionDetailResponse, null, res.getResultCode(),
-                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),"operationName");
+                        res.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
                 logService.createSOALog2(soaObject);
             }
             httpServletResponse.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
