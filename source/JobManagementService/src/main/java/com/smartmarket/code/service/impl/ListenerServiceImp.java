@@ -5,6 +5,7 @@ import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.OutboxRepository;
+import com.smartmarket.code.dao.PendingBICTransactionRepository;
 import com.smartmarket.code.model.TravelinsuranceOutbox;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.request.BaseDetail;
@@ -47,6 +48,9 @@ public class ListenerServiceImp implements ListenerService {
 
     @Autowired
     OutboxRepository outboxRepository;
+
+    @Autowired
+    PendingBICTransactionRepository pendingBICTransactionRepository;
 
     @Value("${kafka.topic.travelinsurance.pendingBictransaction}")
     String topicTravelinsurancePendingBictransaction;
