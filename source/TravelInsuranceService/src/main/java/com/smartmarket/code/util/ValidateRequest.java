@@ -1,10 +1,7 @@
 package com.smartmarket.code.util;
 
 import com.smartmarket.code.exception.InvalidInputException;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.*;
 import org.springframework.util.StringUtils;
 
 public class ValidateRequest {
@@ -60,6 +57,27 @@ public class ValidateRequest {
                 if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L) == true) {
                     if(StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderId()) )
                     throw new InvalidInputException("orderId is require", queryTravelInsuranceBICRequest.getRequestId());
+                }
+                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L) == true) {
+                    if (StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderReference())) {
+                        throw new InvalidInputException("orderReference is require", queryTravelInsuranceBICRequest.getRequestId());
+                    }
+                }
+
+            }
+
+        }
+    }
+
+    public static void checkValidJobInquire(BaseJobDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest){
+
+        if (queryTravelInsuranceBICRequest.getDetail() != null ) {
+            if (queryTravelInsuranceBICRequest.getDetail().getInquiryType() == null) {
+                throw new InvalidInputException("inquiryType is require", queryTravelInsuranceBICRequest.getRequestId());
+            }else {
+                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L) == true) {
+                    if(StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderId()) )
+                        throw new InvalidInputException("orderId is require", queryTravelInsuranceBICRequest.getRequestId());
                 }
                 if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L) == true) {
                     if (StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderReference())) {

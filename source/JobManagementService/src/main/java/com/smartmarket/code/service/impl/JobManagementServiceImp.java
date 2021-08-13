@@ -11,6 +11,7 @@ import com.smartmarket.code.model.entitylog.JobManagementExceptionObject;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.service.JobManagementService;
+import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,6 +36,7 @@ public class JobManagementServiceImp implements JobManagementService {
     //10 minutes
     @Scheduled(fixedRate = 10000)
     public void manage(){
+        Long startTime = DateTimeUtils.getCurrenTime();
         try {
             List<PendingBICTransaction> pendingBICTransactionList = pendingBICTransactionRepository.getPendingBICTransaction();
             for (int i = 0; i < pendingBICTransactionList.size(); i++) {
@@ -43,6 +45,12 @@ public class JobManagementServiceImp implements JobManagementService {
                 JobManagementOutbox jobManagementOutbox = new JobManagementOutbox();
 
                 //insert information of PendingBICTransaction into outbox
+                jobManagementOutbox.setId(pendingBICTransaction.getId());
+                jobManagementOutbox.setStartTime(startTime);
+                jobManagementOutbox.setRequestId(pendingBICTransaction.getRequestId());
+                jobManagementOutbox.setOrderId(pendingBICTransaction.getOrderId());
+                jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
+
                 jobManagementOutboxRepository.save(jobManagementOutbox);
             }
 

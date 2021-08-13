@@ -2,10 +2,7 @@ package com.smartmarket.code.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.smartmarket.code.exception.APIAccessException;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.*;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,17 +26,20 @@ public interface TravelInsuranceService {
             throws JsonProcessingException, APIAccessException;
 
 
-    public ResponseEntity<?> create(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, String clientIp, String clientId,
-                                    Long startTime,String hostName)
+    public ResponseEntity<?> createOrderOutbox(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, String clientIp, String clientId,
+                                               Long startTime, String hostName)
             throws JsonProcessingException, APIAccessException, Exception;
 
 
-    public ResponseEntity<?> update(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,String clientIp,String clientId,
-                                    Long startTime,String hostName)
+    public ResponseEntity<?> updateOrderOutbox(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, String clientIp, String clientId,
+                                               Long startTime, String hostName)
             throws JsonProcessingException, APIAccessException;
 
-    public ResponseEntity<?> get(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,String clientIp,String clientId,
-                                 Long startTime,String hostName)
+    public ResponseEntity<?> getOrderOutbox(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, String clientIp, String clientId,
+                                            Long startTime, String hostName)
+            throws JsonProcessingException, APIAccessException;
+
+    public ResponseEntity<?> getJobOutbox(BaseJobDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, Long startTime)
             throws JsonProcessingException, APIAccessException;
 
 }

@@ -21,7 +21,6 @@ public class BICTransaction implements Serializable {
 	@Column(name = "request_id")
 	private String requestId;
 
-
 	@Column(name = "order_reference")
 	private String orderReference;
 

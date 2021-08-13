@@ -197,41 +197,11 @@ public class BICTransactionServiceImp implements BICTransactionService {
     }
 
     @Override
-    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId,
-                                                               String customerName, String phoneNumber, String email,
-                                                               String ordPaidMoney, String consumerId, String fromDate,
-                                                               String toDate, Date logTimestamp, String resultCode,
-                                                               String bicResultCode, String ordDate, String productId,
-                                                               String customerAddress , String clientIp, String type, Long destroy) {
+    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId) {
         PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
-
-
-        String clientId = JwtUtils.getClientId() ;
-        Optional<Client> client = clientService.findByclientName(clientId);
-
         pendingBICTransaction.setOrderId(orderId);
-        pendingBICTransaction.setBicResultCode(bicResultCode);
-        pendingBICTransaction.setConsumerId(client.get().getConsumerId());
-        pendingBICTransaction.setCustomerName(customerName);
-        pendingBICTransaction.setCustomerAddress(customerAddress);
-        pendingBICTransaction.setEmail(email);
-        pendingBICTransaction.setFromDate(fromDate);
-        pendingBICTransaction.setResultCode(resultCode);
-//        bicTransaction.setLogTimestamp(new Date());
         pendingBICTransaction.setOrderReference(orderReference);
-
-
-
-        pendingBICTransaction.setOrdPaidMoney(ordPaidMoney);
-        pendingBICTransaction.setPhoneNumber(phoneNumber);
         pendingBICTransaction.setRequestId(requestId);
-        pendingBICTransaction.setToDate(toDate);
-        pendingBICTransaction.setOrdDate(ordDate);
-        pendingBICTransaction.setClientIp(clientIp);
-        pendingBICTransaction.setType(type);
-        pendingBICTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
-        pendingBICTransaction.setDestroy(destroy);
-
         return pendingBICTransactionRepository.save(pendingBICTransaction);
     }
 
@@ -274,39 +244,11 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
 
     @Override
-    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId,   String orderReference, String orderId,
-                                                              String customerName, String phoneNumber, String email,
-                                                              String ordPaidMoney, String consumerId, String fromDate,
-                                                              String toDate, Date logTimestamp, String resultCode,
-                                                              String bicResultCode, String ordDate, String productId,
-                                                              String customerAddress , String clientIp,String type, Long destroy,String clientId) {
+    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId,String orderReference, String orderId) {
         PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
-
-        Optional<Client> client = clientService.findByclientName(clientId);
-
         pendingBICTransaction.setOrderId(orderId);
-        pendingBICTransaction.setBicResultCode(bicResultCode);
-        pendingBICTransaction.setConsumerId(client.get().getConsumerId());
-        pendingBICTransaction.setCustomerName(customerName);
-        pendingBICTransaction.setCustomerAddress(customerAddress);
-        pendingBICTransaction.setEmail(email);
-        pendingBICTransaction.setFromDate(fromDate);
-        pendingBICTransaction.setResultCode(resultCode);
-//        pendingBICTransaction.setLogTimestamp(new Date());
         pendingBICTransaction.setOrderReference(orderReference);
-
-
-
-        pendingBICTransaction.setOrdPaidMoney(ordPaidMoney);
-        pendingBICTransaction.setPhoneNumber(phoneNumber);
         pendingBICTransaction.setRequestId(requestId);
-        pendingBICTransaction.setToDate(toDate);
-        pendingBICTransaction.setOrdDate(ordDate);
-        pendingBICTransaction.setClientIp(clientIp);
-        pendingBICTransaction.setType(type);
-        pendingBICTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
-        pendingBICTransaction.setDestroy(destroy);
-
         return pendingBICTransactionRepository.save(pendingBICTransaction);
     }
 

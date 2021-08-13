@@ -4,10 +4,7 @@ import com.smartmarket.code.constants.FieldsConstants;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entity.*;
 import com.smartmarket.code.request.entityBIC.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,6 +167,84 @@ public class MapperUtils {
 
 
     public CreateTravelInsuranceBICRequest queryCreateObjectToBIC(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, ResponseEntity<String> resultBIC, String token, String requestId) throws APIAccessException {
+
+        CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
+
+        EJson jsonObjectResultBIC = new EJson(resultBIC.getBody());
+        EJson ordersBIC = jsonObjectResultBIC.getJSONObject("Orders");
+        EJson trvBIC = jsonObjectResultBIC.getJSONObject("TRV");
+        List<EJson> trvDetailsBIC = jsonObjectResultBIC.getJSONArray("TRVDetail");
+
+        Orders orders = new Orders();
+        TRV trv = new TRV();
+        ArrayList<TRVDetail> trvDetails = new ArrayList<>();
+
+        orders.setOrderId(String.valueOf(ordersBIC.getLong("Orderid")));
+        orders.setOrderReference(ordersBIC.getString("OrderReference") == null ? null : ordersBIC.getString("OrderReference").toString());
+//                orders.setOrdCustId(ordersBIC.getLong("Ordcustid"));
+//                orders.setOrdCustMessage(ordersBIC.getString("Ordcustmessage") == null ? null : ordersBIC.getString("Ordcustmessage").toString());
+        orders.setOrdBillFirstName(ordersBIC.getString("Ordbillfirstname") == null ? null : ordersBIC.getString("Ordbillfirstname").toString());
+        orders.setOrdBillMobile(ordersBIC.getString("Ordbillmobile") == null ? null : ordersBIC.getString("Ordbillmobile").toString());
+        orders.setOrdBillStreet1(ordersBIC.getString("Ordbillstreet1") == null ? null : ordersBIC.getString("Ordbillstreet1").toString());
+        orders.setOrdBillEmail(ordersBIC.getString("Ordbillemail") == null ? null : ordersBIC.getString("Ordbillemail").toString());
+        orders.setOrdDate(ordersBIC.getString("Orddate") == null ? null : ordersBIC.getString("Orddate").toString());
+        orders.setOrdStatus(ordersBIC.getLong("Ordstatus"));
+//                orders.setProductId(ordersBIC.getString("ProductId") == null ? null : ordersBIC.getString("ProductId").toString());
+        orders.setOrdTotalQty(ordersBIC.getLong("Ordtotalqty"));
+        orders.setOrderPaymentMethod(ordersBIC.getLong("Orderpaymentmethod"));
+//                orders.setOrderShipModule(ordersBIC.getString("Ordershipmodule") == null ? null : ordersBIC.getString("Ordershipmodule").toString());
+//                orders.setOrdIsDigital(ordersBIC.getLong("Ordisdigital"));
+//                orders.setOrdToken(ordersBIC.getString("Ordtoken") == null ? null : ordersBIC.getString("Ordtoken").toString());
+        orders.setOrdPaidMoney(ordersBIC.getBigDecimal("Ordpaidmoney"));
+//                orders.setOrdTotal(ordersBIC.getBigDecimal("Ordtotal"));
+        orders.setOrdDiscountAmount(ordersBIC.getBigDecimal("Orddiscountamount"));
+//                orders.setUserId(ordersBIC.getLong("UserID"));
+
+        trv.setTrvId(trvBIC.getLong("TRVID"));
+        trv.setOrderId(String.valueOf(trvBIC.getLong("Orderid")));
+        trv.setAmountPersons(trvBIC.getLong("AmountPersons"));
+        trv.setAmountDays(trvBIC.getLong("AmountDays"));
+//                trv.setSi(trvBIC.getBigDecimal("SI"));
+//                trv.setPremium(trvBIC.getBigDecimal("Premium"));
+        trv.setPromotion(getLongFromBool(trvBIC.getBoolean("Promotion")));
+        trv.setPromotionAddress(trvBIC.getString("PromotionAddress"));
+//                trv.setPeriodTime(String.valueOf(trvBIC.getLong("PeriodTime")));
+        trv.setFromDate(trvBIC.getString("FromDate"));
+        trv.setToDate(trvBIC.getString("ToDate"));
+        trv.setIssueDate(trvBIC.getString("IssueDate"));
+//                trv.setIncludePayer(getLongFromBool(trvBIC.getBoolean("IncludePayer")));
+//                trv.setEndorsement(trvBIC.getString("Endorsement"));
+//                trv.setUserID(trvBIC.getLong("UserID"));
+//                trv.setUserUpproveID(trvBIC.getLong("UserUpproveID"));
+        trv.setDestroy(getLongFromBool(trvBIC.getBoolean("Destroy")));
+        trv.setStatus(getLongFromBool(trvBIC.getBoolean("Status")));
+//                trv.setWriteByHand(getLongFromBool(trvBIC.getBoolean("WriteByHand")));
+//                trv.setPrintedPaperNo(trvBIC.getString("PrintedPaperNo"));
+//                trv.setCertificateForm(trvBIC.getString("PrintedPaperNo"));
+//                trv.setModuleId(trvBIC.getLong("Moduleid"));
+
+        for (int i = 0; i < trvDetailsBIC.size(); i++) {
+            EJson trvDetailBIC = trvDetailsBIC.get(i);
+            TRVDetail trvDetail = new TRVDetail();
+            trvDetail.setDateOfBirth(convertDOB(trvDetailBIC.getString("DateofBirth")));
+            trvDetail.setFullName(trvDetailBIC.getString("FullName"));
+            trvDetail.setGender(trvDetailBIC.getLong("Gender"));
+            trvDetail.setId(trvDetailBIC.getLong("ID"));
+            trvDetail.setTrvId(trvDetailBIC.getLong("TRVID"));
+            trvDetail.setPassportCard(trvDetailBIC.getString("PassportCard"));
+            trvDetails.add(trvDetail);
+        }
+
+        createTravelInsuranceBICRequest.setOrders(orders);
+        createTravelInsuranceBICRequest.setTrv(trv);
+        createTravelInsuranceBICRequest.setTrvDetails(trvDetails);
+
+
+        return createTravelInsuranceBICRequest;
+    }
+
+
+    public CreateTravelInsuranceBICRequest queryCreateJobObjectToBIC(BaseJobDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, ResponseEntity<String> resultBIC, String token, String requestId) throws APIAccessException {
 
         CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = new CreateTravelInsuranceBICRequest();
 

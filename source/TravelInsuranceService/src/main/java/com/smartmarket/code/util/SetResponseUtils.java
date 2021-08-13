@@ -3,10 +3,7 @@ package com.smartmarket.code.util;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
+import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
 import com.smartmarket.code.response.DataCreateBIC;
@@ -24,6 +21,18 @@ public class SetResponseUtils {
     public BaseResponse setResponseInquery(BaseResponse response,
                             CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse,
                                            BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest){
+        response.setDetail(createTravelInsuranceBICResponse);
+        response.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+        return response ;
+    }
+
+    //Inquery
+    public BaseResponse setResponseJobInquery(BaseResponse response,
+                                           CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse,
+                                           BaseJobDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest){
         response.setDetail(createTravelInsuranceBICResponse);
         response.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());

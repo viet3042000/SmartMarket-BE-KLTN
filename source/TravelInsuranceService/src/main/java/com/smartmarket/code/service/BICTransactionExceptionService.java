@@ -12,10 +12,15 @@ import org.json.JSONObject;
 import javax.servlet.http.HttpServletRequest;
 
 public interface BICTransactionExceptionService {
+    //createTravelBIC+updateTravelBIC
     BICTransaction createBICTransactionFromRequest(HttpServletRequest request,String resultCode,String bicResultCode);
-    PendingBICTransaction createPendingBICTransactionFromRequest(HttpServletRequest request, String resultCode, String bicResultCode);
+    PendingBICTransaction createPendingBICTransactionFromRequest(HttpServletRequest request) ;
+
+    //createOrderOutbox
     BICTransaction createBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId);
-    PendingBICTransaction createPendingBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId);
+    PendingBICTransaction createPendingBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest);
+
+    //updateOrderOutbox
     BICTransaction createBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId);
-    PendingBICTransaction createPendingBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId);
+    PendingBICTransaction createPendingBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest);
 }

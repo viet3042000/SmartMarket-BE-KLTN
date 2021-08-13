@@ -29,12 +29,7 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy) ;
 
-    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId,
-                                                                      String customerName, String phoneNumber, String email,
-                                                                      String ordPaidMoney, String consumerId, String fromDate,
-                                                                      String toDate, Date logTimestamp, String resultCode,
-                                                                      String bicResultCode, String ordDate, String productId,
-                                                                      String customerAddress , String clientIp, String type, Long destroy) ;
+    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId) ;
 
     public BICTransaction createBICTransactionParameterOutbox(String requestId, String orderReference, String orderId,
                                                         String customerName, String phoneNumber, String email,
@@ -43,12 +38,7 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy,String clientId) ;
 
-    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId, String orderReference, String orderId,
-                                                              String customerName, String phoneNumber, String email,
-                                                              String ordPaidMoney, String consumerId, String fromDate,
-                                                              String toDate, Date logTimestamp, String resultCode,
-                                                              String bicResultCode, String ordDate, String productId,
-                                                              String customerAddress , String clientIp,String type,Long destroy,String clientId) ;
+    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId,String orderReference,String orderId) ;
 
     public BICTransaction createBICTransactionFromUpdateTravel(BaseDetail<UpdateTravelInsuranceBICRequest> object,
                                                                        EJson jsonObjectReponseCreate,
