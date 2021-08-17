@@ -5,12 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+@Transactional
+@Repository
 public interface PendingBICTransactionRepository extends JpaRepository<PendingBICTransaction, Long> {
 
-    @Query(value = "Select * from pending_bic_transaction ORDER BY id LIMIT 10",nativeQuery = true)
+    @Query(value = "Select * from pending_bic_transaction ORDER BY id LIMIT 5",nativeQuery = true)
     public List<PendingBICTransaction> getPendingBICTransaction();
 
     @Modifying(clearAutomatically = true)

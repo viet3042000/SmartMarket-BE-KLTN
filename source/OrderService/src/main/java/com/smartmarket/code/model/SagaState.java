@@ -18,8 +18,11 @@ public class SagaState {
     @Column(name = "id")
     private Long id;
 
+//    @Column(name = "order_id")
+//    private UUID orderId;
+
     @Column(name = "order_id")
-    private UUID orderId;
+    private String orderId;
 
     @Column(name = "current_step")
     private String currentStep;

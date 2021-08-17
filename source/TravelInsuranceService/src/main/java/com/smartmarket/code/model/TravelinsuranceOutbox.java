@@ -12,6 +12,8 @@ import java.util.UUID;
 @Setter
 public class TravelinsuranceOutbox {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "travelinsurance_outbox_seq")
+    @SequenceGenerator(sequenceName = "travelinsurance_outbox_sequence", allocationSize = 1, name = "travelinsurance_outbox_seq")
     @Column(name = "id")
     private Long id;
 
@@ -31,6 +33,9 @@ public class TravelinsuranceOutbox {
     @Column(name = "payload")
     private String payload;
 
+//    @Column(name = "order_id")
+//    private UUID orderId;
+
     @Column(name = "order_id")
-    private UUID orderId;
+    private String orderId;
 }

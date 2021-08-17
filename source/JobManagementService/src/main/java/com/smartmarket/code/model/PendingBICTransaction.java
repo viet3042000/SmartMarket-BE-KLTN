@@ -24,4 +24,7 @@ public class PendingBICTransaction {
     @Column(name = "order_id")
     private String orderId;
 
+    @Column(name = "from_order_service")
+    private Long fromOrderService;
+
 }

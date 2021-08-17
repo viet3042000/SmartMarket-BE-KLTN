@@ -37,8 +37,11 @@ public class OrderOutbox {
     @Column(name = "client_ip")
     private String clientIp;
 
+//    @Column(name = "order_id")
+//    private UUID orderId;
+
     @Column(name = "order_id")
-    private UUID orderId;
+    private String orderId;
 
     @Column(name = "start_time")
     private Long startTime;

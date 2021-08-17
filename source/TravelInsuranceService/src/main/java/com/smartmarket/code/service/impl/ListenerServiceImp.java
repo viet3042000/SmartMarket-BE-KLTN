@@ -7,6 +7,7 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
+import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.TravelinsuranceOutbox;
@@ -21,11 +22,13 @@ import org.apache.kafka.common.KafkaException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -79,8 +82,8 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.orderoutbox}",topics = "${kafka.topic.orderoutbox}")
     public void listenOrderServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
-        UUID orderId = UUID.randomUUID();
-        Long id = 0L;
+//        UUID orderId = UUID.randomUUID();
+        String orderId = "";
         String aggregateId = "";
         String aggregateType = "";
         String type = "";
@@ -113,13 +116,13 @@ public class ListenerServiceImp implements ListenerService {
 
                             if (op.equals("c")) {
                                 for (String k : keyPairs.keySet()) {
-                                    if (k.equals("id")) {
-                                        id = ((Number)keyPairs.get(k)).longValue();
-                                    }
+//                                    if (k.equals("order_id")) {
+//                                        String s = (String) keyPairs.get(k);
+//                                        orderId= UUID.fromString(s);
+////                                        orderId = ((Number)keyPairs.get(k)).longValue();
+//                                    }
                                     if (k.equals("order_id")) {
-                                        String s = (String) keyPairs.get(k);
-                                        orderId= UUID.fromString(s);
-//                                        orderId = ((Number)keyPairs.get(k)).longValue();
+                                        orderId = (String)keyPairs.get(k);
                                     }
                                     if (k.equals("aggregateid")) {
                                         aggregateId =(String) keyPairs.get(k);
@@ -168,7 +171,6 @@ public class ListenerServiceImp implements ListenerService {
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -176,7 +178,6 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setStatus("success");
                                         outBox.setPayload(responseBody);
                                     }else {
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -209,7 +210,6 @@ public class ListenerServiceImp implements ListenerService {
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -217,7 +217,6 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setStatus("success");
                                         outBox.setPayload(responseBody);
                                     }else {
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -249,7 +248,6 @@ public class ListenerServiceImp implements ListenerService {
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -257,7 +255,6 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setStatus("success");
                                         outBox.setPayload(responseBody);
                                     }else {
-                                        outBox.setId(id);
                                         outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
@@ -315,7 +312,6 @@ public class ListenerServiceImp implements ListenerService {
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
 //            insert into travelinsurance_outbox table
-            outBox.setId(id);
             outBox.setOrderId(orderId);
             outBox.setAggregateId(aggregateId);
             outBox.setAggregateType("OrderService");
@@ -335,13 +331,13 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.jobmanagementoutbox}",topics = "${kafka.topic.jobmanagementoutbox}")
     public void listenJobManagementServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
-        Long id = 0L;
+        Long pendingId= 0L;
         String orderId ="";
         String orderReference ="";
         String requestId = "";
         Long startTime = 0L;
-
         Long count =0L;
+        Long fromOrderService = 0L;
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -366,8 +362,8 @@ public class ListenerServiceImp implements ListenerService {
 
                             if (op.equals("c")) {
                                 for (String k : keyPairs.keySet()) {
-                                    if (k.equals("id")) {
-                                        id = ((Number)keyPairs.get(k)).longValue();
+                                    if (k.equals("pending_id")) {
+                                        pendingId = ((Number)keyPairs.get(k)).longValue();
                                     }
                                     if (k.equals("order_id")) {
                                         orderId= (String) keyPairs.get(k);
@@ -381,57 +377,61 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("start_time")) {
                                         startTime = ((Number)keyPairs.get(k)).longValue();
                                     }
+                                    if (k.equals("from_order_service")) {
+                                        fromOrderService = ((Number)keyPairs.get(k)).longValue();
+                                    }
                                 }
 
-                                //ìf count <=2
-                                if(count <=2) {
-                                    JSONObject detail = new JSONObject();
-                                    detail.put("inquiryType",2);
-                                    detail.put("orderId",orderId);
-                                    detail.put("orderReference",orderReference);
+                                Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
+                                if(pendingBICTransaction.isPresent()) {
+                                    //ìf count <=2
+                                    if (pendingBICTransaction.get().getCount() == null || pendingBICTransaction.get().getCount() <= 2) {
 
-                                    String d = detail.toString();
-                                    QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
-                                    BaseJobDetail baseJobDetail = new BaseJobDetail();
-                                    baseJobDetail.setDetail(queryTravelInsuranceBICRequest);
-                                    baseJobDetail.setRequestId(requestId);
+                                        JSONObject detail = new JSONObject();
+                                        detail.put("inquiryType", 2);
+                                        detail.put("orderId", orderId);
+                                        detail.put("orderReference", orderReference);
 
-                                    // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.getJobOutbox(baseJobDetail,startTime);
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    String responseBody = mapper.writeValueAsString(responseEntity);
-                                    JSONObject jsonBody = new JSONObject(responseBody);
-                                    int statusCodeValue = jsonBody.getInt("statusCodeValue");
+                                        String d = detail.toString();
+                                        QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
+                                        BaseJobDetail baseJobDetail = new BaseJobDetail();
+                                        baseJobDetail.setDetail(queryTravelInsuranceBICRequest);
+                                        baseJobDetail.setRequestId(requestId);
 
+                                        // get result from API create.
+                                        ResponseEntity<String> responseEntity = travelInsuranceService.getJobOutbox(baseJobDetail, startTime);
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        String responseBody = mapper.writeValueAsString(responseEntity);
+                                        JSONObject jsonBody = new JSONObject(responseBody);
+                                        int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
-                                    if (statusCodeValue == 200) {
-                                         //modify bictransaction (result_code, BIC result_code )
-                                         //find bictransaction by requestid , orderid, orderref from pending
-//                                        bicTransactionRepository.deleteBICTransactionPending(orderId,orderReference,requestId);
-                                        Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionPending(orderId,orderReference,requestId);
-                                        if(bicTransaction.isPresent()){
-                                            BICTransaction b = bicTransaction.get();
-                                            b.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-                                            b.setBicResultCode("200 OK");
-                                            bicTransactionRepository.save(b);
-                                        }
+                                        if (statusCodeValue == 200) {
+                                            //find bictransaction by requestid , orderid, orderref from pending
+                                            Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionPending(orderId, orderReference, requestId);
+                                            if (bicTransaction.isPresent()) {
+                                                BICTransaction b = bicTransaction.get();
 
-                                        //delete pending by id
-                                        pendingBICTransactionRepository.deletePendingBICTransactionByID(id);
+                                                //modify bictransaction (result_code, BIC result_code )
+                                                b.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+                                                b.setBicResultCode("200 OK");
+                                                bicTransactionRepository.save(b);
+                                            }
 
-                                    } else {
-                                        //count in pending ++
-                                        count ++;
-                                        Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(id);
-                                        if(pendingBICTransaction.isPresent()) {
-                                            PendingBICTransaction p = pendingBICTransaction.get();
-                                            p.setCount(count);
-                                            pendingBICTransactionRepository.save(p);
+                                            if(fromOrderService ==1){
+                                                TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
+                                                outBox.setOrderId(orderReference);
+                                                outBox.setAggregateId(requestId);
+                                                outBox.setAggregateType("OrderService");
+                                                outBox.setType(pendingBICTransaction.get().getType());
+                                                outBox.setStatus("success");
+                                                outBox.setPayload(responseBody);
+                                                outboxRepository.save(outBox);
+                                            }
+
+                                            //delete pending by id
+                                            pendingBICTransactionRepository.deletePendingBICTransactionByID(pendingId);
                                         }
                                     }
-                                }else{
-                                    //delete pending by id if count >2
-                                    pendingBICTransactionRepository.deletePendingBICTransactionByID(id);
                                 }
 
                             }
@@ -473,6 +473,28 @@ public class ListenerServiceImp implements ListenerService {
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
         }catch (Exception ex) {
+            //case order not exist
+            if(ex instanceof CustomException) {
+                Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
+                if (pendingBICTransaction.isPresent()) {
+                    PendingBICTransaction p = pendingBICTransaction.get();
+                    if(p.getCount() == null) {
+                        count ++;
+                        p.setCount(count);
+                        pendingBICTransactionRepository.save(p);
+                    }else {
+                        if (p.getCount() < 2) {
+                            Long c = p.getCount();
+                            c++;
+                            p.setCount(c);
+                            pendingBICTransactionRepository.save(p);
+                        } else {
+                            pendingBICTransactionRepository.deletePendingBICTransactionByID(pendingId);
+                        }
+                    }
+                }
+            }
+
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
             ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicJobManagementOutbox,

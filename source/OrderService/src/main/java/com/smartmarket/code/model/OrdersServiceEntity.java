@@ -18,8 +18,11 @@ public class OrdersServiceEntity {
     @Column(name = "id")
     private Long id;
 
+//    @Column(name = "order_id")
+//    private UUID orderId;
+
     @Column(name = "order_id")
-    private UUID orderId;
+    private String orderId;
 
     @Column(name = "payload")
     private String payload;
@@ -35,7 +38,6 @@ public class OrdersServiceEntity {
 
     @Column(name = "state")
     private String state;
-
 
     @Column(name = "created_at", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)

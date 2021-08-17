@@ -107,7 +107,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderId);
             String payload = j.toString();
 
-            orders.setOrderId(orderId);
+            orders.setOrderId(orderId.toString());
             orders.setPayload(payload);
             orders.setType("createTravelInsuranceBIC");
             orders.setState("Pending");
@@ -133,7 +133,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             orders.setCreateAt(createAt);
             orderRepository.save(orders);
 
-            sagaState.setOrderId(orders.getOrderId());
+            sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             sagaState.setType("createTravelInsuranceBIC");
@@ -141,7 +141,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId());
+            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(createTravelInsuranceBICRequestBaseDetail.getRequestId());
             outBox.setPayload(payload);
@@ -231,7 +231,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "userName is null";
             }
 
-            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
+//            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
+            OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
             if(orders != null && (orders.getState().equals("Success")||orders.getState().equals("UpdateAborted")) ) {
                 if (orders.getUserName().equals(userName)) {
 
@@ -246,8 +247,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "Order does not exist or is processing";
             }
 
-            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
-            sagaState.setOrderId(orders.getOrderId());
+//            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
+            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
+            sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             sagaState.setType("updateTravelInsuranceBIC");
@@ -255,7 +257,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId());
+            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
             outBox.setPayload(payload);
@@ -345,7 +347,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "userName is null";
             }
 
-            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
+//            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
+            OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
             if(orders != null &&
                 (orders.getState().equals("Success")
                 ||orders.getState().equals("UpdateAborted")
@@ -362,15 +365,16 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "Order does not exist or is processing";
             }
 
-            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
-            sagaState.setOrderId(orders.getOrderId());
+//            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
+            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
+            sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             sagaState.setType("getTravelInsuranceBIC");
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId());
+            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
             outBox.setPayload(payload);

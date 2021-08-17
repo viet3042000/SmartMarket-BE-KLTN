@@ -53,6 +53,7 @@ public class ListenerServiceImp implements ListenerService {
         String orderReference ="";
         Long id = 0L;
         String requestId = "";
+        Long fromOrderService = 0L;
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -90,6 +91,9 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("request_id")) {
                                         requestId =(String) keyPairs.get(k);
                                     }
+                                    if (k.equals("from_order_service")) {
+                                        fromOrderService = ((Number)keyPairs.get(k)).longValue();
+                                    }
                                 }
 
                                 //insert to pending
@@ -98,6 +102,8 @@ public class ListenerServiceImp implements ListenerService {
                                     pendingBICTransaction.setRequestId(requestId);
                                     pendingBICTransaction.setOrderId(orderId);
                                     pendingBICTransaction.setOrderReference(orderReference);
+                                    pendingBICTransaction.setFromOrderService(fromOrderService);
+
                                     pendingBICTransactionRepository.save(pendingBICTransaction);
                                 }
 

@@ -89,7 +89,8 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
-        UUID orderId = UUID.randomUUID();
+//        UUID orderId = UUID.randomUUID();
+        String orderId ="";
         String aggregateId = "";
         String aggregateType = "";
         String type = "";
@@ -118,10 +119,12 @@ public class ListenerServiceImp implements ListenerService {
                                 countReadOutBox = 0;
 
                                 for (String k : keyPairs.keySet()) {
+//                                    if (k.equals("order_id")) {
+//                                        String s = (String) keyPairs.get(k);
+//                                        orderId= UUID.fromString(s);
+//                                    }
                                     if (k.equals("order_id")) {
-                                        String s = (String) keyPairs.get(k);
-                                        orderId= UUID.fromString(s);
-//                                        orderId = ((Number) keyPairs.get(k)).longValue();
+                                        orderId = (String)keyPairs.get(k);
                                     }
                                     if (k.equals("aggregateid")) {
                                         aggregateId = (String) keyPairs.get(k);

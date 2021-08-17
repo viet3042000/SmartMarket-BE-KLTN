@@ -18,8 +18,11 @@ public interface OrderRepository extends JpaRepository<OrdersServiceEntity, Stri
     @Query(value = "SELECT * FROM orders WHERE id=:id", nativeQuery = true)
     public OrdersServiceEntity findById(@Param("id") Long id);
 
+//    @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
+//    public OrdersServiceEntity findByOrderId(@Param("order_id") UUID orderId);
+
     @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
-    public OrdersServiceEntity findByOrderId(@Param("order_id") UUID orderId);
+    public OrdersServiceEntity findByOrderId(@Param("order_id") String orderId);
 
     @Query(value = "SELECT * FROM orders WHERE user_name=:user_name",nativeQuery = true)
     public Page<OrdersServiceEntity> findByUserName(@Param("user_name") String userName, Pageable pageable);

@@ -34,24 +34,27 @@ public class JobManagementServiceImp implements JobManagementService {
     LogServiceImpl logService;
 
     //10 minutes
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 40000)
     public void manage(){
         Long startTime = DateTimeUtils.getCurrenTime();
         try {
             List<PendingBICTransaction> pendingBICTransactionList = pendingBICTransactionRepository.getPendingBICTransaction();
-            for (int i = 0; i < pendingBICTransactionList.size(); i++) {
+            if(pendingBICTransactionList.size() >0) {
+                for (int i = 0; i < pendingBICTransactionList.size(); i++) {
 
-                PendingBICTransaction pendingBICTransaction = pendingBICTransactionList.get(i);
-                JobManagementOutbox jobManagementOutbox = new JobManagementOutbox();
+                    PendingBICTransaction pendingBICTransaction = pendingBICTransactionList.get(i);
+                    JobManagementOutbox jobManagementOutbox = new JobManagementOutbox();
 
-                //insert information of PendingBICTransaction into outbox
-                jobManagementOutbox.setId(pendingBICTransaction.getId());
-                jobManagementOutbox.setStartTime(startTime);
-                jobManagementOutbox.setRequestId(pendingBICTransaction.getRequestId());
-                jobManagementOutbox.setOrderId(pendingBICTransaction.getOrderId());
-                jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
+                    //insert information of PendingBICTransaction into outbox
+                    jobManagementOutbox.setPendingId(pendingBICTransaction.getId());
+                    jobManagementOutbox.setStartTime(startTime);
+                    jobManagementOutbox.setRequestId(pendingBICTransaction.getRequestId());
+                    jobManagementOutbox.setOrderId(pendingBICTransaction.getOrderId());
+                    jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
+                    jobManagementOutbox.setFromOrderService(pendingBICTransaction.getFromOrderService());
 
-                jobManagementOutboxRepository.save(jobManagementOutbox);
+                    jobManagementOutboxRepository.save(jobManagementOutbox);
+                }
             }
 
             //can write log?

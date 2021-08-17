@@ -197,11 +197,30 @@ public class BICTransactionServiceImp implements BICTransactionService {
     }
 
     @Override
-    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId) {
+    public PendingBICTransaction createPendingBICTransactionParameter(String requestId, String orderReference, String orderId,String type) {
         PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
         pendingBICTransaction.setOrderId(orderId);
         pendingBICTransaction.setOrderReference(orderReference);
         pendingBICTransaction.setRequestId(requestId);
+        pendingBICTransaction.setType(type);
+        Long fromOrderService = 0L;
+        pendingBICTransaction.setFromOrderService(fromOrderService);
+
+        return pendingBICTransactionRepository.save(pendingBICTransaction);
+    }
+
+    @Override
+    public PendingBICTransaction createPendingBICTransactionParameterOrder(String requestId, String orderReference, String orderId,String type) {
+        PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
+        pendingBICTransaction.setOrderId(orderId);
+        pendingBICTransaction.setOrderReference(orderReference);
+        pendingBICTransaction.setRequestId(requestId);
+        pendingBICTransaction.setType(type);
+
+        Long fromOrderService = 0L;
+        fromOrderService ++;
+        pendingBICTransaction.setFromOrderService(fromOrderService);
+
         return pendingBICTransactionRepository.save(pendingBICTransaction);
     }
 
@@ -244,11 +263,17 @@ public class BICTransactionServiceImp implements BICTransactionService {
 
 
     @Override
-    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId,String orderReference, String orderId) {
+    public PendingBICTransaction createPendingBICTransactionParameterOutbox(String requestId,String orderReference, String orderId,String type) {
         PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
         pendingBICTransaction.setOrderId(orderId);
         pendingBICTransaction.setOrderReference(orderReference);
         pendingBICTransaction.setRequestId(requestId);
+        pendingBICTransaction.setType(type);
+
+        Long fromOrderService = 0L;
+        fromOrderService ++;
+        pendingBICTransaction.setFromOrderService(fromOrderService);
+
         return pendingBICTransactionRepository.save(pendingBICTransaction);
     }
 

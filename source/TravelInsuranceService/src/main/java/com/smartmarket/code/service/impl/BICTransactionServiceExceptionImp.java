@@ -209,7 +209,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
 
 
     @Override
-    public PendingBICTransaction createPendingBICTransactionFromRequest(HttpServletRequest request) {
+    public PendingBICTransaction createPendingBICTransactionFromRequest(HttpServletRequest request,String type) {
         //add BICTransaction
         PendingBICTransaction pendingBICTransaction = null ;
 
@@ -241,7 +241,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 try{
                     createTravelInsuranceBICRequest = gson.fromJson(detail.jsonToString(), CreateTravelInsuranceBICRequest.class) ;
                 }catch (JsonSyntaxException ex){
-                    pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId);
+                    pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId,type);
                     return pendingBICTransaction ;
                 }
 
@@ -250,12 +250,12 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 if (createTravelInsuranceBICRequest.getOrders() != null) {
                     orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrderReference();
 
-                    pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter(messasgeId, orderReference, orderId);
+                    pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter(messasgeId, orderReference, orderId,type);
                 }
 
             }
         }else {
-            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId);
+            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId,type);
         }
 
         return pendingBICTransaction ;
@@ -356,7 +356,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
     }
 
 
-    public PendingBICTransaction createPendingBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest){
+    public PendingBICTransaction createPendingBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest, String type){
         //add BICTransaction
         PendingBICTransaction pendingBICTransaction = null ;
 
@@ -378,7 +378,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         try{
             createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
         }catch (JsonSyntaxException ex){
-            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId);
+            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOrder("Format not True", orderReference, orderId,type);
             return pendingBICTransaction ;
         }
 
@@ -386,7 +386,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         if (createTravelInsuranceBICRequest.getOrders() != null) {
             orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrderReference();
 
-            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOutbox(messasgeId, orderReference, orderId);
+            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOutbox(messasgeId, orderReference, orderId,type);
         }
 
         return pendingBICTransaction;
@@ -486,7 +486,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         return bicTransaction;
     }
 
-    public PendingBICTransaction createPendingBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest){
+    public PendingBICTransaction createPendingBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest,String type){
         //add BICTransaction
         PendingBICTransaction pendingBICTransaction = null ;
 
@@ -508,7 +508,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         try{
             createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
         }catch (JsonSyntaxException ex){
-            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameter("Format not True", orderReference, orderId);
+            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOrder("Format not True", orderReference, orderId,type);
             return pendingBICTransaction ;
         }
 
@@ -516,7 +516,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         if (createTravelInsuranceBICRequest.getOrders() != null) {
             orderReference = createTravelInsuranceBICRequest.getOrders().getOrderReference() == null ? null : createTravelInsuranceBICRequest.getOrders().getOrderReference();
 
-            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOutbox(messasgeId, orderReference, orderId);
+            pendingBICTransaction = bicTransactionService.createPendingBICTransactionParameterOutbox(messasgeId, orderReference, orderId,type);
         }
 
         return pendingBICTransaction;
