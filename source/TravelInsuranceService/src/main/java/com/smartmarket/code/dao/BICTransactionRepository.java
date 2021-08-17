@@ -24,20 +24,9 @@ public interface BICTransactionRepository extends JpaRepository<BICTransaction, 
     @Query(value = "SELECT * FROM bic_transaction bict where bict.order_id = :orderId" +
             "    and bict.order_reference =:order_reference" +
             "    and bict.request_id =:request_id" +
-            "    and bict.result_code = '068'" +
+            "    and (bict.result_code = '068' or bict.result_code = '005')" +
             "    and bict.bic_result_code != '200 OK'" , nativeQuery = true)
     public Optional<BICTransaction> findBICTransactionPending(@Param("orderId") String orderId, @Param("order_reference") String orderReference,
-                                           @Param("request_id") String requestId);
-
-
-    @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM bic_transaction bict where bict.order_id = :orderId" +
-            " and bict.order_reference =:order_reference" +
-            " and bict.request_id =:request_id" +
-            " and bict.result_code = '068'" +
-            " and bict.bic_result_code != '200 OK'", nativeQuery = true)
-    public int deleteBICTransactionPending(@Param("orderId") String orderId,
-                                           @Param("order_reference") String orderReference,
                                            @Param("request_id") String requestId);
 
 }
