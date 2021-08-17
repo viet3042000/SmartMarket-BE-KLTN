@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -50,10 +51,12 @@ public class AuthServerConfig
     @Autowired
 	private ClientDetailsService customClientDetailsService;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    	clients.withClientDetails(customClientDetailsService);
+    	clients.withClientDetails(customClientDetailsService).jdbc().passwordEncoder(bCryptPasswordEncoder);
     }
     
     @Override
