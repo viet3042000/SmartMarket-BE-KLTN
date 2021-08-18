@@ -336,8 +336,8 @@ public class ListenerServiceImp implements ListenerService {
         String orderReference ="";
         String requestId = "";
         Long startTime = 0L;
-        Long count =0L;
         Long fromOrderService = 0L;
+        String intervalId = "";
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -380,6 +380,9 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("from_order_service")) {
                                         fromOrderService = ((Number)keyPairs.get(k)).longValue();
                                     }
+                                    if (k.equals("interval_id")) {
+                                        intervalId= (String) keyPairs.get(k);
+                                    }
                                 }
 
                                 Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
@@ -406,30 +409,52 @@ public class ListenerServiceImp implements ListenerService {
                                         int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                         if (statusCodeValue == 200) {
-                                            //find bictransaction by requestid , orderid, orderref from pending
-                                            Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionPending(orderId, orderReference, requestId);
-                                            if (bicTransaction.isPresent()) {
-                                                BICTransaction b = bicTransaction.get();
 
-                                                //modify bictransaction (result_code, BIC result_code )
-                                                b.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-                                                b.setBicResultCode("200 OK");
-                                                bicTransactionRepository.save(b);
+                                            //if type is createTravelInsuranceBIC
+                                            if(pendingBICTransaction.get().getType().equals("createTravelInsuranceBIC")) {
+
+                                                //find bictransaction by requestid , orderid, orderref from pending
+                                                Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionPending(orderId, orderReference, requestId);
+                                                if (bicTransaction.isPresent()) {
+                                                    BICTransaction b = bicTransaction.get();
+
+                                                    //modify bictransaction (result_code, BIC result_code )
+                                                    b.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+                                                    b.setBicResultCode("200 OK");
+                                                    bicTransactionRepository.save(b);
+                                                }
+
+                                                //OrderService
+                                                if (fromOrderService == 1) {
+                                                    TravelinsuranceOutbox outBoxOrderService = new TravelinsuranceOutbox();
+                                                    outBoxOrderService.setOrderId(orderId);
+                                                    outBoxOrderService.setAggregateId(requestId);
+                                                    outBoxOrderService.setAggregateType("OrderService");
+                                                    outBoxOrderService.setType(pendingBICTransaction.get().getType());
+                                                    outBoxOrderService.setStatus("success");
+                                                    outBoxOrderService.setPayload(responseBody);
+                                                    outboxRepository.save(outBoxOrderService);
+                                                }
+
+                                                //add to outbox to job know what order in 1 interval success
+                                                TravelinsuranceOutbox outBoxJobService = new TravelinsuranceOutbox();
+                                                outBoxJobService.setOrderId(orderId);
+                                                outBoxJobService.setOrderReference(orderReference);
+                                                outBoxJobService.setAggregateId(requestId);
+                                                outBoxJobService.setAggregateType("JobService");
+                                                outBoxJobService.setType(pendingBICTransaction.get().getType());
+                                                outBoxJobService.setStatus("success");
+                                                outBoxJobService.setPayload(responseBody);
+                                                outBoxJobService.setIntervalId(intervalId);
+                                                outboxRepository.save(outBoxJobService);
+
+                                                //delete pending by id
+                                                pendingBICTransactionRepository.deletePendingBICTransactionByID(pendingId);
                                             }
+                                            //type = updateTravelInsuranceBIC
+                                            else {
 
-                                            if(fromOrderService ==1){
-                                                TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
-                                                outBox.setOrderId(orderReference);
-                                                outBox.setAggregateId(requestId);
-                                                outBox.setAggregateType("OrderService");
-                                                outBox.setType(pendingBICTransaction.get().getType());
-                                                outBox.setStatus("success");
-                                                outBox.setPayload(responseBody);
-                                                outboxRepository.save(outBox);
                                             }
-
-                                            //delete pending by id
-                                            pendingBICTransactionRepository.deletePendingBICTransactionByID(pendingId);
                                         }
                                     }
                                 }
@@ -478,20 +503,24 @@ public class ListenerServiceImp implements ListenerService {
                 Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
                 if (pendingBICTransaction.isPresent()) {
                     PendingBICTransaction p = pendingBICTransaction.get();
-                    if(p.getCount() == null) {
-                        count ++;
+                    if (p.getCount() < 5) {
+                        Long count = p.getCount();
+                        count++;
                         p.setCount(count);
                         pendingBICTransactionRepository.save(p);
-                    }else {
-                        if (p.getCount() < 2) {
-                            Long c = p.getCount();
-                            c++;
-                            p.setCount(c);
-                            pendingBICTransactionRepository.save(p);
-                        } else {
-                            pendingBICTransactionRepository.deletePendingBICTransactionByID(pendingId);
-                        }
                     }
+
+                    //add to outbox to job know what order in 1 interval failure
+                    TravelinsuranceOutbox outBoxJobService = new TravelinsuranceOutbox();
+                    outBoxJobService.setOrderId(orderId);
+                    outBoxJobService.setOrderReference(orderReference);
+                    outBoxJobService.setAggregateId(requestId);
+                    outBoxJobService.setAggregateType("JobService");
+                    outBoxJobService.setType(p.getType());
+                    outBoxJobService.setStatus("failure");
+                    outBoxJobService.setPayload("Exception in TravelInsuranceService");
+                    outBoxJobService.setIntervalId(intervalId);
+                    outboxRepository.save(outBoxJobService);
                 }
             }
 

@@ -6,7 +6,7 @@ import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
-import com.smartmarket.code.model.entitylog.KafkaExceptionObject;
+import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.service.ListenerService;
 import com.smartmarket.code.util.GetKeyPairUtil;
 import org.apache.kafka.clients.consumer.CommitFailedException;
@@ -28,7 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Component
 public class ListenerServiceImp implements ListenerService {
@@ -66,7 +65,6 @@ public class ListenerServiceImp implements ListenerService {
     @Value("${kafka.topic.travelinsuranceoutbox}")
     String topicTravelInsuranceOutbox;
 
-    int countReadOutBox =0;
     int countReadUser = 0;
     int countReadClient =0;
     int countReadConsumer =0;
@@ -116,15 +114,13 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                countReadOutBox = 0;
-
                                 for (String k : keyPairs.keySet()) {
 //                                    if (k.equals("order_id")) {
 //                                        String s = (String) keyPairs.get(k);
 //                                        orderId= UUID.fromString(s);
 //                                    }
                                     if (k.equals("order_id")) {
-                                        orderId = (String)keyPairs.get(k);
+                                        orderId = (String) keyPairs.get(k);
                                     }
                                     if (k.equals("aggregateid")) {
                                         aggregateId = (String) keyPairs.get(k);
@@ -143,124 +139,127 @@ public class ListenerServiceImp implements ListenerService {
                                     }
                                 }
 
-                                if (type.equals("createTravelInsuranceBIC")) {
-                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                if (aggregateType.equals("OrderService")) {
+                                    if (type.equals("createTravelInsuranceBIC")) {
+                                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                    //insert to outbox
-                                    if (status.equals("success")) {
-                                        orders.setState("Success");
-                                        Date date = new Date();
-                                        String stringCreateFinish = formatter.format(date);
-                                        Date createFinish = formatter.parse(stringCreateFinish);
-                                        orders.setCreateFinish(createFinish);
+                                        //insert to outbox
+                                        if (status.equals("success")) {
+                                            orders.setState("Success");
+                                            Date date = new Date();
+                                            String stringCreateFinish = formatter.format(date);
+                                            Date createFinish = formatter.parse(stringCreateFinish);
+                                            orders.setCreateFinish(createFinish);
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                            sagaState.setCurrentStep("TravelInsuranceService");
 
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","SUCCEEDED");
-                                        sagaState.setStepState(s.toString());
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "SUCCEEDED");
+                                            sagaState.setStepState(s.toString());
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("SUCCEEDED");
-                                    } else {
-                                        orders.setState("CreateAborted");
-                                        Date date = new Date();
-                                        String stringCreateFinish = formatter.format(date);
-                                        Date createFinish = formatter.parse(stringCreateFinish);
-                                        orders.setCreateFinish(createFinish);
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("SUCCEEDED");
+                                        } else {
+                                            orders.setState("CreateAborted");
+                                            Date date = new Date();
+                                            String stringCreateFinish = formatter.format(date);
+                                            Date createFinish = formatter.parse(stringCreateFinish);
+                                            orders.setCreateFinish(createFinish);
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                            sagaState.setCurrentStep("TravelInsuranceService");
 
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","ABORTED");
-                                        sagaState.setStepState(s.toString());
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "ABORTED");
+                                            sagaState.setStepState(s.toString());
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("ABORTED");
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("ABORTED");
+                                        }
+                                        //if other status of message
+                                        // do ABORTING
+
+                                        orderRepository.save(orders);
+                                        sagaStateRepository.save(sagaState);
                                     }
-                                    //if other status of message
-                                    // do ABORTING
 
-                                    orderRepository.save(orders);
-                                    sagaStateRepository.save(sagaState);
-                                }
+                                    if (type.equals("updateTravelInsuranceBIC")) {
+                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                if (type.equals("updateTravelInsuranceBIC")) {
-                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                        //insert to outbox
+                                        if (status.equals("success")) {
+                                            orders.setState("Success");
 
-                                    //insert to outbox
-                                    if (status.equals("success")) {
-                                        orders.setState("Success");
+                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "SUCCEEDED");
+                                            sagaState.setStepState(s.toString());
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","SUCCEEDED");
-                                        sagaState.setStepState(s.toString());
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("SUCCEEDED");
+                                        } else {
+                                            orders.setState("UpdateAborted");
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("SUCCEEDED");
-                                    } else {
-                                        orders.setState("UpdateAborted");
+                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "ABORTED");
+                                            sagaState.setStepState(s.toString());
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","ABORTED");
-                                        sagaState.setStepState(s.toString());
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("ABORTED");
+                                        }
+                                        //if other status of message
+                                        // do ABORTING
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("ABORTED");
+                                        orderRepository.save(orders);
+                                        sagaStateRepository.save(sagaState);
                                     }
-                                    //if other status of message
-                                    // do ABORTING
 
-                                    orderRepository.save(orders);
-                                    sagaStateRepository.save(sagaState);
-                                }
+                                    if (type.equals("getTravelInsuranceBIC")) {
+                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                if (type.equals("getTravelInsuranceBIC")) {
-                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                        //insert to outbox
+                                        if (status.equals("success")) {
+                                            orders.setState("Success");
+                                            orders.setPayloadGet(payload);
 
-                                    //insert to outbox
-                                    if (status.equals("success")) {
-                                        orders.setState("Success");
-                                        orders.setPayloadGet(payload);
+                                            sagaState.setCurrentStep("TravelInsuranceService");
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "SUCCEEDED");
+                                            sagaState.setStepState(s.toString());
 
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","SUCCEEDED");
-                                        sagaState.setStepState(s.toString());
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("SUCCEEDED");
+                                        } else {
+                                            orders.setState("GetAborted");
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("SUCCEEDED");
-                                    } else {
-                                        orders.setState("GetAborted");
+                                            sagaState.setCurrentStep("TravelInsuranceService");
 
-                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                            JSONObject s = new JSONObject();
+                                            s.put("TravelInsuranceService", "ABORTED");
+                                            sagaState.setStepState(s.toString());
 
-                                        JSONObject s = new JSONObject();
-                                        s.put("TravelInsuranceService","ABORTED");
-                                        sagaState.setStepState(s.toString());
+                                            sagaState.setType(type);
+                                            sagaState.setStatus("ABORTED");
+                                        }
+                                        //if other status of message
+                                        // do ABORTING
 
-                                        sagaState.setType(type);
-                                        sagaState.setStatus("ABORTED");
+                                        orderRepository.save(orders);
+                                        sagaStateRepository.save(sagaState);
                                     }
-                                    //if other status of message
-                                    // do ABORTING
-
-                                    orderRepository.save(orders);
-                                    sagaStateRepository.save(sagaState);
                                 }
                             }
                             if (op.equals("r")) {
                                 //countReadOutBox ++;
 
                             }
+
                         } else {
                             System.out.println("afterObj is null");
                         }
@@ -280,7 +279,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -288,14 +287,14 @@ public class ListenerServiceImp implements ListenerService {
         } catch (KafkaException ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicTravelInsuranceOutbox,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -384,7 +383,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicUsers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -392,7 +391,7 @@ public class ListenerServiceImp implements ListenerService {
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicUsers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -400,7 +399,7 @@ public class ListenerServiceImp implements ListenerService {
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicUsers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -486,7 +485,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicClients,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
                     "clients", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -494,14 +493,14 @@ public class ListenerServiceImp implements ListenerService {
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicClients,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
                     "clients", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
         }catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicClients,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
                     "clients", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -587,7 +586,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicConsumers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
                     "consumers", op , dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -595,7 +594,7 @@ public class ListenerServiceImp implements ListenerService {
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicConsumers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
                     "consumers", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
@@ -603,7 +602,7 @@ public class ListenerServiceImp implements ListenerService {
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            KafkaExceptionObject kafkaExceptionObject = new KafkaExceptionObject(topicConsumers,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
                     "consumers", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);

@@ -34,4 +34,7 @@ public class JobManagementOutbox {
     @Column(name = "from_order_service")
     private Long fromOrderService;
 
+    @Column(name = "interval_id")
+    private String intervalId;
+
 }

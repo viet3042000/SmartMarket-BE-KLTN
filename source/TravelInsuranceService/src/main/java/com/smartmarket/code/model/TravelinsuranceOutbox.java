@@ -38,4 +38,10 @@ public class TravelinsuranceOutbox {
 
     @Column(name = "order_id")
     private String orderId;
+
+    @Column(name = "interval_id")
+    private String intervalId;
+
+    @Column(name = "order_reference")
+    private String orderReference;
 }
