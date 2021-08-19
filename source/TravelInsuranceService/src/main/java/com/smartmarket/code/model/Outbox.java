@@ -7,10 +7,10 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "travelinsurance_outbox")
+@Table(name = "outbox")
 @Getter
 @Setter
-public class TravelInsuranceOutbox {
+public class Outbox {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "travelinsurance_outbox_seq")
     @SequenceGenerator(sequenceName = "travelinsurance_outbox_sequence", allocationSize = 1, name = "travelinsurance_outbox_seq")

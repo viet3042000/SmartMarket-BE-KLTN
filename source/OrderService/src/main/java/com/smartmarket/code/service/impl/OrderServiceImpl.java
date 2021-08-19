@@ -9,8 +9,7 @@ import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.exception.*;
-import com.smartmarket.code.model.Client;
-import com.smartmarket.code.model.OrderOutbox;
+import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
 import com.smartmarket.code.model.entitylog.ServiceObject;
@@ -19,8 +18,7 @@ import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.UpdateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
-import com.smartmarket.code.service.ClientService;
-import com.smartmarket.code.service.TravelInsuranceService;
+import com.smartmarket.code.service.OrderService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.MapperUtils;
@@ -49,7 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class TravelInsuranceServiceImpl implements TravelInsuranceService {
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     OrderRepository orderRepository;
@@ -76,7 +74,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         OrdersServiceEntity orders = new OrdersServiceEntity();
-        OrderOutbox outBox = new OrderOutbox();
+        Outbox outBox = new Outbox();
         SagaState sagaState = new SagaState();
         String userName = "";
 
@@ -102,13 +100,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String requestBody = gson.toJson(createTravelInsuranceBICRequestBaseDetail);
             JSONObject j = new JSONObject(requestBody);
 
-//            j.getJSONObject("detail").getJSONObject("orders").remove("orderReference");
             UUID orderId = UUID.randomUUID();
             j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderId);
-            String payload = j.toString();
 
             orders.setOrderId(orderId.toString());
-            orders.setPayload(payload);
+            orders.setPayload(j.toString());
             orders.setType("createTravelInsuranceBIC");
             orders.setState("Pending");
 
@@ -137,19 +133,21 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             sagaState.setType("createTravelInsuranceBIC");
-            sagaState.setPayload(payload);
+            sagaState.setPayload(j.toString());
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(createTravelInsuranceBICRequestBaseDetail.getRequestId());
-            outBox.setPayload(payload);
             outBox.setType("createTravelInsuranceBIC");
-            outBox.setClientIp(Utils.getClientIp(request));
-            outBox.setClientId(clientId);
-            outBox.setStartTime(startTime);
-            outBox.setHostName(hostName);
+
+            j.put("orderId",orders.getOrderId().toString());
+            j.put("startTime",startTime);
+            j.put("hostName",hostName);
+            j.put("clientId",clientId);
+            j.put("clientIp",Utils.getClientIp(request));
+            outBox.setPayload(j.toString());
+
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -192,7 +190,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             throws JsonProcessingException, APIAccessException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
-        OrderOutbox outBox = new OrderOutbox();
+        Outbox outBox = new Outbox();
         Gson gson = new Gson();
         String userName = "";
 
@@ -231,11 +229,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "userName is null";
             }
 
-//            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
             OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
             if(orders != null && (orders.getState().equals("Success")||orders.getState().equals("UpdateAborted")) ) {
                 if (orders.getUserName().equals(userName)) {
-
                     orders.setPayloadUpdate(payload);
                     orders.setType("updateTravelInsuranceBIC");
                     orders.setState("Pending");
@@ -257,15 +253,18 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
-            outBox.setPayload(payload);
             outBox.setType("updateTravelInsuranceBIC");
-            outBox.setClientIp(Utils.getClientIp(request));
-            outBox.setClientId(clientId);
-            outBox.setStartTime(startTime);
-            outBox.setHostName(hostName);
+
+            JSONObject j = new JSONObject(payload);
+            j.put("orderId",orders.getOrderId().toString());
+            j.put("startTime",startTime);
+            j.put("hostName",hostName);
+            j.put("clientId",clientId);
+            j.put("clientIp",Utils.getClientIp(request));
+            outBox.setPayload(j.toString());
+
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {
@@ -308,7 +307,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     public String getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
-        OrderOutbox outBox = new OrderOutbox();
+        Outbox outBox = new Outbox();
         String userName = "";
 
         String hostName = request.getRemoteHost();
@@ -365,7 +364,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 return "Order does not exist or is processing";
             }
 
-//            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
             SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
             sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
@@ -374,15 +372,17 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setOrderId(orders.getOrderId().toString());
             outBox.setAggregateType("TravelInsuranceService");
             outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
-            outBox.setPayload(payload);
             outBox.setType("getTravelInsuranceBIC");
-            outBox.setClientIp(Utils.getClientIp(request));
-            outBox.setClientId(clientId);
-            outBox.setStartTime(startTime);
-            outBox.setHostName(hostName);
+
+            JSONObject j = new JSONObject(payload);
+            j.put("orderId",orders.getOrderId().toString());
+            j.put("startTime",startTime);
+            j.put("hostName",hostName);
+            j.put("clientId",clientId);
+            j.put("clientIp",Utils.getClientIp(request));
+            outBox.setPayload(j.toString());
             outboxRepository.save(outBox);
 
         }catch (Exception ex) {

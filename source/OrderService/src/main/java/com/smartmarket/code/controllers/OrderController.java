@@ -3,8 +3,7 @@ package com.smartmarket.code.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.request.*;
-import com.smartmarket.code.service.TravelInsuranceService;
-import com.smartmarket.code.service.impl.ListenerServiceImp;
+import com.smartmarket.code.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ import java.text.ParseException;
 public class OrderController {
 
     @Autowired
-    TravelInsuranceService travelInsuranceService ;
+    OrderService travelInsuranceService ;
 
 
     @PostMapping(value = "/create-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})

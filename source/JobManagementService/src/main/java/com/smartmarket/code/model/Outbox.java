@@ -6,10 +6,10 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "jobmanagement_outbox")
+@Table(name = "outbox")
 @Getter
 @Setter
-public class JobManagementOutbox {
+public class Outbox {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "jobmanagement_outbox_seq")

@@ -8,17 +8,17 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order_outbox")
+@Table(name = "outbox")
 @Getter
 @Setter
-public class OrderOutbox {
+public class Outbox {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
     @SequenceGenerator(sequenceName = "outbox_sequence", allocationSize = 1, name = "order_seq")
     @Column(name = "id")
     private Long id;
 
-    //service đích
+    //service gốc
     @Column(name = "aggregatetype")
     private String aggregateType;
 
@@ -31,22 +31,7 @@ public class OrderOutbox {
     @Column(name = "payload")
     private String payload;
 
-    @Column(name = "client_id")
-    private String clientId;
-
-    @Column(name = "client_ip")
-    private String clientIp;
-
 //    @Column(name = "order_id")
 //    private UUID orderId;
 
-    //= order ref
-    @Column(name = "order_id")
-    private String orderId;
-
-    @Column(name = "start_time")
-    private Long startTime;
-
-    @Column(name = "host_name")
-    private String hostName;
 }

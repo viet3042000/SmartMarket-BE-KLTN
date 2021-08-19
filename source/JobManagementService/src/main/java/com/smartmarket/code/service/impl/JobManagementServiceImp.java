@@ -5,11 +5,11 @@ import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.IntervalHistoryRepository;
 import com.smartmarket.code.dao.JobHistoryRepository;
-import com.smartmarket.code.dao.JobManagementOutboxRepository;
+import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
 import com.smartmarket.code.model.IntervalHistory;
 import com.smartmarket.code.model.JobHistory;
-import com.smartmarket.code.model.JobManagementOutbox;
+import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.entitylog.JobManagementExceptionObject;
 import com.smartmarket.code.service.JobManagementService;
@@ -33,7 +33,7 @@ public class JobManagementServiceImp implements JobManagementService {
     PendingBICTransactionRepository pendingBICTransactionRepository;
 
     @Autowired
-    JobManagementOutboxRepository jobManagementOutboxRepository;
+    OutboxRepository jobManagementOutboxRepository;
 
     @Autowired
     LogServiceImpl logService;
@@ -90,7 +90,7 @@ public class JobManagementServiceImp implements JobManagementService {
 
                         intervalHistoryRepository.save(intervalHistory);
 
-                        JobManagementOutbox jobManagementOutbox = new JobManagementOutbox();
+                        Outbox jobManagementOutbox = new Outbox();
                         //insert information of PendingBICTransaction into outbox
                         jobManagementOutbox.setPendingId(pendingBICTransaction.getId());
                         jobManagementOutbox.setStartTime(startTime);

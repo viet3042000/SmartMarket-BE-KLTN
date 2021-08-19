@@ -24,6 +24,7 @@ public class OrdersServiceEntity {
     @Column(name = "order_id")
     private String orderId;
 
+    //request body
     @Column(name = "payload")
     private String payload;
 
@@ -43,7 +44,7 @@ public class OrdersServiceEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createAt;
 
-    @Column(name = "created_finish", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "finished_at", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishedAt;
 
