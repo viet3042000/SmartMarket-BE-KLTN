@@ -23,4 +23,7 @@ public class Job {
     //this job is enable to run manage()
     @Column(name = "enable")
     private String enable;
+
+    @Column(name = "amount_step")
+    private int amountStep;
 }

@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -198,12 +197,14 @@ public class ListenerServiceImp implements ListenerService {
         String op = "";
 //        UUID orderId = UUID.randomUUID();
         String orderId ="";
+        Long pendingId= 0L;
         String orderReference ="";
         String aggregateId = "";
         String aggregateType = "";
         String payload = "";
         String status = "";
         String intervalId = "";
+        int step = 0;
 
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -225,6 +226,9 @@ public class ListenerServiceImp implements ListenerService {
 
                             if (op.equals("c")) {
                                 for (String k : keyPairs.keySet()) {
+                                    if (k.equals("pending_id")) {
+                                        pendingId = ((Number)keyPairs.get(k)).longValue();
+                                    }
                                     if (k.equals("order_id")) {
                                         orderId = (String) keyPairs.get(k);
                                     }
@@ -246,31 +250,32 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("interval_id")) {
                                         intervalId= (String) keyPairs.get(k);
                                     }
+                                    if (k.equals("step")) {
+                                        step = ((Number)keyPairs.get(k)).intValue();
+                                    }
                                 }
 
                                 if (aggregateType.equals("JobService")) {
                                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-                                    JSONObject intervalDetail = new JSONObject();
-                                    intervalDetail.put("requestId",aggregateId);
-                                    intervalDetail.put("orderId",orderId);
-                                    intervalDetail.put("orderId",orderId);
+                                    JSONObject pendingOrderDetail = new JSONObject();
+                                    pendingOrderDetail.put("requestId",aggregateId);
+                                    pendingOrderDetail.put("orderId",orderId);
+                                    pendingOrderDetail.put("orderReference",orderReference);
 
                                     //insert to outbox
                                     if (status.equals("success")) {
                                         Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
                                         if(jobHistory.isPresent()){
                                             JobHistory j = jobHistory.get();
-//                                            j.setIntervalDetail(intervalDetail.toString());
-                                            j.setState("success");
+
                                             jobHistoryRepository.save(j);
                                         }
                                     } else {
                                         Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
                                         if(jobHistory.isPresent()){
                                             JobHistory j = jobHistory.get();
-//                                            j.setIntervalDetail(intervalDetail.toString());
-                                            j.setState("failure");
+
                                             jobHistoryRepository.save(j);
                                         }
                                     }

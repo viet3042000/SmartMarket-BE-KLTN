@@ -10,7 +10,7 @@ import com.smartmarket.code.dao.PendingBICTransactionRepository;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.model.PendingBICTransaction;
-import com.smartmarket.code.model.TravelinsuranceOutbox;
+import com.smartmarket.code.model.TravelInsuranceOutbox;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.service.ListenerService;
@@ -22,13 +22,11 @@ import org.apache.kafka.common.KafkaException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -36,7 +34,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class ListenerServiceImp implements ListenerService {
@@ -94,7 +91,7 @@ public class ListenerServiceImp implements ListenerService {
         String hostName="";
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        TravelinsuranceOutbox outBox = new TravelinsuranceOutbox();
+        TravelInsuranceOutbox outBox = new TravelInsuranceOutbox();
         Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -338,6 +335,7 @@ public class ListenerServiceImp implements ListenerService {
         Long startTime = 0L;
         Long fromOrderService = 0L;
         String intervalId = "";
+        int step = 0;
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -383,6 +381,9 @@ public class ListenerServiceImp implements ListenerService {
                                     if (k.equals("interval_id")) {
                                         intervalId= (String) keyPairs.get(k);
                                     }
+                                    if (k.equals("step")) {
+                                        step = ((Number)keyPairs.get(k)).intValue();
+                                    }
                                 }
 
                                 Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
@@ -426,7 +427,7 @@ public class ListenerServiceImp implements ListenerService {
 
                                                 //OrderService
                                                 if (fromOrderService == 1) {
-                                                    TravelinsuranceOutbox outBoxOrderService = new TravelinsuranceOutbox();
+                                                    TravelInsuranceOutbox outBoxOrderService = new TravelInsuranceOutbox();
                                                     outBoxOrderService.setOrderId(orderId);
                                                     outBoxOrderService.setAggregateId(requestId);
                                                     outBoxOrderService.setAggregateType("OrderService");
@@ -437,7 +438,7 @@ public class ListenerServiceImp implements ListenerService {
                                                 }
 
                                                 //add to outbox to job know what order in 1 interval success
-                                                TravelinsuranceOutbox outBoxJobService = new TravelinsuranceOutbox();
+                                                TravelInsuranceOutbox outBoxJobService = new TravelInsuranceOutbox();
                                                 outBoxJobService.setOrderId(orderId);
                                                 outBoxJobService.setOrderReference(orderReference);
                                                 outBoxJobService.setAggregateId(requestId);
@@ -446,6 +447,8 @@ public class ListenerServiceImp implements ListenerService {
                                                 outBoxJobService.setStatus("success");
                                                 outBoxJobService.setPayload(responseBody);
                                                 outBoxJobService.setIntervalId(intervalId);
+                                                outBoxJobService.setPendingId(pendingId);
+                                                outBoxJobService.setStep(step);
                                                 outboxRepository.save(outBoxJobService);
 
                                                 //delete pending by id
@@ -511,7 +514,7 @@ public class ListenerServiceImp implements ListenerService {
                     }
 
                     //add to outbox to job know what order in 1 interval failure
-                    TravelinsuranceOutbox outBoxJobService = new TravelinsuranceOutbox();
+                    TravelInsuranceOutbox outBoxJobService = new TravelInsuranceOutbox();
                     outBoxJobService.setOrderId(orderId);
                     outBoxJobService.setOrderReference(orderReference);
                     outBoxJobService.setAggregateId(requestId);
@@ -520,6 +523,7 @@ public class ListenerServiceImp implements ListenerService {
                     outBoxJobService.setStatus("failure");
                     outBoxJobService.setPayload("Exception in TravelInsuranceService");
                     outBoxJobService.setIntervalId(intervalId);
+                    outBoxJobService.setStep(step);
                     outboxRepository.save(outBoxJobService);
                 }
             }

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Table(name = "travelinsurance_outbox")
 @Getter
 @Setter
-public class TravelinsuranceOutbox {
+public class TravelInsuranceOutbox {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "travelinsurance_outbox_seq")
     @SequenceGenerator(sequenceName = "travelinsurance_outbox_sequence", allocationSize = 1, name = "travelinsurance_outbox_seq")
@@ -44,4 +44,11 @@ public class TravelinsuranceOutbox {
 
     @Column(name = "order_reference")
     private String orderReference;
+
+    @Column(name = "pending_id")
+    private Long pendingId;
+
+    // 1,2,3,4,5
+    @Column(name = "step")
+    private int step;
 }

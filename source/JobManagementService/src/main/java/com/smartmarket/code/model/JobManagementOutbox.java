@@ -37,4 +37,8 @@ public class JobManagementOutbox {
     @Column(name = "interval_id")
     private String intervalId;
 
+    // 1,2,3,4,5
+    @Column(name = "step")
+    private int step;
+
 }
