@@ -3,8 +3,10 @@ package com.smartmarket.code.service.impl;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.dao.IntervalHistoryRepository;
 import com.smartmarket.code.dao.JobHistoryRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
+import com.smartmarket.code.model.IntervalHistory;
 import com.smartmarket.code.model.JobHistory;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,6 +56,9 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     JobHistoryRepository jobHistoryRepository;
 
+    @Autowired
+    IntervalHistoryRepository intervalHistoryRepository;
+
 
     @KafkaListener(id = "${kafka.groupID.travelinsurance.pendingBictransaction}",topics = "${kafka.topic.travelinsurance.pendingBictransaction}")
     public void listenPendingBicTransaction(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
@@ -67,7 +73,6 @@ public class ListenerServiceImp implements ListenerService {
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-        PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
         Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -87,28 +92,29 @@ public class ListenerServiceImp implements ListenerService {
                             Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
-                            if (op.equals("c")) {
-                                for (String k : keyPairs.keySet()) {
-                                    if (k.equals("id")) {
-                                        id = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("order_id")) {
-                                        orderId= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("order_reference")) {
-                                        orderReference= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("request_id")) {
-                                        requestId =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("from_order_service")) {
-                                        fromOrderService = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("count")) {
-                                        count = ((Number)keyPairs.get(k)).longValue();
-                                    }
+                            for (String k : keyPairs.keySet()) {
+                                if (k.equals("id")) {
+                                    id = ((Number)keyPairs.get(k)).longValue();
                                 }
+                                if (k.equals("order_id")) {
+                                    orderId= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("order_reference")) {
+                                    orderReference= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("request_id")) {
+                                    requestId =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("from_order_service")) {
+                                    fromOrderService = ((Number)keyPairs.get(k)).longValue();
+                                }
+                                if (k.equals("count")) {
+                                    count = ((Number)keyPairs.get(k)).longValue();
+                                }
+                            }
 
+                            if (op.equals("c")) {
+                                PendingBICTransaction pendingBICTransaction = new PendingBICTransaction();
                                 //insert to pending
                                 if(!requestId.equals("Format not True")) {
                                     pendingBICTransaction.setId(id);
@@ -120,7 +126,17 @@ public class ListenerServiceImp implements ListenerService {
 
                                     pendingBICTransactionRepository.save(pendingBICTransaction);
                                 }
-
+                            }
+                            if (op.equals("u")) {
+                                Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(id);
+                                if(pendingBICTransaction.isPresent()) {
+                                    PendingBICTransaction p = pendingBICTransaction.get();
+                                    //insert to pending
+                                    if (!requestId.equals("Format not True")) {
+                                        p.setCount(count);
+                                        pendingBICTransactionRepository.save(p);
+                                    }
+                                }
                             }
 
                         } else {
@@ -139,7 +155,6 @@ public class ListenerServiceImp implements ListenerService {
                                         id = ((Number)keyPairs.get(k)).longValue();
                                     }
                                 }
-
                                 //delete pending by id
                                 pendingBICTransactionRepository.deletePendingBICTransactionByID(id);
                             }
@@ -197,7 +212,6 @@ public class ListenerServiceImp implements ListenerService {
         String op = "";
 //        UUID orderId = UUID.randomUUID();
         String orderId ="";
-        Long pendingId= 0L;
         String orderReference ="";
         String aggregateId = "";
         String aggregateType = "";
@@ -224,59 +238,85 @@ public class ListenerServiceImp implements ListenerService {
                             Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
-                            if (op.equals("c")) {
-                                for (String k : keyPairs.keySet()) {
-                                    if (k.equals("pending_id")) {
-                                        pendingId = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("order_id")) {
-                                        orderId = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("order_reference")) {
-                                        orderReference= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregateid")) {
-                                        aggregateId = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregatetype")) {
-                                        aggregateType = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("payload")) {
-                                        payload = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("status")) {
-                                        status = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("interval_id")) {
-                                        intervalId= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("step")) {
-                                        step = ((Number)keyPairs.get(k)).intValue();
-                                    }
+                            for (String k : keyPairs.keySet()) {
+                                if (k.equals("order_id")) {
+                                    orderId = (String) keyPairs.get(k);
                                 }
+                                if (k.equals("order_reference")) {
+                                    orderReference= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("aggregateid")) {
+                                    aggregateId = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("aggregatetype")) {
+                                    aggregateType = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("payload")) {
+                                    payload = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("status")) {
+                                    status = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("interval_id")) {
+                                    intervalId= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("step")) {
+                                    step = ((Number)keyPairs.get(k)).intValue();
+                                }
+                            }
 
+                            if (op.equals("c")) {
                                 if (aggregateType.equals("JobService")) {
-                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-
                                     JSONObject pendingOrderDetail = new JSONObject();
                                     pendingOrderDetail.put("requestId",aggregateId);
                                     pendingOrderDetail.put("orderId",orderId);
                                     pendingOrderDetail.put("orderReference",orderReference);
 
-                                    //insert to outbox
-                                    if (status.equals("success")) {
-                                        Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
-                                        if(jobHistory.isPresent()){
-                                            JobHistory j = jobHistory.get();
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                    Date date = new Date();
+                                    String finishedAt = formatter.format(date);
 
-                                            jobHistoryRepository.save(j);
-                                        }
-                                    } else {
-                                        Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
-                                        if(jobHistory.isPresent()){
+                                    Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
+                                    if(jobHistory.isPresent()) {
+                                        //insert to outbox
+                                        if (status.equals("success")) {
                                             JobHistory j = jobHistory.get();
+                                            j.setFinishedAt(finishedAt);
 
+                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
+                                            j.setCurrentStep(currentStep);
+
+                                            if (step == j.getAmountStep() && !j.getState().equals("error")) {
+                                                j.setState("succeeded");
+                                            }
                                             jobHistoryRepository.save(j);
+
+                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                            if (intervalHistory != null) {
+                                                intervalHistory.setFinishedAt(finishedAt);
+                                                intervalHistory.setState("succeeded");
+                                                intervalHistoryRepository.save(intervalHistory);
+                                            }
+                                        }else {
+                                            JobHistory j = jobHistory.get();
+                                            j.setFinishedAt(finishedAt);
+
+                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
+                                            j.setCurrentStep(currentStep);
+
+                                            if (step < j.getAmountStep()) {
+                                                j.setState("error");
+                                            } else {
+                                                j.setState("failed");
+                                            }
+                                            jobHistoryRepository.save(j);
+
+                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                            if (intervalHistory != null) {
+                                                intervalHistory.setFinishedAt(finishedAt);
+                                                intervalHistory.setState("failed");
+                                                intervalHistoryRepository.save(intervalHistory);
+                                            }
                                         }
                                     }
                                 }

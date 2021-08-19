@@ -111,42 +111,42 @@ public class ListenerServiceImp implements ListenerService {
                             Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
-                            if (op.equals("c")) {
-                                for (String k : keyPairs.keySet()) {
+                            for (String k : keyPairs.keySet()) {
 //                                    if (k.equals("order_id")) {
 //                                        String s = (String) keyPairs.get(k);
 //                                        orderId= UUID.fromString(s);
 ////                                        orderId = ((Number)keyPairs.get(k)).longValue();
 //                                    }
-                                    if (k.equals("order_id")) {
-                                        orderId = (String)keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregateid")) {
-                                        aggregateId =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregatetype")) {
-                                        aggregateType =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("type")) {
-                                        type =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("payload")) {
-                                        payload =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("client_ip")) {
-                                        clientIp =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("client_id")) {
-                                        clientId =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("start_time")) {
-                                        startTime = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("host_name")) {
-                                        hostName = (String) keyPairs.get(k);
-                                    }
+                                if (k.equals("order_id")) {
+                                    orderId = (String)keyPairs.get(k);
                                 }
+                                if (k.equals("aggregateid")) {
+                                    aggregateId =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("aggregatetype")) {
+                                    aggregateType =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("type")) {
+                                    type =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("payload")) {
+                                    payload =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("client_ip")) {
+                                    clientIp =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("client_id")) {
+                                    clientId =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("start_time")) {
+                                    startTime = ((Number)keyPairs.get(k)).longValue();
+                                }
+                                if (k.equals("host_name")) {
+                                    hostName = (String) keyPairs.get(k);
+                                }
+                            }
 
+                            if (op.equals("c")) {
                                 if(type.equals("createTravelInsuranceBIC")){
                                     //convert payload--> BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest
                                     JSONObject jsonPayload = new JSONObject(payload);
@@ -358,38 +358,38 @@ public class ListenerServiceImp implements ListenerService {
                             Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
-                            if (op.equals("c")) {
-                                for (String k : keyPairs.keySet()) {
-                                    if (k.equals("pending_id")) {
-                                        pendingId = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("order_id")) {
-                                        orderId= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("order_reference")) {
-                                        orderReference= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("request_id")) {
-                                        requestId =(String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("start_time")) {
-                                        startTime = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("from_order_service")) {
-                                        fromOrderService = ((Number)keyPairs.get(k)).longValue();
-                                    }
-                                    if (k.equals("interval_id")) {
-                                        intervalId= (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("step")) {
-                                        step = ((Number)keyPairs.get(k)).intValue();
-                                    }
+                            for (String k : keyPairs.keySet()) {
+                                if (k.equals("pending_id")) {
+                                    pendingId = ((Number)keyPairs.get(k)).longValue();
                                 }
+                                if (k.equals("order_id")) {
+                                    orderId= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("order_reference")) {
+                                    orderReference= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("request_id")) {
+                                    requestId =(String) keyPairs.get(k);
+                                }
+                                if (k.equals("start_time")) {
+                                    startTime = ((Number)keyPairs.get(k)).longValue();
+                                }
+                                if (k.equals("from_order_service")) {
+                                    fromOrderService = ((Number)keyPairs.get(k)).longValue();
+                                }
+                                if (k.equals("interval_id")) {
+                                    intervalId= (String) keyPairs.get(k);
+                                }
+                                if (k.equals("step")) {
+                                    step = ((Number)keyPairs.get(k)).intValue();
+                                }
+                            }
 
+                            if (op.equals("c")) {
                                 Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
                                 if(pendingBICTransaction.isPresent()) {
-                                    //ìf count <=2
-                                    if (pendingBICTransaction.get().getCount() == null || pendingBICTransaction.get().getCount() <= 2) {
+                                    //ìf count <=5
+                                    if (pendingBICTransaction.get().getCount() == null || pendingBICTransaction.get().getCount() <= 5) {
 
                                         JSONObject detail = new JSONObject();
                                         detail.put("inquiryType", 2);
@@ -428,7 +428,7 @@ public class ListenerServiceImp implements ListenerService {
                                                 //OrderService
                                                 if (fromOrderService == 1) {
                                                     TravelInsuranceOutbox outBoxOrderService = new TravelInsuranceOutbox();
-                                                    outBoxOrderService.setOrderId(orderId);
+                                                    outBoxOrderService.setOrderId(orderReference);
                                                     outBoxOrderService.setAggregateId(requestId);
                                                     outBoxOrderService.setAggregateType("OrderService");
                                                     outBoxOrderService.setType(pendingBICTransaction.get().getType());
@@ -447,7 +447,6 @@ public class ListenerServiceImp implements ListenerService {
                                                 outBoxJobService.setStatus("success");
                                                 outBoxJobService.setPayload(responseBody);
                                                 outBoxJobService.setIntervalId(intervalId);
-                                                outBoxJobService.setPendingId(pendingId);
                                                 outBoxJobService.setStep(step);
                                                 outboxRepository.save(outBoxJobService);
 
@@ -461,7 +460,6 @@ public class ListenerServiceImp implements ListenerService {
                                         }
                                     }
                                 }
-
                             }
                             if (op.equals("r")) {
 //                                countReadOutBox ++;
@@ -501,17 +499,21 @@ public class ListenerServiceImp implements ListenerService {
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
         }catch (Exception ex) {
-            //case order not exist
-            if(ex instanceof CustomException) {
-                Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
-                if (pendingBICTransaction.isPresent()) {
-                    PendingBICTransaction p = pendingBICTransaction.get();
-                    if (p.getCount() < 5) {
-                        Long count = p.getCount();
-                        count++;
-                        p.setCount(count);
-                        pendingBICTransactionRepository.save(p);
-                    }
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime currentTime = LocalDateTime.now();
+
+            Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
+            if (pendingBICTransaction.isPresent()) {
+                PendingBICTransaction p = pendingBICTransaction.get();
+                if (p.getCount() < 5) {
+                    Long count = p.getCount();
+                    count++;
+                    p.setCount(count);
+                    pendingBICTransactionRepository.save(p);
+                }
+
+                //case order not exist
+                if(ex instanceof CustomException) {
 
                     //add to outbox to job know what order in 1 interval failure
                     TravelInsuranceOutbox outBoxJobService = new TravelInsuranceOutbox();
@@ -521,19 +523,22 @@ public class ListenerServiceImp implements ListenerService {
                     outBoxJobService.setAggregateType("JobService");
                     outBoxJobService.setType(p.getType());
                     outBoxJobService.setStatus("failure");
-                    outBoxJobService.setPayload("Exception in TravelInsuranceService");
+                    outBoxJobService.setPayload(((CustomException) ex).getDetailErrorMessage());
                     outBoxJobService.setIntervalId(intervalId);
                     outBoxJobService.setStep(step);
                     outboxRepository.save(outBoxJobService);
+
+                    ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicJobManagementOutbox,
+                            "outbox", op , dateTimeFormatter.format(currentTime),
+                            ((CustomException) ex).getErrorMessage(), ((CustomException) ex).getHttpStatusCode(), Throwables.getStackTraceAsString(ex));
+                    logService.createListenerLogExceptionException(listenerExceptionObject);
+                }else {
+                    ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicJobManagementOutbox,
+                            "outbox", op , dateTimeFormatter.format(currentTime),
+                            ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
+                    logService.createListenerLogExceptionException(listenerExceptionObject);
                 }
             }
-
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicJobManagementOutbox,
-                    "outbox", op , dateTimeFormatter.format(currentTime),
-                    ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createListenerLogExceptionException(listenerExceptionObject);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we leave.

@@ -40,6 +40,7 @@ public class OrderOutbox {
 //    @Column(name = "order_id")
 //    private UUID orderId;
 
+    //= order ref
     @Column(name = "order_id")
     private String orderId;
 

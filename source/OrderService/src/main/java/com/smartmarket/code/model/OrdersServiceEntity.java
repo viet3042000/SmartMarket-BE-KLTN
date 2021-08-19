@@ -45,7 +45,7 @@ public class OrdersServiceEntity {
 
     @Column(name = "created_finish", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createFinish;
+    private Date finishedAt;
 
     @Column(name = "user_name")
     private String userName;

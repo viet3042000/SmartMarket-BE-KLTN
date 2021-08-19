@@ -23,7 +23,7 @@ public class IntervalHistory {
 
     // 1,2,3,4,5
     @Column(name = "step")
-    private int Step;
+    private int step;
 
     @Column(name = "step_detail")
     private String stepDetail;

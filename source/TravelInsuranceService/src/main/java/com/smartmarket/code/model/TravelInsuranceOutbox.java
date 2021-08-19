@@ -45,9 +45,6 @@ public class TravelInsuranceOutbox {
     @Column(name = "order_reference")
     private String orderReference;
 
-    @Column(name = "pending_id")
-    private Long pendingId;
-
     // 1,2,3,4,5
     @Column(name = "step")
     private int step;

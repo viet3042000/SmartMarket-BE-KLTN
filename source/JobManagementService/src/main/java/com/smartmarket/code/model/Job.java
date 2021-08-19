@@ -24,6 +24,6 @@ public class Job {
     @Column(name = "enable")
     private String enable;
 
-    @Column(name = "amount_step")
-    private int amountStep;
+    @Column(name = "max_amount_step")
+    private int maxAmountStep;
 }

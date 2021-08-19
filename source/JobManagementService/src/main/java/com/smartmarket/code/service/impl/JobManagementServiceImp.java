@@ -12,14 +12,10 @@ import com.smartmarket.code.model.JobHistory;
 import com.smartmarket.code.model.JobManagementOutbox;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.entitylog.JobManagementExceptionObject;
-import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
-import com.smartmarket.code.model.entitylog.ServiceExceptionObject;
 import com.smartmarket.code.service.JobManagementService;
 import com.smartmarket.code.util.DateTimeUtils;
-import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +45,7 @@ public class JobManagementServiceImp implements JobManagementService {
     IntervalHistoryRepository intervalHistoryRepository;
 
 
-    @Scheduled(fixedRate = 35000)
+    @Scheduled(fixedRate = 40000)
     public void manage(){
         Long startTime = DateTimeUtils.getCurrenTime();
         try {
@@ -60,9 +56,11 @@ public class JobManagementServiceImp implements JobManagementService {
                 JobHistory jobHistory = new JobHistory();
                 jobHistory.setName("PendingBICTransaction");
                 jobHistory.setIntervalId(intervalId.toString());
-                jobHistory.setAmountStep(5);
-                jobHistory.setState("Running");
-                jobHistory.setCurrentStep("0/5");
+                jobHistory.setAmountStep(pendingBICTransactionList.size());
+                jobHistory.setState("running");
+
+                String currentStep = "0/"+String.valueOf(pendingBICTransactionList.size());
+                jobHistory.setCurrentStep(currentStep);
 
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                 Date date = new Date();
@@ -73,11 +71,11 @@ public class JobManagementServiceImp implements JobManagementService {
 
                 for (int i = 1; i <= pendingBICTransactionList.size(); i++) {
 
-                    PendingBICTransaction pendingBICTransaction = pendingBICTransactionList.get(i);
+                    PendingBICTransaction pendingBICTransaction = pendingBICTransactionList.get(i-1);
                     if(pendingBICTransaction.getCount() <5) {
                         IntervalHistory intervalHistory = new IntervalHistory();
                         intervalHistory.setIntervalId(intervalId.toString());
-                        intervalHistory.setState("Running");
+                        intervalHistory.setState("running");
                         intervalHistory.setStep(i);
 
                         JSONObject stepDetail = new JSONObject();
@@ -88,7 +86,7 @@ public class JobManagementServiceImp implements JobManagementService {
 
                         Date dateInterval = new Date();
                         String intervalCreateAt = formatter.format(dateInterval);
-                        jobHistory.setCreateAt(intervalCreateAt);
+                        intervalHistory.setCreateAt(intervalCreateAt);
 
                         intervalHistoryRepository.save(intervalHistory);
 

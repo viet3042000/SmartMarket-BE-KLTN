@@ -88,6 +88,7 @@ public class ListenerServiceImp implements ListenerService {
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
 //        UUID orderId = UUID.randomUUID();
+        //=order ref
         String orderId ="";
         String aggregateId = "";
         String aggregateType = "";
@@ -113,32 +114,32 @@ public class ListenerServiceImp implements ListenerService {
                             Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
-                            if (op.equals("c")) {
-                                for (String k : keyPairs.keySet()) {
+                            for (String k : keyPairs.keySet()) {
 //                                    if (k.equals("order_id")) {
 //                                        String s = (String) keyPairs.get(k);
 //                                        orderId= UUID.fromString(s);
 //                                    }
-                                    if (k.equals("order_id")) {
-                                        orderId = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregateid")) {
-                                        aggregateId = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("aggregatetype")) {
-                                        aggregateType = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("type")) {
-                                        type = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("payload")) {
-                                        payload = (String) keyPairs.get(k);
-                                    }
-                                    if (k.equals("status")) {
-                                        status = (String) keyPairs.get(k);
-                                    }
+                                if (k.equals("order_id")) {
+                                    orderId = (String) keyPairs.get(k);
                                 }
+                                if (k.equals("aggregateid")) {
+                                    aggregateId = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("aggregatetype")) {
+                                    aggregateType = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("type")) {
+                                    type = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("payload")) {
+                                    payload = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("status")) {
+                                    status = (String) keyPairs.get(k);
+                                }
+                            }
 
+                            if (op.equals("c")) {
                                 if (aggregateType.equals("OrderService")) {
                                     if (type.equals("createTravelInsuranceBIC")) {
                                         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -150,9 +151,9 @@ public class ListenerServiceImp implements ListenerService {
                                         if (status.equals("success")) {
                                             orders.setState("Success");
                                             Date date = new Date();
-                                            String stringCreateFinish = formatter.format(date);
-                                            Date createFinish = formatter.parse(stringCreateFinish);
-                                            orders.setCreateFinish(createFinish);
+                                            String stringFinishedAt = formatter.format(date);
+                                            Date finishedAt = formatter.parse(stringFinishedAt);
+                                            orders.setFinishedAt(finishedAt);
 
                                             sagaState.setCurrentStep("TravelInsuranceService");
 
@@ -165,9 +166,9 @@ public class ListenerServiceImp implements ListenerService {
                                         } else {
                                             orders.setState("CreateAborted");
                                             Date date = new Date();
-                                            String stringCreateFinish = formatter.format(date);
-                                            Date createFinish = formatter.parse(stringCreateFinish);
-                                            orders.setCreateFinish(createFinish);
+                                            String stringFinishedAt = formatter.format(date);
+                                            Date finishedAt = formatter.parse(stringFinishedAt);
+                                            orders.setFinishedAt(finishedAt);
 
                                             sagaState.setCurrentStep("TravelInsuranceService");
 
