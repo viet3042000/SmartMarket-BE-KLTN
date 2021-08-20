@@ -124,8 +124,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-//            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
-            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody("https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Create", null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
+            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
+//            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody("https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Create", null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
@@ -514,8 +514,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
             long startTime = System.currentTimeMillis();
             //post Data to BIC
-//            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
-            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,"https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Update", null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+//            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,"https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Update", null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
 
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
@@ -713,8 +713,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
                 throw new CustomException("Not found token response from BIC", HttpStatus.INTERNAL_SERVER_ERROR, createTravelInsuranceBICRequest.getRequestId(),null,ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG,HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
-//            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
-            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody("https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Create", null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
+            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.createTravelBIC"), null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
+//            ResponseEntity<String> jsonResultCreateBIC = apiUtils.postDataByApiBody("https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Create", null, responseCreate, token, createTravelInsuranceBICRequest.getRequestId(),clientHttpRequestFactoryCreateBIC);
             EJson jsonObjectReponseCreate = null;
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
@@ -912,8 +912,8 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             }
 
             //post Data to BIC
-//            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
-            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,"https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Update", null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,environment.getRequiredProperty("api.updateTravelBIC"), null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
+//            ResponseEntity<String> jsonResultPutBIC = apiUtils.putDataByApiBody(orderID,"https://app.bic.vn:1111/EbizApiTest/api/v1/TRV/Update", null, responseCreate, token, updateTravelInsuranceBICRequest.getRequestId(), clientHttpRequestFactoryUpdateBIC);
 
             //get duration time
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);

@@ -137,7 +137,7 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("TravelInsuranceService");
+            outBox.setAggregateType("OrderService");
             outBox.setAggregateId(createTravelInsuranceBICRequestBaseDetail.getRequestId());
             outBox.setType("createTravelInsuranceBIC");
 
@@ -253,7 +253,7 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("TravelInsuranceService");
+            outBox.setAggregateType("OrderService");
             outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
             outBox.setType("updateTravelInsuranceBIC");
 
@@ -372,7 +372,7 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("TravelInsuranceService");
+            outBox.setAggregateType("OrderService");
             outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
             outBox.setType("getTravelInsuranceBIC");
 

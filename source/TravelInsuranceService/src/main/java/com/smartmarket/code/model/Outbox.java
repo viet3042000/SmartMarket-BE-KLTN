@@ -27,25 +27,6 @@ public class Outbox {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "status")
-    private String status;
-
     @Column(name = "payload")
     private String payload;
-
-//    @Column(name = "order_id")
-//    private UUID orderId;
-
-    @Column(name = "order_id")
-    private String orderId;
-
-    @Column(name = "interval_id")
-    private String intervalId;
-
-    @Column(name = "order_reference")
-    private String orderReference;
-
-    // 1,2,3,4,5
-    @Column(name = "step")
-    private int step;
 }

@@ -97,7 +97,6 @@ public class JobManagementServiceImp implements JobManagementService {
                         jobManagementOutbox.setRequestId(pendingBICTransaction.getRequestId());
                         jobManagementOutbox.setOrderId(pendingBICTransaction.getOrderId());
                         jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
-                        jobManagementOutbox.setFromOrderService(pendingBICTransaction.getFromOrderService());
                         jobManagementOutbox.setIntervalId(intervalId.toString());
                         jobManagementOutbox.setStep(i);
                         jobManagementOutboxRepository.save(jobManagementOutbox);

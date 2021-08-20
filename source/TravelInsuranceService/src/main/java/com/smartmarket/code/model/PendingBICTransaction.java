@@ -27,9 +27,6 @@ public class PendingBICTransaction {
     @Column(name = "count")
     private Long count;
 
-    @Column(name = "from_order_service")
-    private Long fromOrderService;
-
     @Column(name = "type")
     private String type;
 }

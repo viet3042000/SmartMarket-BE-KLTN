@@ -9,14 +9,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
-
 @Transactional
 @Repository
 public interface OrderRepository extends JpaRepository<OrdersServiceEntity, String> {
-    @Query(value = "SELECT * FROM orders WHERE id=:id", nativeQuery = true)
-    public OrdersServiceEntity findById(@Param("id") Long id);
 
 //    @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
 //    public OrdersServiceEntity findByOrderId(@Param("order_id") UUID orderId);

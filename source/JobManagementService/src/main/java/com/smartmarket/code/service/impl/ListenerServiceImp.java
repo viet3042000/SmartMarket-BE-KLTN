@@ -68,7 +68,6 @@ public class ListenerServiceImp implements ListenerService {
         String orderReference ="";
         Long id = 0L;
         String requestId = "";
-        Long fromOrderService = 0L;
         Long count =0L;
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -105,9 +104,6 @@ public class ListenerServiceImp implements ListenerService {
                                 if (k.equals("request_id")) {
                                     requestId =(String) keyPairs.get(k);
                                 }
-                                if (k.equals("from_order_service")) {
-                                    fromOrderService = ((Number)keyPairs.get(k)).longValue();
-                                }
                                 if (k.equals("count")) {
                                     count = ((Number)keyPairs.get(k)).longValue();
                                 }
@@ -121,7 +117,6 @@ public class ListenerServiceImp implements ListenerService {
                                     pendingBICTransaction.setRequestId(requestId);
                                     pendingBICTransaction.setOrderId(orderId);
                                     pendingBICTransaction.setOrderReference(orderReference);
-                                    pendingBICTransaction.setFromOrderService(fromOrderService);
                                     pendingBICTransaction.setCount(count);
 
                                     pendingBICTransactionRepository.save(pendingBICTransaction);
@@ -266,57 +261,55 @@ public class ListenerServiceImp implements ListenerService {
                             }
 
                             if (op.equals("c")) {
-                                if (aggregateType.equals("JobService")) {
-                                    JSONObject pendingOrderDetail = new JSONObject();
-                                    pendingOrderDetail.put("requestId",aggregateId);
-                                    pendingOrderDetail.put("orderId",orderId);
-                                    pendingOrderDetail.put("orderReference",orderReference);
+                                JSONObject pendingOrderDetail = new JSONObject();
+                                pendingOrderDetail.put("requestId",aggregateId);
+                                pendingOrderDetail.put("orderId",orderId);
+                                pendingOrderDetail.put("orderReference",orderReference);
 
-                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                                    Date date = new Date();
-                                    String finishedAt = formatter.format(date);
+                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                Date date = new Date();
+                                String finishedAt = formatter.format(date);
 
-                                    Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
-                                    if(jobHistory.isPresent()) {
-                                        //insert to outbox
-                                        if (status.equals("success")) {
-                                            JobHistory j = jobHistory.get();
-                                            j.setFinishedAt(finishedAt);
+                                Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
+                                if(jobHistory.isPresent()) {
+                                    //insert to outbox
+                                    if (status.equals("success")) {
+                                        JobHistory j = jobHistory.get();
+                                        j.setFinishedAt(finishedAt);
 
-                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
-                                            j.setCurrentStep(currentStep);
+                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
+                                        j.setCurrentStep(currentStep);
 
-                                            if (step == j.getAmountStep() && !j.getState().equals("error")) {
-                                                j.setState("succeeded");
-                                            }
-                                            jobHistoryRepository.save(j);
+                                        if (step == j.getAmountStep() && !j.getState().equals("error")) {
+                                            j.setState("succeeded");
+                                        }
+                                        jobHistoryRepository.save(j);
 
-                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
-                                            if (intervalHistory != null) {
-                                                intervalHistory.setFinishedAt(finishedAt);
-                                                intervalHistory.setState("succeeded");
-                                                intervalHistoryRepository.save(intervalHistory);
-                                            }
-                                        }else {
-                                            JobHistory j = jobHistory.get();
-                                            j.setFinishedAt(finishedAt);
+                                        IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                        if (intervalHistory != null) {
+                                            intervalHistory.setFinishedAt(finishedAt);
+                                            intervalHistory.setState("succeeded");
+                                            intervalHistoryRepository.save(intervalHistory);
+                                        }
+                                    }else {
+                                        JobHistory j = jobHistory.get();
+                                        j.setFinishedAt(finishedAt);
 
-                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
-                                            j.setCurrentStep(currentStep);
+                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
+                                        j.setCurrentStep(currentStep);
 
-                                            if (step < j.getAmountStep()) {
-                                                j.setState("error");
-                                            } else {
-                                                j.setState("failed");
-                                            }
-                                            jobHistoryRepository.save(j);
+                                        if (step < j.getAmountStep()) {
+                                            j.setState("error");
+                                        } else {
+                                            j.setState("failed");
+                                        }
+                                        jobHistoryRepository.save(j);
 
-                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
-                                            if (intervalHistory != null) {
-                                                intervalHistory.setFinishedAt(finishedAt);
-                                                intervalHistory.setState("failed");
-                                                intervalHistoryRepository.save(intervalHistory);
-                                            }
+                                        IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                        if (intervalHistory != null) {
+                                            intervalHistory.setFinishedAt(finishedAt);
+                                            intervalHistory.setState("failed");
+                                            intervalHistoryRepository.save(intervalHistory);
                                         }
                                     }
                                 }

@@ -88,7 +88,7 @@ public class ListenerServiceImp implements ListenerService {
         String clientIp = "";
         String clientId = "";
         String hostName= "";
-        String startTime= "";
+        Long startTime= 0L;
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Outbox outBox = new Outbox();
@@ -130,21 +130,15 @@ public class ListenerServiceImp implements ListenerService {
                                     payload =(String) keyPairs.get(k);
                                 }
                             }
+                            JSONObject jsonPayload = new JSONObject(payload);
+
+                            orderId = jsonPayload.getString("orderId");
+                            clientIp = jsonPayload.getString("clientIp");
+                            clientId = jsonPayload.getString("clientId");
+                            hostName= jsonPayload.getString("hostName");
+                            startTime = jsonPayload.getLong("startTime");
 
                             if (op.equals("c")) {
-                                JSONObject jsonPayload = new JSONObject(payload);
-
-                                orderId = jsonPayload.getString("orderId");
-                                clientIp = jsonPayload.getString("clientIp");
-                                clientId = jsonPayload.getString("clientId");
-                                hostName= jsonPayload.getString("hostName");
-                                startTime = jsonPayload.getString("startTime");
-                                jsonPayload.remove("orderId");
-                                jsonPayload.remove("clientIp");
-                                jsonPayload.remove("clientId");
-                                jsonPayload.remove("hostName");
-                                jsonPayload.remove("startTime");
-
                                 if(type.equals("createTravelInsuranceBIC")){
 
                                     JSONObject detail = jsonPayload.getJSONObject("detail");
@@ -157,27 +151,30 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.createOrderOutbox(baseDetail,clientIp,clientId, Long.parseLong(startTime),hostName);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.createOrderOutbox(baseDetail,clientIp,clientId,startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
+                                    jsonBody.put("orderId",orderId);
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebody + order id + status
+                                        jsonBody.put("status","success");
+                                        outBox.setPayload(jsonBody.toString());
                                     }else {
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebpdy + order id + status
+                                        jsonBody.put("status","failure");
+                                        outBox.setPayload(jsonBody.toString());
                                     }
                                     outboxRepository.save(outBox);
                                 }
@@ -194,27 +191,30 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.updateOrderOutbox(baseDetail,clientIp,clientId, Long.parseLong(startTime),hostName);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.updateOrderOutbox(baseDetail,clientIp,clientId,startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
+                                    jsonBody.put("orderId",orderId);
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebody + order id + status
+                                        jsonBody.put("status","success");
+                                        outBox.setPayload(jsonBody.toString());
                                     }else {
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebody + order id + status
+                                        jsonBody.put("status","failure");
+                                        outBox.setPayload(jsonBody.toString());
                                     }
                                     outboxRepository.save(outBox);
                                 }
@@ -231,27 +231,30 @@ public class ListenerServiceImp implements ListenerService {
                                     baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
                                     // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.getOrderOutbox(baseDetail,clientIp,clientId, Long.parseLong(startTime),hostName);
+                                    ResponseEntity<String> responseEntity = travelInsuranceService.getOrderOutbox(baseDetail,clientIp,clientId,startTime,hostName);
                                     ObjectMapper mapper = new ObjectMapper();
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
+                                    jsonBody.put("orderId",orderId);
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("success");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebody + order id + status
+                                        jsonBody.put("status","success");
+                                        outBox.setPayload(jsonBody.toString());
                                     }else {
-                                        outBox.setOrderId(orderId);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType("OrderService");
                                         outBox.setType(type);
-                                        outBox.setStatus("failure");
-                                        outBox.setPayload(responseBody);
+
+                                        //payload = responsebody + order id + status
+                                        jsonBody.put("status","failure");
+                                        outBox.setPayload(jsonBody.toString());
                                     }
                                     outboxRepository.save(outBox);
                                 }
@@ -303,12 +306,16 @@ public class ListenerServiceImp implements ListenerService {
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
 //            insert into travelinsurance_outbox table
-            outBox.setOrderId(orderId);
             outBox.setAggregateId(aggregateId);
             outBox.setAggregateType("OrderService");
             outBox.setType(type);
-            outBox.setStatus("failure");
-            outBox.setPayload("Exception in TravelInsuranceService");
+
+            //payload = responsebody + order id + status
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("orderId",orderId);
+            jsonBody.put("status","failure");
+//            jsonBody.put("detail","Exception in TravelInsuranceService");
+            outBox.setPayload(jsonBody.toString());
             outboxRepository.save(outBox);
         }
         finally {
@@ -322,12 +329,13 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.jobmanagementoutbox}",topics = "${kafka.topic.jobmanagementoutbox}")
     public void listenJobManagementServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
+        String payload ="";
+        String requestId = "";
+
         Long pendingId= 0L;
         String orderId ="";
         String orderReference ="";
-        String requestId = "";
         Long startTime = 0L;
-        Long fromOrderService = 0L;
         String intervalId = "";
         int step = 0;
 
@@ -353,31 +361,23 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             for (String k : keyPairs.keySet()) {
-                                if (k.equals("pending_id")) {
-                                    pendingId = ((Number)keyPairs.get(k)).longValue();
+                                if (k.equals("payload")) {
+                                    payload= (String) keyPairs.get(k);
                                 }
-                                if (k.equals("order_id")) {
-                                    orderId= (String) keyPairs.get(k);
-                                }
-                                if (k.equals("order_reference")) {
-                                    orderReference= (String) keyPairs.get(k);
-                                }
-                                if (k.equals("request_id")) {
+                                if (k.equals("aggregateid")) {
+                                    //= aggrate id
                                     requestId =(String) keyPairs.get(k);
                                 }
-                                if (k.equals("start_time")) {
-                                    startTime = ((Number)keyPairs.get(k)).longValue();
-                                }
-                                if (k.equals("from_order_service")) {
-                                    fromOrderService = ((Number)keyPairs.get(k)).longValue();
-                                }
-                                if (k.equals("interval_id")) {
-                                    intervalId= (String) keyPairs.get(k);
-                                }
-                                if (k.equals("step")) {
-                                    step = ((Number)keyPairs.get(k)).intValue();
-                                }
                             }
+
+                            //step, intervalId, startTime,orderReference, orderId,pendingId = payload.get
+                            JSONObject j = new JSONObject(payload);
+                            orderId = j.getString("orderId");
+                            orderReference = j.getString("orderReference");
+                            pendingId = j.getLong("pendingId");
+                            startTime = j.getLong("startTime");
+                            intervalId = j.getString("intervalId");
+                            step = j.getInt("step");
 
                             if (op.equals("c")) {
                                 Optional<PendingBICTransaction> pendingBICTransaction = pendingBICTransactionRepository.findById(pendingId);
@@ -408,7 +408,6 @@ public class ListenerServiceImp implements ListenerService {
                                             //if type is createTravelInsuranceBIC
                                             if(pendingBICTransaction.get().getType().equals("createTravelInsuranceBIC")) {
 
-                                                //find bictransaction by requestid , orderid, orderref from pending
                                                 Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionPending(orderId, orderReference, requestId);
                                                 if (bicTransaction.isPresent()) {
                                                     BICTransaction b = bicTransaction.get();
@@ -420,28 +419,33 @@ public class ListenerServiceImp implements ListenerService {
                                                 }
 
                                                 //OrderService
-                                                if (fromOrderService == 1) {
-                                                    Outbox outBoxOrderService = new Outbox();
-                                                    outBoxOrderService.setOrderId(orderReference);
-                                                    outBoxOrderService.setAggregateId(requestId);
-                                                    outBoxOrderService.setAggregateType("OrderService");
-                                                    outBoxOrderService.setType(pendingBICTransaction.get().getType());
-                                                    outBoxOrderService.setStatus("success");
-                                                    outBoxOrderService.setPayload(responseBody);
-                                                    outboxRepository.save(outBoxOrderService);
-                                                }
+                                                Outbox outBoxOrderService = new Outbox();
+                                                outBoxOrderService.setAggregateId(requestId);
+                                                outBoxOrderService.setAggregateType("OrderService");
+                                                outBoxOrderService.setType(pendingBICTransaction.get().getType());
+
+                                                //payload = responsebody + orderId = orderRef + status
+                                                jsonBody.put("orderId",orderReference);
+                                                jsonBody.put("status","success");
+                                                outBoxOrderService.setPayload(jsonBody.toString());
+                                                outboxRepository.save(outBoxOrderService);
+
+                                                //remove orderId = orderRef
+                                                jsonBody.remove("orderId");
 
                                                 //add to outbox to job know what order in 1 interval success
                                                 Outbox outBoxJobService = new Outbox();
-                                                outBoxJobService.setOrderId(orderId);
-                                                outBoxJobService.setOrderReference(orderReference);
                                                 outBoxJobService.setAggregateId(requestId);
                                                 outBoxJobService.setAggregateType("JobService");
                                                 outBoxJobService.setType(pendingBICTransaction.get().getType());
-                                                outBoxJobService.setStatus("success");
-                                                outBoxJobService.setPayload(responseBody);
-                                                outBoxJobService.setIntervalId(intervalId);
-                                                outBoxJobService.setStep(step);
+
+                                                //response body + orderReference, order id, intervalId, step,status
+                                                jsonBody.put("orderId",orderId);
+                                                jsonBody.put("orderReference",orderReference);
+                                                jsonBody.put("intervalId",intervalId);
+                                                jsonBody.put("step",step);
+                                                outBoxJobService.setPayload(jsonBody.toString());
+
                                                 outboxRepository.save(outBoxJobService);
 
                                                 //delete pending by id
@@ -511,15 +515,20 @@ public class ListenerServiceImp implements ListenerService {
 
                     //add to outbox to job know what order in 1 interval failure
                     Outbox outBoxJobService = new Outbox();
-                    outBoxJobService.setOrderId(orderId);
-                    outBoxJobService.setOrderReference(orderReference);
                     outBoxJobService.setAggregateId(requestId);
                     outBoxJobService.setAggregateType("JobService");
                     outBoxJobService.setType(p.getType());
-                    outBoxJobService.setStatus("failure");
-                    outBoxJobService.setPayload(((CustomException) ex).getDetailErrorMessage());
-                    outBoxJobService.setIntervalId(intervalId);
-                    outBoxJobService.setStep(step);
+//                    outBoxJobService.setStatus("failure");
+
+                    //response body + orderReference, order id, intervalId, step + status
+                    JSONObject jsonBody = new JSONObject();
+                    jsonBody.put("orderId",orderId);
+                    jsonBody.put("orderReference",orderReference);
+                    jsonBody.put("intervalId",intervalId);
+                    jsonBody.put("status","failure");
+                    jsonBody.put("step",step);
+                    outBoxJobService.setPayload(jsonBody.toString());
+
                     outboxRepository.save(outBoxJobService);
 
                     ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicJobManagementOutbox,

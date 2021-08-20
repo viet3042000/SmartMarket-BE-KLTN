@@ -31,9 +31,6 @@ public class Outbox {
     @Column(name = "start_time")
     private Long startTime;
 
-    @Column(name = "from_order_service")
-    private Long fromOrderService;
-
     @Column(name = "interval_id")
     private String intervalId;
 

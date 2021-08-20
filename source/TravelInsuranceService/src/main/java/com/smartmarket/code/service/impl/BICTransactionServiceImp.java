@@ -203,8 +203,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
         pendingBICTransaction.setOrderReference(orderReference);
         pendingBICTransaction.setRequestId(requestId);
         pendingBICTransaction.setType(type);
-        Long fromOrderService = 0L;
-        pendingBICTransaction.setFromOrderService(fromOrderService);
+
         Long count = 0L;
         pendingBICTransaction.setCount(count);
 
@@ -218,10 +217,6 @@ public class BICTransactionServiceImp implements BICTransactionService {
         pendingBICTransaction.setOrderReference(orderReference);
         pendingBICTransaction.setRequestId(requestId);
         pendingBICTransaction.setType(type);
-
-        Long fromOrderService = 0L;
-        fromOrderService ++;
-        pendingBICTransaction.setFromOrderService(fromOrderService);
 
         Long count = 0L;
         pendingBICTransaction.setCount(count);
@@ -274,10 +269,6 @@ public class BICTransactionServiceImp implements BICTransactionService {
         pendingBICTransaction.setOrderReference(orderReference);
         pendingBICTransaction.setRequestId(requestId);
         pendingBICTransaction.setType(type);
-
-        Long fromOrderService = 0L;
-        fromOrderService ++;
-        pendingBICTransaction.setFromOrderService(fromOrderService);
 
         Long count = 0L;
         pendingBICTransaction.setCount(count);

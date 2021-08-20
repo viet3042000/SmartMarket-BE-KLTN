@@ -86,15 +86,14 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
-//        UUID orderId = UUID.randomUUID();
         //=order ref
         String orderId ="";
         String aggregateId = "";
         String aggregateType = "";
         String type = "";
         String payload = "";
-        String status = "";
 
+        String status = "";
         try {
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println(record.offset());
@@ -118,9 +117,6 @@ public class ListenerServiceImp implements ListenerService {
 //                                        String s = (String) keyPairs.get(k);
 //                                        orderId= UUID.fromString(s);
 //                                    }
-                                if (k.equals("order_id")) {
-                                    orderId = (String) keyPairs.get(k);
-                                }
                                 if (k.equals("aggregateid")) {
                                     aggregateId = (String) keyPairs.get(k);
                                 }
@@ -133,126 +129,132 @@ public class ListenerServiceImp implements ListenerService {
                                 if (k.equals("payload")) {
                                     payload = (String) keyPairs.get(k);
                                 }
-                                if (k.equals("status")) {
-                                    status = (String) keyPairs.get(k);
-                                }
                             }
 
+                            //order id, status = payload.get
+                            JSONObject j = new JSONObject(payload);
+                            //orderId = order ref
+                            orderId = j.getString("orderId");
+                            status = j.getString("status");
+                            //remove order id from payload
+                            j.remove("orderId");
+                            j.remove("status");
+
                             if (op.equals("c")) {
-                                if (aggregateType.equals("OrderService")) {
-                                    if (type.equals("createTravelInsuranceBIC")) {
-                                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                if (type.equals("createTravelInsuranceBIC")) {
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                        //insert to outbox
-                                        if (status.equals("success")) {
-                                            orders.setState("Success");
-                                            Date date = new Date();
-                                            String stringFinishedAt = formatter.format(date);
-                                            Date finishedAt = formatter.parse(stringFinishedAt);
-                                            orders.setFinishedAt(finishedAt);
+                                    //insert to outbox
+                                    if (status.equals("success")) {
+                                        orders.setState("Success");
+                                        Date date = new Date();
+                                        String stringFinishedAt = formatter.format(date);
+                                        Date finishedAt = formatter.parse(stringFinishedAt);
+                                        orders.setFinishedAt(finishedAt);
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                        sagaState.setCurrentStep("TravelInsuranceService");
 
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "SUCCEEDED");
-                                            sagaState.setStepState(s.toString());
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "SUCCEEDED");
+                                        sagaState.setStepState(s.toString());
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("SUCCEEDED");
-                                        } else {
-                                            orders.setState("CreateAborted");
-                                            Date date = new Date();
-                                            String stringFinishedAt = formatter.format(date);
-                                            Date finishedAt = formatter.parse(stringFinishedAt);
-                                            orders.setFinishedAt(finishedAt);
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("SUCCEEDED");
+                                    } else {
+                                        orders.setState("CreateAborted");
+                                        Date date = new Date();
+                                        String stringFinishedAt = formatter.format(date);
+                                        Date finishedAt = formatter.parse(stringFinishedAt);
+                                        orders.setFinishedAt(finishedAt);
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                        sagaState.setCurrentStep("TravelInsuranceService");
 
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "ABORTED");
-                                            sagaState.setStepState(s.toString());
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "ABORTED");
+                                        sagaState.setStepState(s.toString());
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("ABORTED");
-                                        }
-                                        //if other status of message
-                                        // do ABORTING
-
-                                        orderRepository.save(orders);
-                                        sagaStateRepository.save(sagaState);
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("ABORTED");
                                     }
+                                    //if other status of message
+                                    // do ABORTING
 
-                                    if (type.equals("updateTravelInsuranceBIC")) {
-                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                    orderRepository.save(orders);
+                                    sagaStateRepository.save(sagaState);
+                                }
 
-                                        //insert to outbox
-                                        if (status.equals("success")) {
-                                            orders.setState("Success");
+                                if (type.equals("updateTravelInsuranceBIC")) {
+                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "SUCCEEDED");
-                                            sagaState.setStepState(s.toString());
+                                    //insert to outbox
+                                    if (status.equals("success")) {
+                                        orders.setState("Success");
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("SUCCEEDED");
-                                        } else {
-                                            orders.setState("UpdateAborted");
+                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "SUCCEEDED");
+                                        sagaState.setStepState(s.toString());
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "ABORTED");
-                                            sagaState.setStepState(s.toString());
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("SUCCEEDED");
+                                    } else {
+                                        orders.setState("UpdateAborted");
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("ABORTED");
-                                        }
-                                        //if other status of message
-                                        // do ABORTING
+                                        sagaState.setCurrentStep("TravelInsuranceService");
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "ABORTED");
+                                        sagaState.setStepState(s.toString());
 
-                                        orderRepository.save(orders);
-                                        sagaStateRepository.save(sagaState);
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("ABORTED");
                                     }
+                                    //if other status of message
+                                    // do ABORTING
 
-                                    if (type.equals("getTravelInsuranceBIC")) {
-                                        OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
-                                        SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
+                                    orderRepository.save(orders);
+                                    sagaStateRepository.save(sagaState);
+                                }
 
-                                        //insert to outbox
-                                        if (status.equals("success")) {
-                                            orders.setState("Success");
-                                            orders.setPayloadGet(payload);
+                                if (type.equals("getTravelInsuranceBIC")) {
+                                    OrdersServiceEntity orders = orderRepository.findByOrderId(orderId);
+                                    SagaState sagaState = sagaStateRepository.findByOrderId(orderId);
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                    //insert to outbox
+                                    if (status.equals("success")) {
+                                        orders.setState("Success");
 
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "SUCCEEDED");
-                                            sagaState.setStepState(s.toString());
+                                        //payload - order id - status
+                                        orders.setPayloadGet(j.toString());
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("SUCCEEDED");
-                                        } else {
-                                            orders.setState("GetAborted");
+                                        sagaState.setCurrentStep("TravelInsuranceService");
 
-                                            sagaState.setCurrentStep("TravelInsuranceService");
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "SUCCEEDED");
+                                        sagaState.setStepState(s.toString());
 
-                                            JSONObject s = new JSONObject();
-                                            s.put("TravelInsuranceService", "ABORTED");
-                                            sagaState.setStepState(s.toString());
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("SUCCEEDED");
+                                    } else {
+                                        orders.setState("GetAborted");
 
-                                            sagaState.setType(type);
-                                            sagaState.setStatus("ABORTED");
-                                        }
-                                        //if other status of message
-                                        // do ABORTING
+                                        sagaState.setCurrentStep("TravelInsuranceService");
 
-                                        orderRepository.save(orders);
-                                        sagaStateRepository.save(sagaState);
+                                        JSONObject s = new JSONObject();
+                                        s.put("TravelInsuranceService", "ABORTED");
+                                        sagaState.setStepState(s.toString());
+
+                                        sagaState.setType(type);
+                                        sagaState.setStatus("ABORTED");
                                     }
+                                    //if other status of message
+                                    // do ABORTING
+
+                                    orderRepository.save(orders);
+                                    sagaStateRepository.save(sagaState);
                                 }
                             }
                             if (op.equals("r")) {
