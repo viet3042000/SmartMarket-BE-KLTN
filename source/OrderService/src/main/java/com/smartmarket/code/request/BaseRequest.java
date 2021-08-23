@@ -25,5 +25,8 @@ public class BaseRequest implements Serializable {
     @Size(max =10, message = "targetId should be less than or equal to 14 characters")
     private String targetId ;
 
+    @NotBlank(message = "type is require")
+    @Size(max =36, message = "type should be less than or equal to 36 characters")
+    private String type ;
 
 }

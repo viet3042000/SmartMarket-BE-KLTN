@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     LogServiceImpl logService;
 
     @Transactional
-    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -86,18 +86,18 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             //Create BIC
-            CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequestBaseDetail.getDetail());
+            CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
             String responseCreate = null;
             Gson gson = new Gson();
             responseCreate = gson.toJson(createTravelInsuranceToBIC);
             JSONObject transactionDetail = new JSONObject(responseCreate);
 
             //logRequest vs TravelInsuranceService
-            TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequestBaseDetail.getRequestId(), createTravelInsuranceBICRequestBaseDetail.getRequestTime(),"TravelInsuranceService","createOrder","request",
+            TargetObject tarObjectRequest = new TargetObject("targetLog", null, createTravelInsuranceBICRequest.getRequestId(), createTravelInsuranceBICRequest.getRequestTime(),"TravelInsuranceService","createOrder","request",
                     transactionDetail, logTimestamp, messageTimestamp, null);
             logService.createTargetLog(tarObjectRequest);
 
-            String requestBody = gson.toJson(createTravelInsuranceBICRequestBaseDetail);
+            String requestBody = gson.toJson(createTravelInsuranceBICRequest);
             JSONObject j = new JSONObject(requestBody);
 
             UUID orderId = UUID.randomUUID();
@@ -105,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
 
             orders.setOrderId(orderId.toString());
             orders.setPayload(j.toString());
-            orders.setType("createTravelInsuranceBIC");
+            orders.setType(j.getString("type"));
             orders.setState("Pending");
 
             //get client Id
@@ -132,14 +132,18 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
-            sagaState.setType("createTravelInsuranceBIC");
+            if("BICTravelInsurance".equals(j.getString("type"))) {
+                sagaState.setType("createTravelInsuranceBIC");
+            }
             sagaState.setPayload(j.toString());
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("OrderService");
-            outBox.setAggregateId(createTravelInsuranceBICRequestBaseDetail.getRequestId());
-            outBox.setType("createTravelInsuranceBIC");
+            outBox.setAggregateType("Order");
+            outBox.setAggregateId(createTravelInsuranceBICRequest.getRequestId());
+            if("BICTravelInsurance".equals(j.getString("type"))) {
+                outBox.setType("createTravelInsuranceBIC");
+            }
 
             j.put("orderId",orders.getOrderId().toString());
             j.put("startTime",startTime);
@@ -155,21 +159,21 @@ public class OrderServiceImpl implements OrderService {
             if (ex instanceof ResourceAccessException) {
                 ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                 if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(createTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 } else {
-                    throw new APIAccessException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(createTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 }
             }
 
             //catch truong hop goi dc sang BIC nhưng loi
             else if (ex instanceof HttpClientErrorException) {
                 HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                throw new APIResponseException(createTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
             }
 
             //catch invalid input exception
             else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), createTravelInsuranceBICRequestBaseDetail.getRequestId());
+                throw new InvalidInputException(ex.getMessage(), createTravelInsuranceBICRequest.getRequestId());
             }
 
             //catch truong hop loi kết nối database
@@ -177,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } else if (ex instanceof CustomException) {
                 CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
             } else {
                 throw ex;
             }
@@ -233,7 +237,6 @@ public class OrderServiceImpl implements OrderService {
             if(orders != null && (orders.getState().equals("Success")||orders.getState().equals("UpdateAborted")) ) {
                 if (orders.getUserName().equals(userName)) {
                     orders.setPayloadUpdate(payload);
-                    orders.setType("updateTravelInsuranceBIC");
                     orders.setState("Pending");
                     orderRepository.save(orders);
                 } else {
@@ -248,14 +251,18 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
-            sagaState.setType("updateTravelInsuranceBIC");
+            if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
+                sagaState.setType("updateTravelInsuranceBIC");
+            }
             sagaState.setPayload(payload);
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("OrderService");
+            outBox.setAggregateType("Order");
             outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
-            outBox.setType("updateTravelInsuranceBIC");
+            if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
+                outBox.setType("updateTravelInsuranceBIC");
+            }
 
             JSONObject j = new JSONObject(payload);
             j.put("orderId",orders.getOrderId().toString());
@@ -354,7 +361,6 @@ public class OrderServiceImpl implements OrderService {
                 ||orders.getState().equals("GetAborted"))) {
 
                 if(orders.getUserName().equals(userName)) {
-                    orders.setType("getTravelInsuranceBIC");
                     orders.setState("Pending");
                     orderRepository.save(orders);
                 }else {
@@ -368,13 +374,17 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setOrderId(orders.getOrderId().toString());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
-            sagaState.setType("getTravelInsuranceBIC");
+            if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
+                sagaState.setType("getTravelInsuranceBIC");
+            }
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("OrderService");
+            outBox.setAggregateType("Order");
             outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
-            outBox.setType("getTravelInsuranceBIC");
+            if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
+                outBox.setType("getTravelInsuranceBIC");
+            }
 
             JSONObject j = new JSONObject(payload);
             j.put("orderId",orders.getOrderId().toString());

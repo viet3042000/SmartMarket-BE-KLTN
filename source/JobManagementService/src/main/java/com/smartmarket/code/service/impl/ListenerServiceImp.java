@@ -70,8 +70,6 @@ public class ListenerServiceImp implements ListenerService {
         String requestId = "";
         Long count =0L;
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
         Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {

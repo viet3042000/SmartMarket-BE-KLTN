@@ -90,7 +90,6 @@ public class ListenerServiceImp implements ListenerService {
         String hostName= "";
         Long startTime= 0L;
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         Outbox outBox = new Outbox();
         Gson g = new Gson();
         try {
@@ -161,7 +160,7 @@ public class ListenerServiceImp implements ListenerService {
                                     //insert to outbox
                                     if(statusCodeValue == 200){
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebody + order id + status
@@ -169,7 +168,7 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebpdy + order id + status
@@ -201,7 +200,7 @@ public class ListenerServiceImp implements ListenerService {
                                     //insert to outbox
                                     if(statusCodeValue == 200){
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebody + order id + status
@@ -209,7 +208,7 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebody + order id + status
@@ -241,7 +240,7 @@ public class ListenerServiceImp implements ListenerService {
                                     //insert to outbox
                                     if(statusCodeValue == 200){
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebody + order id + status
@@ -249,7 +248,7 @@ public class ListenerServiceImp implements ListenerService {
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("OrderService");
+                                        outBox.setAggregateType("Travelinsurance");
                                         outBox.setType(type);
 
                                         //payload = responsebody + order id + status
@@ -307,7 +306,7 @@ public class ListenerServiceImp implements ListenerService {
 
 //            insert into travelinsurance_outbox table
             outBox.setAggregateId(aggregateId);
-            outBox.setAggregateType("OrderService");
+            outBox.setAggregateType("Travelinsurance");
             outBox.setType(type);
 
             //payload = responsebody + order id + status
@@ -338,8 +337,6 @@ public class ListenerServiceImp implements ListenerService {
         Long startTime = 0L;
         String intervalId = "";
         int step = 0;
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
         Gson g = new Gson();
         try {
@@ -421,7 +418,7 @@ public class ListenerServiceImp implements ListenerService {
                                                 //OrderService
                                                 Outbox outBoxOrderService = new Outbox();
                                                 outBoxOrderService.setAggregateId(requestId);
-                                                outBoxOrderService.setAggregateType("OrderService");
+                                                outBoxOrderService.setAggregateType("Travelinsurance");
                                                 outBoxOrderService.setType(pendingBICTransaction.get().getType());
 
                                                 //payload = responsebody + orderId = orderRef + status
@@ -436,7 +433,7 @@ public class ListenerServiceImp implements ListenerService {
                                                 //add to outbox to job know what order in 1 interval success
                                                 Outbox outBoxJobService = new Outbox();
                                                 outBoxJobService.setAggregateId(requestId);
-                                                outBoxJobService.setAggregateType("JobService");
+                                                outBoxJobService.setAggregateType("Travelinsurance");
                                                 outBoxJobService.setType(pendingBICTransaction.get().getType());
 
                                                 //response body + orderReference, order id, intervalId, step,status
@@ -516,7 +513,7 @@ public class ListenerServiceImp implements ListenerService {
                     //add to outbox to job know what order in 1 interval failure
                     Outbox outBoxJobService = new Outbox();
                     outBoxJobService.setAggregateId(requestId);
-                    outBoxJobService.setAggregateType("JobService");
+                    outBoxJobService.setAggregateType("Travelinsurance");
                     outBoxJobService.setType(p.getType());
 //                    outBoxJobService.setStatus("failure");
 

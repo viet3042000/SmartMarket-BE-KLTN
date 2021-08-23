@@ -41,11 +41,11 @@ public class OrdersServiceEntity {
     @Column(name = "state")
     private String state;
 
-    @Column(name = "created_at", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createAt;
 
-    @Column(name = "finished_at", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishedAt;
 
