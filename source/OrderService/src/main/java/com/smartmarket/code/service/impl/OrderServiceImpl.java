@@ -126,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
             Date date = new Date();
             String stringCreateAt = formatter.format(date);
             Date createAt = formatter.parse(stringCreateAt);
-            orders.setCreateAt(createAt);
+            orders.setCreatedLogtimestamp(createAt);
             orderRepository.save(orders);
 
             sagaState.setOrderId(orders.getOrderId().toString());

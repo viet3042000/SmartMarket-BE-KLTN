@@ -153,7 +153,7 @@ public class ListenerServiceImp implements ListenerService {
                                         Date date = new Date();
                                         String stringFinishedAt = formatter.format(date);
                                         Date finishedAt = formatter.parse(stringFinishedAt);
-                                        orders.setFinishedAt(finishedAt);
+                                        orders.setFinishedLogtimestamp(finishedAt);
 
                                         sagaState.setCurrentStep("TravelInsuranceService");
 
@@ -168,7 +168,7 @@ public class ListenerServiceImp implements ListenerService {
                                         Date date = new Date();
                                         String stringFinishedAt = formatter.format(date);
                                         Date finishedAt = formatter.parse(stringFinishedAt);
-                                        orders.setFinishedAt(finishedAt);
+                                        orders.setFinishedLogtimestamp(finishedAt);
 
                                         sagaState.setCurrentStep("TravelInsuranceService");
 
