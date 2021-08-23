@@ -456,7 +456,7 @@ public class OrderServiceImpl implements OrderService {
             Pageable pageable = PageRequest.of(page-1, size);
             //find by user name
             Page<OrdersServiceEntity> allOrders =
-                    orderRepository.findByUserName(userName, pageable);
+                    orderRepository.findByUserName(userName,queryAllOrdersOfUserRequest.getType(),pageable);
 
             if(!allOrders.isEmpty()) {
                 totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
