@@ -18,7 +18,7 @@ public class Outbox {
     @Column(name = "id")
     private Long id;
 
-    //service gốc
+    //đích
     @Column(name = "aggregatetype")
     private String aggregateType;
 
@@ -30,6 +30,10 @@ public class Outbox {
 
     @Column(name = "payload")
     private String payload;
+
+    @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdLogtimestamp;
 
 //    @Column(name = "order_id")
 //    private UUID orderId;

@@ -18,6 +18,7 @@ import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.UpdateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.OrderService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
@@ -68,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
     LogServiceImpl logService;
 
     @Transactional
-    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public ResponseEntity<?> createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -84,6 +85,7 @@ public class OrderServiceImpl implements OrderService {
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
 
+        BaseResponse response = new BaseResponse();
         try {
             //Create BIC
             CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
@@ -100,6 +102,7 @@ public class OrderServiceImpl implements OrderService {
             String requestBody = gson.toJson(createTravelInsuranceBICRequest);
             JSONObject j = new JSONObject(requestBody);
 
+            //orderReference
             UUID orderId = UUID.randomUUID();
             j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderId);
 
@@ -119,7 +122,12 @@ public class OrderServiceImpl implements OrderService {
             if (claims != null) {
                 userName = (String) claims.get("user_name");
             }else{
-                return null;
+                ResponseError responseError = new ResponseError();
+                responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
+                responseError.setResponseTime(createTravelInsuranceBICRequest.getRequestTime());
+                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                responseError.setResultMessage("userName is null");
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
             orders.setUserName(userName);
 
@@ -129,7 +137,8 @@ public class OrderServiceImpl implements OrderService {
             orders.setCreatedLogtimestamp(createAt);
             orderRepository.save(orders);
 
-            sagaState.setOrderId(orders.getOrderId().toString());
+            sagaState.setCreatedLogtimestamp(createAt);
+            sagaState.setId(createTravelInsuranceBICRequest.getRequestId());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(j.getString("type"))) {
@@ -139,13 +148,14 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("Order");
-            outBox.setAggregateId(createTravelInsuranceBICRequest.getRequestId());
+            outBox.setCreatedLogtimestamp(createAt);
+            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(j.getString("type"))) {
                 outBox.setType("createTravelInsuranceBIC");
             }
 
-            j.put("orderId",orders.getOrderId().toString());
+//            j.put("requestId",createTravelInsuranceBICRequest.getRequestId());
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
@@ -153,6 +163,11 @@ public class OrderServiceImpl implements OrderService {
             outBox.setPayload(j.toString());
 
             outboxRepository.save(outBox);
+
+            response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("Successful");
 
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -186,20 +201,21 @@ public class OrderServiceImpl implements OrderService {
                 throw ex;
             }
         }
-        return null;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
-    public String updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?>  updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
+            throws JsonProcessingException, APIAccessException, ParseException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
-        Outbox outBox = new Outbox();
         Gson gson = new Gson();
         String userName = "";
 
         String hostName = request.getRemoteHost();
 
+        BaseResponse response = new BaseResponse();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         try {
             //get log time
             String logtimeStamp = DateTimeUtils.getCurrentDate();
@@ -230,25 +246,44 @@ public class OrderServiceImpl implements OrderService {
             if (claims != null) {
                 userName = (String) claims.get("user_name");
             }else{
-                return "userName is null";
+                ResponseError responseError = new ResponseError();
+                responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+                responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
+                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                responseError.setResultMessage("userName is null");
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
             OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
-            if(orders != null && (orders.getState().equals("Success")||orders.getState().equals("UpdateAborted")) ) {
+            if(orders != null && orders.getState().equals("Success")) {
                 if (orders.getUserName().equals(userName)) {
                     orders.setPayloadUpdate(payload);
-                    orders.setState("Pending");
                     orderRepository.save(orders);
                 } else {
-                    return "Order does not exist with user";
+                    ResponseError responseError = new ResponseError();
+                    responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+                    responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
+                    responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                    responseError.setResultMessage("Order does not exist with user");
+                    return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                 }
             }else{
-                return "Order does not exist or is processing";
+                ResponseError responseError = new ResponseError();
+                responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+                responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
+                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                responseError.setResultMessage("Order does not exist or is processing");
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
-//            SagaState sagaState = sagaStateRepository.findByOrderId(UUID.fromString(orderReferenceString));
-            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
-            sagaState.setOrderId(orders.getOrderId().toString());
+            Date date = new Date();
+            String stringCreateAt = formatter.format(date);
+            Date createAt = formatter.parse(stringCreateAt);
+
+//            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
+            SagaState sagaState = new SagaState();
+            sagaState.setCreatedLogtimestamp(createAt);
+            sagaState.setId(updateTravelInsuranceBICRequest.getRequestId());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
@@ -258,14 +293,15 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("Order");
-            outBox.setAggregateId(updateTravelInsuranceBICRequest.getRequestId());
+            Outbox outBox = new Outbox();
+            outBox.setCreatedLogtimestamp(createAt);
+            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
                 outBox.setType("updateTravelInsuranceBIC");
             }
 
             JSONObject j = new JSONObject(payload);
-            j.put("orderId",orders.getOrderId().toString());
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
@@ -273,6 +309,11 @@ public class OrderServiceImpl implements OrderService {
             outBox.setPayload(j.toString());
 
             outboxRepository.save(outBox);
+
+            response.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("Successful");
 
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -306,19 +347,19 @@ public class OrderServiceImpl implements OrderService {
                 throw ex;
             }
         }
-        return null;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @Override
-    public String getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
-        Outbox outBox = new Outbox();
         String userName = "";
-
         String hostName = request.getRemoteHost();
 
+        BaseResponse response = new BaseResponse();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         try {
             //get time log
             String logTimestamp = DateTimeUtils.getCurrentDate();
@@ -350,50 +391,71 @@ public class OrderServiceImpl implements OrderService {
             if (claims != null) {
                 userName = (String) claims.get("user_name");
             }else{
-                return "userName is null";
+                ResponseError responseError = new ResponseError();
+                responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+                responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
+                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                responseError.setResultMessage("userName is null");
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
 //            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
             OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
-            if(orders != null &&
-                (orders.getState().equals("Success")
-                ||orders.getState().equals("UpdateAborted")
-                ||orders.getState().equals("GetAborted"))) {
-
-                if(orders.getUserName().equals(userName)) {
-                    orders.setState("Pending");
-                    orderRepository.save(orders);
-                }else {
-                    return "Order does not exist with user";
+            if(orders != null && orders.getState().equals("Success")) {
+                if(!orders.getUserName().equals(userName)) {
+                    ResponseError responseError = new ResponseError();
+                    responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+                    responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
+                    responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                    responseError.setResultMessage("Order does not exist with user");
+                    return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                 }
             }else{
-                return "Order does not exist or is processing";
+                ResponseError responseError = new ResponseError();
+                responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+                responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
+                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+                responseError.setResultMessage("Order does not exist or is processing");
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
-            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
-            sagaState.setOrderId(orders.getOrderId().toString());
+            Date date = new Date();
+            String stringCreateAt = formatter.format(date);
+            Date createAt = formatter.parse(stringCreateAt);
+
+//            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
+            SagaState sagaState = new SagaState();
+            sagaState.setCreatedLogtimestamp(createAt);
+            sagaState.setId(queryTravelInsuranceBICRequest.getRequestId());
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
                 sagaState.setType("getTravelInsuranceBIC");
             }
+            sagaState.setPayload(payload);
             sagaState.setStatus("STARTED");
             sagaStateRepository.save(sagaState);
 
-            outBox.setAggregateType("Order");
-            outBox.setAggregateId(queryTravelInsuranceBICRequest.getRequestId());
+            Outbox outBox = new Outbox();
+            outBox.setCreatedLogtimestamp(createAt);
+            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
                 outBox.setType("getTravelInsuranceBIC");
             }
 
             JSONObject j = new JSONObject(payload);
-            j.put("orderId",orders.getOrderId().toString());
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
             j.put("clientIp",Utils.getClientIp(request));
             outBox.setPayload(j.toString());
             outboxRepository.save(outBox);
+
+            response.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("Successful");
 
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -427,7 +489,7 @@ public class OrderServiceImpl implements OrderService {
                 throw ex;
             }
         }
-        return null;
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -462,6 +524,7 @@ public class OrderServiceImpl implements OrderService {
                 totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
 
                 //set response data to client
+                response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
                 response.setDetail(allOrders);
                 response.setPage(page);
                 response.setTotalPage(totalPage);
@@ -492,6 +555,7 @@ public class OrderServiceImpl implements OrderService {
             }else{
 //                return "User has no orders";
                 //set response data to client
+                response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
                 response.setResponseTime(DateTimeUtils.getCurrentDate());
                 response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
                 response.setResultMessage("User has no orders");

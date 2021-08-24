@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "outbox")
@@ -37,5 +38,9 @@ public class Outbox {
     // 1,2,3,4,5
     @Column(name = "step")
     private int step;
+
+    @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdLogtimestamp;
 
 }

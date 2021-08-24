@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.*;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -12,21 +13,18 @@ import java.util.UUID;
 @Getter
 @Setter
 public class SagaState {
+    //= request_id
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sagastate_seq")
-    @SequenceGenerator(sequenceName = "sagastate_sequence", allocationSize = 1, name = "sagastate_seq")
     @Column(name = "id")
-    private Long id;
+    private String id;
 
 //    @Column(name = "order_id")
 //    private UUID orderId;
 
-    @Column(name = "order_id")
-    private String orderId;
-
     @Column(name = "current_step")
     private String currentStep;
 
+    //STARTED, SUCCEEDED, ABORTING, or ABORTED
     @Column(name = "step_state")
     private String stepState;
 
@@ -40,6 +38,14 @@ public class SagaState {
 
     @Column(name = "payload")
     private String payload;
+
+    @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdLogtimestamp;
+
+    @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date finishedLogtimestamp;
 
     //version
 }

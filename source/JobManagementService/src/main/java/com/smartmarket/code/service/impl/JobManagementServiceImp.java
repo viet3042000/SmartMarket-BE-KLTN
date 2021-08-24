@@ -99,6 +99,12 @@ public class JobManagementServiceImp implements JobManagementService {
                         jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
                         jobManagementOutbox.setIntervalId(intervalId.toString());
                         jobManagementOutbox.setStep(i);
+
+                        Date dateOutbox = new Date();
+                        String stringCreateAtOutbox = formatter.format(dateOutbox);
+                        Date createAtOubtox = formatter.parse(stringCreateAtOutbox);
+                        jobManagementOutbox.setCreatedLogtimestamp(createAtOubtox);
+
                         jobManagementOutboxRepository.save(jobManagementOutbox);
                     }
                 }

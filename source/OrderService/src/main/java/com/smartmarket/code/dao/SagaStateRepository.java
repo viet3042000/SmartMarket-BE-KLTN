@@ -7,18 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.Optional;
 
 @Transactional
 @Repository
 public interface SagaStateRepository extends JpaRepository<SagaState, String> {
+    //id = request_id
     @Query(value = "SELECT * FROM saga_state WHERE id=:id", nativeQuery = true)
-    public SagaState findById(@Param("id") UUID id);
+    public Optional<SagaState> findById(@Param("id") String id);
 
 //    @Query(value = "SELECT * FROM saga_state WHERE order_id=:order_id", nativeQuery = true)
 //    public SagaState findByOrderId(@Param("order_id") UUID orderId);
-
-    @Query(value = "SELECT * FROM saga_state WHERE order_id=:order_id", nativeQuery = true)
-    public SagaState findByOrderId(@Param("order_id") String orderId);
 
 }

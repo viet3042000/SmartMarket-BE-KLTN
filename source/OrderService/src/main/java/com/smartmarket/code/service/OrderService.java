@@ -10,18 +10,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 
 public interface OrderService {
-    public String createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public ResponseEntity<?> createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
-    public String updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
+    public ResponseEntity<?> updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
                                              HttpServletRequest request,
                                              HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APIAccessException;
+            throws JsonProcessingException, APIAccessException, ParseException;
 
-    public String getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
+    public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APIAccessException;
+            throws JsonProcessingException, APIAccessException, ParseException;
 
     public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
                                                      HttpServletRequest request,
