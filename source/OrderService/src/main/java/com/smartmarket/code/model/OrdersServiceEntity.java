@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Table(name = "orders")
 @Getter
 @Setter
-public class OrdersServiceEntity {
+public class OrdersServiceEntity implements Serializable {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
 //	@SequenceGenerator(sequenceName = "order_sequence", allocationSize = 1, name = "order_seq")
