@@ -142,11 +142,7 @@ public class ListenerServiceImp implements ListenerService {
                                 //order id, status = payload.get
                                 JSONObject j = new JSONObject(payload);
                                 requestId = j.getString("requestId");
-                                orderReference = j.getString("OrderReference");
                                 status = j.getString("status");
-//                                //remove order id from payload (for case payload-get)
-                                j.remove("requestId");
-                                j.remove("status");
 
                                 if (op.equals("c")) {
                                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -154,6 +150,7 @@ public class ListenerServiceImp implements ListenerService {
                                     String stringFinishedAt = formatter.format(date);
                                     Date finishedAt = formatter.parse(stringFinishedAt);
                                     if (type.equals("createTravelInsuranceBIC")) {
+                                        orderReference = j.getString("OrderReference");
 
                                         OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
@@ -185,9 +182,6 @@ public class ListenerServiceImp implements ListenerService {
                                                 st.setStepState(s.toString());
                                                 st.setStatus(SagaStateStatus.ABORTED);
                                             }
-                                            //if other status of message
-                                            // do ABORTING
-
                                             orderRepository.save(order);
                                             sagaStateRepository.save(st);
                                         }
@@ -217,6 +211,10 @@ public class ListenerServiceImp implements ListenerService {
                                     }
 
                                     if (type.equals("getTravelInsuranceBIC")) {
+                                        //remove order id from payload (for case payload-get)
+                                        j.remove("requestId");
+                                        j.remove("status");
+
                                         OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
 
@@ -228,7 +226,6 @@ public class ListenerServiceImp implements ListenerService {
                                             JSONObject s = new JSONObject();
                                             //insert to outbox
                                             if (status.equals("success")) {
-                                                //payload - request id - status
                                                 order.setPayloadGet(j.toString());
                                                 orderRepository.save(order);
 

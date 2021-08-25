@@ -225,7 +225,6 @@ public class ListenerServiceImp implements ListenerService {
                                         String responseBody = mapper.writeValueAsString(responseEntity);
                                         JSONObject jsonBody = new JSONObject(responseBody);
                                         jsonBody.put("requestId", requestId);
-                                        jsonBody.put("OrderReference",detail.getJSONObject("orders").getString("orderReference"));
                                         int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                         //insert to outbox
@@ -237,7 +236,7 @@ public class ListenerServiceImp implements ListenerService {
                                             outBox.setAggregateType(AggregateType.Order);
                                             outBox.setType(type);
 
-                                            //payload = responsebody + status+requestId+ orderRef
+                                            //payload = responsebody + status+requestId
                                             jsonBody.put("status", "success");
                                             outBox.setPayload(jsonBody.toString());
                                         } else {
@@ -248,7 +247,7 @@ public class ListenerServiceImp implements ListenerService {
                                             outBox.setAggregateType(AggregateType.Order);
                                             outBox.setType(type);
 
-                                            //payload = responsebody + status+requestId+ orderRef
+                                            //payload = responsebody + status+requestId
                                             jsonBody.put("status", "failure");
                                             outBox.setPayload(jsonBody.toString());
                                         }
@@ -271,7 +270,6 @@ public class ListenerServiceImp implements ListenerService {
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     jsonBody.put("requestId",requestId);
-                                    jsonBody.put("OrderReference",detail.getString("orderReference"));
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                     outBox.setCreatedLogtimestamp(createAt);
@@ -280,11 +278,11 @@ public class ListenerServiceImp implements ListenerService {
                                     outBox.setType(type);
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        //payload = responsebody+ status+requestId+ orderRef
+                                        //payload = responsebody+ status+requestId
                                         jsonBody.put("status","success");
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
-                                        //payload = responsebody+ status+requestId+ orderRef
+                                        //payload = responsebody+ status+requestId
                                         jsonBody.put("status","failure");
                                         outBox.setPayload(jsonBody.toString());
                                     }
@@ -339,9 +337,7 @@ public class ListenerServiceImp implements ListenerService {
 
             //payload = responsebody + status+ request_id + orderRef
             JSONObject jsonBody = new JSONObject();
-            if(type.equals("getTravelInsuranceBIC")){
-                jsonBody.put("OrderReference",detail.getString("orderReference"));
-            }else{
+            if(type.equals("createTravelInsuranceBIC")){
                 jsonBody.put("OrderReference",detail.getJSONObject("orders").getString("orderReference"));
             }
             jsonBody.put("requestId",requestId);
