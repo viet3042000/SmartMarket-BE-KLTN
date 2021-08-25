@@ -5,13 +5,16 @@ import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.AggregateType;
 import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.constants.TravelInsuranceState;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
+import com.smartmarket.code.dao.TravelInsuranceRepository;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.model.Outbox;
+import com.smartmarket.code.model.TravelInsurance;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.service.ListenerService;
@@ -58,6 +61,9 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     OutboxRepository outboxRepository;
 
+    @Autowired
+    TravelInsuranceRepository travelInsuranceRepository;
+
     @Value("${kafka.topic.orderoutbox}")
     String topicOrderOutbox;
 
@@ -92,6 +98,7 @@ public class ListenerServiceImp implements ListenerService {
         String clientId = "";
         String hostName= "";
         Long startTime= 0L;
+        JSONObject detail = new JSONObject();
 
         Outbox outBox = new Outbox();
         Gson g = new Gson();
@@ -146,10 +153,14 @@ public class ListenerServiceImp implements ListenerService {
                                 String stringCreateAt = formatter.format(date);
                                 Date createAt = formatter.parse(stringCreateAt);
 
+                                detail = jsonPayload.getJSONObject("detail");
+                                String d = detail.toString();
                                 if(type.equals("createTravelInsuranceBIC")){
+                                    TravelInsurance travelInsurance = new TravelInsurance();
+                                    travelInsurance.setId(detail.getJSONObject("orders").getString("orderReference"));
+                                    travelInsurance.setState(TravelInsuranceState.CREATING);
+                                    travelInsuranceRepository.save(travelInsurance);
 
-                                    JSONObject detail = jsonPayload.getJSONObject("detail");
-                                    String d = detail.toString();
                                     CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = g.fromJson(d, CreateTravelInsuranceBICRequest.class);
                                     BaseDetail baseDetail = new BaseDetail();
                                     baseDetail.setDetail(createTravelInsuranceBICRequest);
@@ -163,77 +174,90 @@ public class ListenerServiceImp implements ListenerService {
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     jsonBody.put("requestId",requestId);
+                                    jsonBody.put("OrderReference",detail.getJSONObject("orders").getString("orderReference"));
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
                                     //insert to outbox
                                     if(statusCodeValue == 200){
+                                        travelInsurance.setState(TravelInsuranceState.SUCCESS);
+
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
-                                        //payload = responsebody + status+requestId
+                                        //payload = responsebody + status+requestId + orderRef
                                         jsonBody.put("status","success");
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
+                                        travelInsurance.setState(TravelInsuranceState.CREATE_FAILURE);
+
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
                                         outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
-                                        //payload = responsebpdy + status+requestId
+                                        //payload = responsebpdy + status+requestId+ orderRef
                                         jsonBody.put("status","failure");
                                         outBox.setPayload(jsonBody.toString());
                                     }
+                                    travelInsuranceRepository.save(travelInsurance);
                                     outboxRepository.save(outBox);
                                 }
 
                                 if(type.equals("updateTravelInsuranceBIC")){
+                                    Optional<TravelInsurance> travelInsurance = travelInsuranceRepository.findById(detail.getJSONObject("orders").getString("orderReference"));
+                                    if(travelInsurance.isPresent()) {
+                                        TravelInsurance t = travelInsurance.get();
+                                        t.setState(TravelInsuranceState.UPDATING);
+                                        travelInsuranceRepository.save(t);
 
-                                    JSONObject detail = jsonPayload.getJSONObject("detail");
-                                    String d = detail.toString();
-                                    UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest = g.fromJson(d, UpdateTravelInsuranceBICRequest.class);
-                                    BaseDetail baseDetail = new BaseDetail();
-                                    baseDetail.setDetail(updateTravelInsuranceBICRequest);
-                                    baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                                    baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
-                                    baseDetail.setTargetId(jsonPayload.getString("targetId"));
+                                        UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest = g.fromJson(d, UpdateTravelInsuranceBICRequest.class);
+                                        BaseDetail baseDetail = new BaseDetail();
+                                        baseDetail.setDetail(updateTravelInsuranceBICRequest);
+                                        baseDetail.setRequestId(jsonPayload.getString("requestId"));
+                                        baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
+                                        baseDetail.setTargetId(jsonPayload.getString("targetId"));
 
-                                    // get result from API create.
-                                    ResponseEntity<String> responseEntity = travelInsuranceService.updateOrderOutbox(baseDetail,clientIp,clientId,startTime,hostName);
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    String responseBody = mapper.writeValueAsString(responseEntity);
-                                    JSONObject jsonBody = new JSONObject(responseBody);
-                                    jsonBody.put("requestId",requestId);
-                                    int statusCodeValue = jsonBody.getInt("statusCodeValue");
+                                        // get result from API create.
+                                        ResponseEntity<String> responseEntity = travelInsuranceService.updateOrderOutbox(baseDetail, clientIp, clientId, startTime, hostName);
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        String responseBody = mapper.writeValueAsString(responseEntity);
+                                        JSONObject jsonBody = new JSONObject(responseBody);
+                                        jsonBody.put("requestId", requestId);
+                                        jsonBody.put("OrderReference",detail.getJSONObject("orders").getString("orderReference"));
+                                        int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
-                                    //insert to outbox
-                                    if(statusCodeValue == 200){
-                                        outBox.setCreatedLogtimestamp(createAt);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType(AggregateType.Order);
-                                        outBox.setType(type);
+                                        //insert to outbox
+                                        if (statusCodeValue == 200) {
+                                            t.setState(TravelInsuranceState.SUCCESS);
 
-                                        //payload = responsebody + status+requestId
-                                        jsonBody.put("status","success");
-                                        outBox.setPayload(jsonBody.toString());
-                                    }else {
-                                        outBox.setCreatedLogtimestamp(createAt);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType(AggregateType.Order);
-                                        outBox.setType(type);
+                                            outBox.setCreatedLogtimestamp(createAt);
+                                            outBox.setAggregateId(aggregateId);
+                                            outBox.setAggregateType(AggregateType.Order);
+                                            outBox.setType(type);
 
-                                        //payload = responsebody + status+requestId
-                                        jsonBody.put("status","failure");
-                                        outBox.setPayload(jsonBody.toString());
+                                            //payload = responsebody + status+requestId+ orderRef
+                                            jsonBody.put("status", "success");
+                                            outBox.setPayload(jsonBody.toString());
+                                        } else {
+                                            t.setState(TravelInsuranceState.UPDATE_FAILURE);
+
+                                            outBox.setCreatedLogtimestamp(createAt);
+                                            outBox.setAggregateId(aggregateId);
+                                            outBox.setAggregateType(AggregateType.Order);
+                                            outBox.setType(type);
+
+                                            //payload = responsebody + status+requestId+ orderRef
+                                            jsonBody.put("status", "failure");
+                                            outBox.setPayload(jsonBody.toString());
+                                        }
+                                        travelInsuranceRepository.save(t);
+                                        outboxRepository.save(outBox);
                                     }
-                                    outboxRepository.save(outBox);
                                 }
 
                                 if(type.equals("getTravelInsuranceBIC")){
-
-                                    JSONObject detail = jsonPayload.getJSONObject("detail");
-                                    String d = detail.toString();
                                     QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
                                     BaseDetail baseDetail = new BaseDetail();
                                     baseDetail.setDetail(queryTravelInsuranceBICRequest);
@@ -247,25 +271,20 @@ public class ListenerServiceImp implements ListenerService {
                                     String responseBody = mapper.writeValueAsString(responseEntity);
                                     JSONObject jsonBody = new JSONObject(responseBody);
                                     jsonBody.put("requestId",requestId);
+                                    jsonBody.put("OrderReference",detail.getString("orderReference"));
                                     int statusCodeValue = jsonBody.getInt("statusCodeValue");
 
+                                    outBox.setCreatedLogtimestamp(createAt);
+                                    outBox.setAggregateId(aggregateId);
+                                    outBox.setAggregateType(AggregateType.Order);
+                                    outBox.setType(type);
                                     //insert to outbox
                                     if(statusCodeValue == 200){
-                                        outBox.setCreatedLogtimestamp(createAt);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType(AggregateType.Order);
-                                        outBox.setType(type);
-
-                                        //payload = responsebody+ status+requestId
+                                        //payload = responsebody+ status+requestId+ orderRef
                                         jsonBody.put("status","success");
                                         outBox.setPayload(jsonBody.toString());
                                     }else {
-                                        outBox.setCreatedLogtimestamp(createAt);
-                                        outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType(AggregateType.Order);
-                                        outBox.setType(type);
-
-                                        //payload = responsebody+ status+requestId
+                                        //payload = responsebody+ status+requestId+ orderRef
                                         jsonBody.put("status","failure");
                                         outBox.setPayload(jsonBody.toString());
                                     }
@@ -318,8 +337,13 @@ public class ListenerServiceImp implements ListenerService {
             outBox.setAggregateType(AggregateType.Order);
             outBox.setType(type);
 
-            //payload = responsebody + status+ request_id
+            //payload = responsebody + status+ request_id + orderRef
             JSONObject jsonBody = new JSONObject();
+            if(type.equals("getTravelInsuranceBIC")){
+                jsonBody.put("OrderReference",detail.getString("orderReference"));
+            }else{
+                jsonBody.put("OrderReference",detail.getJSONObject("orders").getString("orderReference"));
+            }
             jsonBody.put("requestId",requestId);
             jsonBody.put("status","failure");
 //            jsonBody.put("detail","Exception in TravelInsuranceService");

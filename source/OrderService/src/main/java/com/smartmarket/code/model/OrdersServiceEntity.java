@@ -22,7 +22,6 @@ public class OrdersServiceEntity implements Serializable {
 //    @Column(name = "order_id")
 //    private UUID orderId;
 
-    //=order_reference
     @Id
     @Column(name = "order_id")
     private String orderId;

@@ -102,10 +102,7 @@ public class OrderServiceImpl implements OrderService {
             String requestBody = gson.toJson(createTravelInsuranceBICRequest);
             JSONObject j = new JSONObject(requestBody);
 
-            //orderReference
             UUID orderId = UUID.randomUUID();
-            j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderId);
-
             orders.setOrderId(orderId.toString());
             orders.setPayload(j.toString());
             orders.setType(j.getString("type"));
@@ -150,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
 
             outBox.setCreatedLogtimestamp(createAt);
             outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
-            outBox.setAggregateId(orders.getOrderId().toString());
+            outBox.setAggregateId(orderId.toString());
             if("BICTravelInsurance".equals(j.getString("type"))) {
                 outBox.setType(OutboxType.CREATE_TRAVEL_INSURANCE_BIC);
             }
@@ -230,7 +227,7 @@ public class OrderServiceImpl implements OrderService {
             logService.createTargetLog(tarObjectRequest);
 
             String payload = gson.toJson(updateTravelInsuranceBICRequest);
-            String orderReferenceString = updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference();
+            String orderIdString = updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderEntityId();
 
             //get client Id
             String clientId = JwtUtils.getClientId() ;
@@ -251,7 +248,7 @@ public class OrderServiceImpl implements OrderService {
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
-            OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
+            OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
             if(orders != null && orders.getState().equals("Success")) {
                 if (orders.getUserName().equals(userName)) {
                     orders.setPayloadUpdate(payload);
@@ -293,11 +290,12 @@ public class OrderServiceImpl implements OrderService {
             Outbox outBox = new Outbox();
             outBox.setCreatedLogtimestamp(createAt);
             outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
-            outBox.setAggregateId(orders.getOrderId().toString());
+            outBox.setAggregateId(orderIdString);
             if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
                 outBox.setType(OutboxType.UPDATE_TRAVEL_INSURANCE_BIC);
             }
             JSONObject j = new JSONObject(payload);
+            j.remove("orderEntityId");
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
@@ -372,7 +370,7 @@ public class OrderServiceImpl implements OrderService {
             logService.createTargetLog(tarObjectRequest);
 
             Gson gson = new Gson();
-            String orderReferenceString = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+            String orderIdString = queryTravelInsuranceBICRequest.getDetail().getOrderEntityId();
             String payload = gson.toJson(queryTravelInsuranceBICRequest);
 
             //get client Id
@@ -395,7 +393,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
 //            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
-            OrdersServiceEntity orders = orderRepository.findByOrderId(orderReferenceString);
+            OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
             if(orders != null && orders.getState().equals("Success")) {
                 if(!orders.getUserName().equals(userName)) {
                     ResponseError responseError = new ResponseError();
@@ -434,11 +432,12 @@ public class OrderServiceImpl implements OrderService {
             Outbox outBox = new Outbox();
             outBox.setCreatedLogtimestamp(createAt);
             outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
-            outBox.setAggregateId(orders.getOrderId().toString());
+            outBox.setAggregateId(orderIdString);
             if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
                 outBox.setType(OutboxType.GET_TRAVEL_INSURANCE_BIC);
             }
             JSONObject j = new JSONObject(payload);
+            j.remove("orderEntityId");
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);

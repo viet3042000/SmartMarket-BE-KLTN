@@ -15,6 +15,11 @@ import java.util.UUID;
 @Setter
 public class OrderUpdate {
 
+    //order id in orderService
+    @NotBlank(message = "orderReference is require")
+    @Size(max = 50, message = "orderEntityId should be less than or equal to 50 characters")
+    private String orderEntityId;
+
     //map order id in order service
     @NotBlank(message = "orderReference is require")
     @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")

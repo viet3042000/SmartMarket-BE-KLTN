@@ -16,10 +16,12 @@ import java.io.Serializable;
 @Setter
 public class TravelInsurance implements Serializable {
 
+    //=order_id(order_ref)
     @Id
     @Column(name = "id")
-    private Long id;
+    private String id;
 
+    //creating/updating/succeeded
     @Column(name = "state")
     @JsonIgnore
     private String state;
