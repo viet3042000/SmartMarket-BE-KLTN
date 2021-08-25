@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
-import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.constants.*;
 import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
             orders.setOrderId(orderId.toString());
             orders.setPayload(j.toString());
             orders.setType(j.getString("type"));
-            orders.setState("Pending");
+            orders.setState(OrderEntityState.PENDING);
 
             //get client Id
             String clientId = JwtUtils.getClientId() ;
@@ -142,26 +142,23 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(j.getString("type"))) {
-                sagaState.setType("createTravelInsuranceBIC");
+                sagaState.setType(SagaStateType.CREATE_TRAVEL_INSURANCE_BIC);
             }
             sagaState.setPayload(j.toString());
-            sagaState.setStatus("STARTED");
+            sagaState.setStatus(SagaStateStatus.STARTED);
             sagaStateRepository.save(sagaState);
 
             outBox.setCreatedLogtimestamp(createAt);
-            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
             outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(j.getString("type"))) {
-                outBox.setType("createTravelInsuranceBIC");
+                outBox.setType(OutboxType.CREATE_TRAVEL_INSURANCE_BIC);
             }
-
-//            j.put("requestId",createTravelInsuranceBICRequest.getRequestId());
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
             j.put("clientIp",Utils.getClientIp(request));
             outBox.setPayload(j.toString());
-
             outboxRepository.save(outBox);
 
             response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
@@ -287,27 +284,25 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
-                sagaState.setType("updateTravelInsuranceBIC");
+                sagaState.setType(SagaStateType.UPDATE_TRAVEL_INSURANCE_BIC);
             }
             sagaState.setPayload(payload);
-            sagaState.setStatus("STARTED");
+            sagaState.setStatus(SagaStateStatus.STARTED);
             sagaStateRepository.save(sagaState);
 
             Outbox outBox = new Outbox();
             outBox.setCreatedLogtimestamp(createAt);
-            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
             outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(updateTravelInsuranceBICRequest.getType())) {
-                outBox.setType("updateTravelInsuranceBIC");
+                outBox.setType(OutboxType.UPDATE_TRAVEL_INSURANCE_BIC);
             }
-
             JSONObject j = new JSONObject(payload);
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
             j.put("clientIp",Utils.getClientIp(request));
             outBox.setPayload(j.toString());
-
             outboxRepository.save(outBox);
 
             response.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
@@ -430,20 +425,19 @@ public class OrderServiceImpl implements OrderService {
             sagaState.setCurrentStep("");
             sagaState.setStepState("");
             if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
-                sagaState.setType("getTravelInsuranceBIC");
+                sagaState.setType(SagaStateType.GET_TRAVEL_INSURANCE_BIC);
             }
             sagaState.setPayload(payload);
-            sagaState.setStatus("STARTED");
+            sagaState.setStatus(SagaStateStatus.STARTED);
             sagaStateRepository.save(sagaState);
 
             Outbox outBox = new Outbox();
             outBox.setCreatedLogtimestamp(createAt);
-            outBox.setAggregateType("Travelinsurance");
+            outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);
             outBox.setAggregateId(orders.getOrderId().toString());
             if("BICTravelInsurance".equals(queryTravelInsuranceBICRequest.getType())) {
-                outBox.setType("getTravelInsuranceBIC");
+                outBox.setType(OutboxType.GET_TRAVEL_INSURANCE_BIC);
             }
-
             JSONObject j = new JSONObject(payload);
             j.put("startTime",startTime);
             j.put("hostName",hostName);

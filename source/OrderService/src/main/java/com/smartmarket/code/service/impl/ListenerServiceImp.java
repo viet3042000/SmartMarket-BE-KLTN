@@ -1,7 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.google.common.base.Throwables;
-import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.constants.*;
 import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.model.OrdersServiceEntity;
@@ -152,34 +152,27 @@ public class ListenerServiceImp implements ListenerService {
                                         OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
                                         if (order != null && sagaState.isPresent()) {
+                                            order.setFinishedLogtimestamp(finishedAt);
+
                                             SagaState st = sagaState.get();
+                                            st.setType(type);
+                                            st.setFinishedLogtimestamp(finishedAt);
+                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
                                             //insert to outbox
                                             if (status.equals("success")) {
-                                                order.setState("Success");
-                                                order.setFinishedLogtimestamp(finishedAt);
-
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
+                                                order.setState(OrderEntityState.SUCCESS);
 
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "SUCCEEDED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("SUCCEEDED");
+                                                st.setStatus(SagaStateStatus.SUCCEEDED);
                                             } else {
-                                                order.setState("Aborted");
-                                                order.setFinishedLogtimestamp(finishedAt);
-
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
+                                                order.setState(OrderEntityState.ABORTED);
 
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "ABORTED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("ABORTED");
+                                                st.setStatus(SagaStateStatus.ABORTED);
                                             }
                                             //if other status of message
                                             // do ABORTING
@@ -194,25 +187,20 @@ public class ListenerServiceImp implements ListenerService {
 
                                         if (sagaState.isPresent()) {
                                             SagaState st = sagaState.get();
+                                            st.setFinishedLogtimestamp(finishedAt);
+                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
+                                            st.setType(type);
                                             //insert to outbox
                                             if (status.equals("success")) {
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "SUCCEEDED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("SUCCEEDED");
+                                                st.setStatus(SagaStateStatus.SUCCEEDED);
                                             } else {
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "ABORTED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("ABORTED");
+                                                st.setStatus(SagaStateStatus.ABORTED);
                                             }
                                             sagaStateRepository.save(st);
                                         }
@@ -224,30 +212,24 @@ public class ListenerServiceImp implements ListenerService {
 
                                         if (order != null && sagaState.isPresent()) {
                                             SagaState st = sagaState.get();
+                                            st.setFinishedLogtimestamp(finishedAt);
+                                            st.setType(type);
+                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
                                             //insert to outbox
                                             if (status.equals("success")) {
                                                 //payload - request id - status
                                                 order.setPayloadGet(j.toString());
                                                 orderRepository.save(order);
 
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "SUCCEEDED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("SUCCEEDED");
+                                                st.setStatus(SagaStateStatus.SUCCEEDED);
                                             } else {
-                                                st.setFinishedLogtimestamp(finishedAt);
-                                                st.setCurrentStep("TravelInsuranceService");
-
                                                 JSONObject s = new JSONObject();
-                                                s.put("TravelInsuranceService", "ABORTED");
+                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
                                                 st.setStepState(s.toString());
-
-                                                st.setType(type);
-                                                st.setStatus("ABORTED");
+                                                st.setStatus(SagaStateStatus.ABORTED);
                                             }
                                             sagaStateRepository.save(st);
                                         }

@@ -32,7 +32,7 @@ public class SagaState {
     @Column(name = "status")
     private String status;
 
-    //create/update/rollback
+    //order-placement/createTravelInsuranceBIC/...
     @Column(name = "type")
     private String type;
 

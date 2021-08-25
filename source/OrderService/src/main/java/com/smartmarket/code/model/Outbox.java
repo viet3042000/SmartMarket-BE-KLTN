@@ -23,6 +23,7 @@ public class Outbox implements Serializable {
     @Column(name = "aggregatetype")
     private String aggregateType;
 
+    //order_id (=order_reference)
     @Column(name = "aggregateid")
     private String aggregateId;
 

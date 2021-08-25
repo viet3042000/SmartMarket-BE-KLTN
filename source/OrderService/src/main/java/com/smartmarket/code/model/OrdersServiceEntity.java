@@ -40,6 +40,7 @@ public class OrdersServiceEntity implements Serializable {
     @Column(name = "type")
     private String type;
 
+    //Pending/Success/Aborted
     @Column(name = "state")
     private String state;
 

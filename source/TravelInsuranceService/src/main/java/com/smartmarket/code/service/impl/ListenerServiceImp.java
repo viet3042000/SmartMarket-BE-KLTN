@@ -3,6 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
+import com.smartmarket.code.constants.AggregateType;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
@@ -125,7 +126,7 @@ public class ListenerServiceImp implements ListenerService {
                                     aggregateType =(String) keyPairs.get(k);
                                 }
                                 if (k.equals("type")) {
-                                    type =(String) keyPairs.get(k);
+                                    type = (String) keyPairs.get(k);
                                 }
                                 if (k.equals("payload")) {
                                     payload =(String) keyPairs.get(k);
@@ -144,6 +145,7 @@ public class ListenerServiceImp implements ListenerService {
                                 Date date = new Date();
                                 String stringCreateAt = formatter.format(date);
                                 Date createAt = formatter.parse(stringCreateAt);
+
                                 if(type.equals("createTravelInsuranceBIC")){
 
                                     JSONObject detail = jsonPayload.getJSONObject("detail");
@@ -167,7 +169,7 @@ public class ListenerServiceImp implements ListenerService {
                                     if(statusCodeValue == 200){
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebody + status+requestId
@@ -176,7 +178,7 @@ public class ListenerServiceImp implements ListenerService {
                                     }else {
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebpdy + status+requestId
@@ -209,7 +211,7 @@ public class ListenerServiceImp implements ListenerService {
                                     if(statusCodeValue == 200){
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebody + status+requestId
@@ -218,7 +220,7 @@ public class ListenerServiceImp implements ListenerService {
                                     }else {
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebody + status+requestId
@@ -251,7 +253,7 @@ public class ListenerServiceImp implements ListenerService {
                                     if(statusCodeValue == 200){
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebody+ status+requestId
@@ -260,7 +262,7 @@ public class ListenerServiceImp implements ListenerService {
                                     }else {
                                         outBox.setCreatedLogtimestamp(createAt);
                                         outBox.setAggregateId(aggregateId);
-                                        outBox.setAggregateType("Order");
+                                        outBox.setAggregateType(AggregateType.Order);
                                         outBox.setType(type);
 
                                         //payload = responsebody+ status+requestId
@@ -269,11 +271,6 @@ public class ListenerServiceImp implements ListenerService {
                                     }
                                     outboxRepository.save(outBox);
                                 }
-
-                            }
-                            if (op.equals("r")) {
-//                                countReadOutBox ++;
-
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -318,7 +315,7 @@ public class ListenerServiceImp implements ListenerService {
 
 //            insert into travelinsurance_outbox table
             outBox.setAggregateId(aggregateId);
-            outBox.setAggregateType("Order");
+            outBox.setAggregateType(AggregateType.Order);
             outBox.setType(type);
 
             //payload = responsebody + status+ request_id
