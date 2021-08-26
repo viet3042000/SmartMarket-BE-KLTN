@@ -259,11 +259,12 @@ public class OrderServiceImpl implements OrderService {
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
-            OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
-            if(orders != null && orders.getState().equals("Succeeded")) {
-                if (orders.getUserName().equals(userName)) {
-                    orders.setPayloadUpdate(payload);
-                    orderRepository.save(orders);
+            Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(orderIdString);
+            if(orders.isPresent() && orders.get().getState().equals("Succeeded")) {
+                OrdersServiceEntity order = orders.get();
+                if (order.getUserName().equals(userName)) {
+                    order.setPayloadUpdate(payload);
+                    orderRepository.save(order);
                 } else {
                     ResponseError responseError = new ResponseError();
                     responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
@@ -408,9 +409,10 @@ public class OrderServiceImpl implements OrderService {
             }
 
 //            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
-            OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
-            if(orders != null && orders.getState().equals("Succeeded")) {
-                if(!orders.getUserName().equals(userName)) {
+            Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(orderIdString);
+            if(orders.isPresent() && orders.get().getState().equals("Succeeded")) {
+                OrdersServiceEntity order = orders.get();
+                if(!order.getUserName().equals(userName)) {
                     ResponseError responseError = new ResponseError();
                     responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
                     responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());

@@ -39,6 +39,7 @@ public class SagaState {
     @Column(name = "payload")
     private String payload;
 
+    //@Temporal sử dụng để chú thích cho cột dữ liệu ngày tháng và thời gian (date time).
     @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdLogtimestamp;
@@ -47,5 +48,7 @@ public class SagaState {
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishedLogtimestamp;
 
-    //version
+    @Version
+    @Column(name = "version")
+    private int version;
 }

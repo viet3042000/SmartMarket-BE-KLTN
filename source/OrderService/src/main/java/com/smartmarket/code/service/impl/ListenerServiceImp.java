@@ -152,10 +152,11 @@ public class ListenerServiceImp implements ListenerService {
                                     if (type.equals("createTravelInsuranceBIC")) {
                                         orderReference = j.getString("OrderReference");
 
-                                        OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
+                                        Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
                                         OrderProduct orderProduct = new OrderProduct();
-                                        if (order != null && sagaState.isPresent()) {
+                                        if (orders.isPresent() && sagaState.isPresent()) {
+                                            OrdersServiceEntity order = orders.get();
                                             order.setFinishedLogtimestamp(finishedAt);
 
                                             SagaState st = sagaState.get();
