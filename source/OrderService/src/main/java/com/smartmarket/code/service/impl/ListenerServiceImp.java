@@ -154,6 +154,7 @@ public class ListenerServiceImp implements ListenerService {
 
                                         OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
+                                        OrderProduct orderProduct = new OrderProduct();
                                         if (order != null && sagaState.isPresent()) {
                                             order.setFinishedLogtimestamp(finishedAt);
 
@@ -164,24 +165,31 @@ public class ListenerServiceImp implements ListenerService {
                                             JSONObject s = new JSONObject();
                                             //insert to outbox
                                             if (status.equals("success")) {
-                                                order.setState(OrderEntityState.SUCCESS);
+                                                order.setState(OrderEntityState.SUCCEEDED);
 
                                                 s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
                                                 st.setStepState(s.toString());
                                                 st.setStatus(SagaStateStatus.SUCCEEDED);
 
-                                                OrderProduct orderProduct = new OrderProduct();
                                                 orderProduct.setOrderId(aggregateId);
                                                 orderProduct.setProductId(orderReference);
                                                 orderProduct.setProductName("TravelInsuranceBIC");
-                                                orderProductRepository.save(orderProduct);
+                                                orderProduct.setState("Succeeded");
+                                                orderProduct.setFinishedLogtimestamp(finishedAt);
                                             } else {
                                                 order.setState(OrderEntityState.ABORTED);
 
                                                 s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
                                                 st.setStepState(s.toString());
                                                 st.setStatus(SagaStateStatus.ABORTED);
+
+                                                orderProduct.setOrderId(aggregateId);
+                                                orderProduct.setProductId(orderReference);
+                                                orderProduct.setProductName("TravelInsuranceBIC");
+                                                orderProduct.setState("Aborted");
+                                                orderProduct.setFinishedLogtimestamp(finishedAt);
                                             }
+                                            orderProductRepository.save(orderProduct);
                                             orderRepository.save(order);
                                             sagaStateRepository.save(st);
                                         }
@@ -211,14 +219,9 @@ public class ListenerServiceImp implements ListenerService {
                                     }
 
                                     if (type.equals("getTravelInsuranceBIC")) {
-                                        //remove order id from payload (for case payload-get)
-                                        j.remove("requestId");
-                                        j.remove("status");
-
-                                        OrdersServiceEntity order = orderRepository.findByOrderId(aggregateId);
                                         Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
 
-                                        if (order != null && sagaState.isPresent()) {
+                                        if (sagaState.isPresent()) {
                                             SagaState st = sagaState.get();
                                             st.setFinishedLogtimestamp(finishedAt);
                                             st.setType(type);
@@ -226,9 +229,6 @@ public class ListenerServiceImp implements ListenerService {
                                             JSONObject s = new JSONObject();
                                             //insert to outbox
                                             if (status.equals("success")) {
-                                                order.setPayloadGet(j.toString());
-                                                orderRepository.save(order);
-
                                                 s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
                                                 st.setStepState(s.toString());
                                                 st.setStatus(SagaStateStatus.SUCCEEDED);

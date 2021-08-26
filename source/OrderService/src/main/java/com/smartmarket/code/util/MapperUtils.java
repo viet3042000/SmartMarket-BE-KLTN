@@ -134,7 +134,7 @@ public class MapperUtils {
         ArrayList<trvDetailUpdateBIC> trvDetailsBICs = new ArrayList<>();
 
         if (orders != null) {
-            ordersBIC.setOrderReference(orders.getOrderReference());
+//            ordersBIC.setOrderReference(orders.getOrderReference());
             ordersBIC.setOrderid(Long.parseLong(orders.getOrderId()));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());

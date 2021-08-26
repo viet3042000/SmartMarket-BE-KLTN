@@ -33,13 +33,10 @@ public class OrdersServiceEntity implements Serializable {
     @Column(name = "payload_update")
     private String payloadUpdate;
 
-    @Column(name = "payload_get")
-    private String payloadGet;
-
     @Column(name = "type")
     private String type;
 
-    //Pending/Success/Aborted
+    //Pending/Succeeded/Aborted
     @Column(name = "state")
     private String state;
 

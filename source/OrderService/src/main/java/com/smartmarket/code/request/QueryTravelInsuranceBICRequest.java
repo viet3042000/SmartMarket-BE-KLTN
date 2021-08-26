@@ -18,11 +18,11 @@ public class QueryTravelInsuranceBICRequest implements Serializable {
     @Size(max = 50, message = "orderEntityId should be less than or equal to 50 characters")
     private String orderEntityId;
 
-    @NotNull(message = "inquiryType is required")
-    private Long inquiryType ;
-
-    private String orderId ;
-
-    private String orderReference ;
+//    @NotNull(message = "inquiryType is required")
+//    private Long inquiryType ;
+//
+//    private String orderId ;
+//
+//    private String orderReference ;
 
 }

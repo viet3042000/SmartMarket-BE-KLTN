@@ -9,9 +9,17 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class BaseResponse implements Serializable {
+public class BaseResponseGetAll implements Serializable {
+
     private String responseId;
     private String responseTime;
     private String resultCode;
     private String resultMessage;
+    private String detailErrorCode;
+    private String detailErrorMessage;
+    private Object detail;
+    private int page;
+    private int totalPage;
+    private Long total;
+
 }

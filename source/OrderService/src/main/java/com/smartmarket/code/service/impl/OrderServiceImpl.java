@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.*;
+import com.smartmarket.code.dao.OrderProductRepository;
 import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.exception.*;
+import com.smartmarket.code.model.OrderProduct;
 import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
@@ -18,6 +20,7 @@ import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entityBIC.CreateTravelInsuranceToBIC;
 import com.smartmarket.code.request.entityBIC.UpdateTravelInsuranceToBIC;
 import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.OrderService;
 import com.smartmarket.code.util.DateTimeUtils;
@@ -58,6 +61,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     SagaStateRepository sagaStateRepository;
+
+    @Autowired
+    OrderProductRepository orderProductRepository;
 
     @Autowired
     ConfigurableEnvironment environment;
@@ -228,6 +234,11 @@ public class OrderServiceImpl implements OrderService {
 
             String payload = gson.toJson(updateTravelInsuranceBICRequest);
             String orderIdString = updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderEntityId();
+            Optional<OrderProduct> orderProduct = orderProductRepository.findByOrderId(orderIdString);
+            String orderReference = "";
+            if(orderProduct!= null){
+                orderReference = orderProduct.get().getProductId();
+            }
 
             //get client Id
             String clientId = JwtUtils.getClientId() ;
@@ -249,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
-            if(orders != null && orders.getState().equals("Success")) {
+            if(orders != null && orders.getState().equals("Succeeded")) {
                 if (orders.getUserName().equals(userName)) {
                     orders.setPayloadUpdate(payload);
                     orderRepository.save(orders);
@@ -295,7 +306,8 @@ public class OrderServiceImpl implements OrderService {
                 outBox.setType(OutboxType.UPDATE_TRAVEL_INSURANCE_BIC);
             }
             JSONObject j = new JSONObject(payload);
-            j.remove("orderEntityId");
+            j.getJSONObject("detail").getJSONObject("orders").remove("orderEntityId");
+            j.getJSONObject("detail").getJSONObject("orders").put("orderReference",orderReference);
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
@@ -358,11 +370,9 @@ public class OrderServiceImpl implements OrderService {
             String logTimestamp = DateTimeUtils.getCurrentDate();
             String messageTimestamp = logTimestamp;
             //properties log
-            String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
-            String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
+            String orderId = queryTravelInsuranceBICRequest.getDetail().getOrderEntityId();
             org.json.JSONObject transactionDetail = new org.json.JSONObject();
-            transactionDetail.put("orderId", orderID);
-            transactionDetail.put("orderRef", orderReference);
+            transactionDetail.put("orderId", orderId);
 
             //logRequest vs TravelInsuranceService
             TargetObject tarObjectRequest = new TargetObject("targetLog", null, queryTravelInsuranceBICRequest.getRequestId(), queryTravelInsuranceBICRequest.getRequestTime(), "TravelInsuranceService","getOrder","request",
@@ -371,6 +381,11 @@ public class OrderServiceImpl implements OrderService {
 
             Gson gson = new Gson();
             String orderIdString = queryTravelInsuranceBICRequest.getDetail().getOrderEntityId();
+            Optional<OrderProduct> orderProduct = orderProductRepository.findByOrderId(orderIdString);
+            String orderReference = "";
+            if(orderProduct!= null){
+                orderReference = orderProduct.get().getProductId();
+            }
             String payload = gson.toJson(queryTravelInsuranceBICRequest);
 
             //get client Id
@@ -394,7 +409,7 @@ public class OrderServiceImpl implements OrderService {
 
 //            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
             OrdersServiceEntity orders = orderRepository.findByOrderId(orderIdString);
-            if(orders != null && orders.getState().equals("Success")) {
+            if(orders != null && orders.getState().equals("Succeeded")) {
                 if(!orders.getUserName().equals(userName)) {
                     ResponseError responseError = new ResponseError();
                     responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
@@ -416,7 +431,6 @@ public class OrderServiceImpl implements OrderService {
             String stringCreateAt = formatter.format(date);
             Date createAt = formatter.parse(stringCreateAt);
 
-//            SagaState sagaState = sagaStateRepository.findByOrderId(orderReferenceString);
             SagaState sagaState = new SagaState();
             sagaState.setCreatedLogtimestamp(createAt);
             sagaState.setId(queryTravelInsuranceBICRequest.getRequestId());
@@ -437,7 +451,9 @@ public class OrderServiceImpl implements OrderService {
                 outBox.setType(OutboxType.GET_TRAVEL_INSURANCE_BIC);
             }
             JSONObject j = new JSONObject(payload);
-            j.remove("orderEntityId");
+            j.getJSONObject("detail").remove("orderEntityId");
+            j.getJSONObject("detail").put("inquiryType",2);
+            j.getJSONObject("detail").put("orderReference",orderReference);
             j.put("startTime",startTime);
             j.put("hostName",hostName);
             j.put("clientId",clientId);
@@ -490,7 +506,7 @@ public class OrderServiceImpl implements OrderService {
     public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         String userName = "";
         int totalPage = 0 ;
-        BaseResponse response = new BaseResponse();
+        BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
         String hostName = request.getRemoteHost();

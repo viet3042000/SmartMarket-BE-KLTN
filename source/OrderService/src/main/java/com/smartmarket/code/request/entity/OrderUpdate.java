@@ -21,9 +21,9 @@ public class OrderUpdate {
     private String orderEntityId;
 
     //map order id in order service
-    @NotBlank(message = "orderReference is require")
-    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
-    private String orderReference;
+//    @NotBlank(message = "orderReference is require")
+//    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
+//    private String orderReference;
 
     //order id in travelinsuranceservice
     private String orderId;

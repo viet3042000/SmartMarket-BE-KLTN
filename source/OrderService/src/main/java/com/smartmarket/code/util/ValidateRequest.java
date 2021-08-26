@@ -50,25 +50,4 @@ public class ValidateRequest {
         }
     }
 
-
-    public static void checkValidInquire(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest){
-
-        if (queryTravelInsuranceBICRequest.getDetail() != null ) {
-            if (queryTravelInsuranceBICRequest.getDetail().getInquiryType() == null) {
-                throw new InvalidInputException("inquiryType is require", queryTravelInsuranceBICRequest.getRequestId());
-            }else {
-                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(1L) == true) {
-                    if(StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderId()) )
-                    throw new InvalidInputException("orderId is require", queryTravelInsuranceBICRequest.getRequestId());
-                }
-                if (queryTravelInsuranceBICRequest.getDetail().getInquiryType().equals(2L) == true) {
-                    if (StringUtils.isEmpty(queryTravelInsuranceBICRequest.getDetail().getOrderReference())) {
-                        throw new InvalidInputException("orderReference is require", queryTravelInsuranceBICRequest.getRequestId());
-                    }
-                }
-
-            }
-
-        }
-    }
 }
