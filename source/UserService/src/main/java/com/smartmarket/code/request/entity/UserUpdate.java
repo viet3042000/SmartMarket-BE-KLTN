@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class UserUpdate {
 
-    private Long id;
+//    private Long id;
 
     private String userName;
 

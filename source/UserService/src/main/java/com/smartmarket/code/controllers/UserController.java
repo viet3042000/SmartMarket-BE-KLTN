@@ -170,24 +170,24 @@ public class UserController {
 
         try {
 
-            Optional<User> userExist = userRepository.checkUserExist(updateUserRequestBaseDetail.getDetail().getUser().getUserName(),updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+            Optional<User> user = userRepository.checkUserExist(updateUserRequestBaseDetail.getDetail().getUser().getUserName()) ;
 
-            if(userExist.isPresent()){
-                throw new CustomException("User is exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            if(!user.isPresent()){
+                throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
 
-            Optional<User> userGetById = userRepository.findByUserId(updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+//            Optional<User> userGetById = userRepository.findByUserId(updateUserRequestBaseDetail.getDetail().getUser().getId()) ;
+//
+//            if(!userGetById.isPresent()){
+//                throw new CustomException("userGetById is not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//            }
 
-            if(!userGetById.isPresent()){
-                throw new CustomException("userGetById is not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-            }
-
-            User userUpdate = new User();
+            User userUpdate = user.get();
             UserProfile userProfileUpdate = new UserProfile();
 
             userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
             userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
-            userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
+//            userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
 
             userProfileUpdate.setFullName(updateUserRequestBaseDetail.getDetail().getUser().getFullName());
@@ -200,10 +200,10 @@ public class UserController {
             userProfileUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
             userProfileUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
 
-            UserProfile userProfileUpdated = userProfileService.update(userProfileUpdate,userGetById.get().getUserName());
+            UserProfile userProfileUpdated = userProfileService.update(userProfileUpdate,user.get().getUserName());
             User userUpdated = userService.update(userUpdate);
 
-            userRoleService.deleteByUserId(updateUserRequestBaseDetail.getDetail().getUser().getId());
+            userRoleService.deleteByUserId(user.get().getId());
             ArrayList<Long> roles = updateUserRequestBaseDetail.getDetail().getRoles();
 
             if (roles != null && roles.size() > 0) {
@@ -279,8 +279,7 @@ public class UserController {
 
 
         try {
-
-            User userDelete = userService.delete(deleteUserRequestBaseDetail.getDetail().getId());
+            User userDelete = userService.delete(deleteUserRequestBaseDetail.getDetail().getUserName());
             UserProfile userProfileDelete = userProfileService.deleteByUserName(userDelete.getUserName());
 
             //set response data to client
@@ -464,9 +463,9 @@ public class UserController {
 
 
     // URL: http://localhost:9979/SomeContextPath/provider/{id}
-    @RequestMapping(value = "/getdetail-user/{id}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @RequestMapping(value = "/getdetail-user/{username}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     @ResponseBody
-    public ResponseEntity<?> getDetailProvider(@PathVariable("id") Long id, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getDetailProvider(@PathVariable("username") String userName, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         BaseResponse response = new BaseResponse();
@@ -483,7 +482,8 @@ public class UserController {
         UserCreateResponse userCreateResponse = new UserCreateResponse() ;
         try {
 
-            Optional<User> user = userService.findByUserId(id);
+//            Optional<User> user = userService.findByUserId(id);
+            Optional<User> user = userService.findByUsername(userName);
 
             if(!user.isPresent()){
                 throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);

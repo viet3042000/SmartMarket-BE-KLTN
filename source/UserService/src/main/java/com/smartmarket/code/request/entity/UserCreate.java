@@ -13,8 +13,6 @@ import java.util.Date;
 @Setter
 public class UserCreate {
 
-    private Long id;
-
     private String userName;
 
     private String password;

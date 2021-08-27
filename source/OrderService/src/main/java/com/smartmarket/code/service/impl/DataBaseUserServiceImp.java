@@ -1,6 +1,7 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.service.DataBaseUserService;
+import com.smartmarket.code.service.UserKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,10 @@ import java.util.Map;
 public class DataBaseUserServiceImp implements DataBaseUserService {
 
     @Autowired
-    UserKafkaServiceImp userKafkaServiceImp;
+    UserKafkaService userKafkaService;
 
     public void createDatabaseUser(Map<String, Object> keyPairs) throws ParseException{
-        userKafkaServiceImp.createUserKafka(keyPairs);
+        userKafkaService.createUserKafka(keyPairs);
     }
     public void updateDatabaseUser(Map<String, Object> keyPairs) throws ParseException{
         String username = "";
@@ -32,8 +33,7 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
                 enabled = (((Number)keyPairs.get(k)).longValue());
             }
         }
-
-        userKafkaServiceImp.updateUserKafka(username,password,enabled);
+        userKafkaService.updateUserKafka(username,password,enabled);
     }
     public void deleteDatabaseUser(Map<String, Object> keyPairs){
         String username = "";
@@ -42,11 +42,11 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
                 username = (String)  keyPairs.get(k);
             }
         }
-        userKafkaServiceImp.deleteUserKafka(username);
+        userKafkaService.deleteUserKafka(username);
     }
 
     public void truncateDatabaseUser(){
-        userKafkaServiceImp.truncateUserKafka();
+        userKafkaService.truncateUserKafka();
     }
 
 
@@ -54,11 +54,11 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
         //countUser>=1 mean that after read , code not yet crete/update/...
         //check if first message read
         if(countReadUser == 1){
-            userKafkaServiceImp.truncateUserKafka();
-            userKafkaServiceImp.createUserKafka(keyPairs);
+            userKafkaService.truncateUserKafka();
+            userKafkaService.createUserKafka(keyPairs);
         }
         if(countReadUser > 1){
-            userKafkaServiceImp.createUserKafka(keyPairs);
+            userKafkaService.createUserKafka(keyPairs);
         }
     }
 }

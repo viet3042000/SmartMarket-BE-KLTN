@@ -13,9 +13,7 @@ import java.io.Serializable;
 @Setter
 public class User implements Serializable {
 
-	@Column(name = "user_id")
-//	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
-//	@SequenceGenerator(sequenceName = "user_id_sequence", allocationSize = 1, name = "user_id_seq")
+	@Column(name = "id")
 	private Long id;
 
 	//@Id la primary key

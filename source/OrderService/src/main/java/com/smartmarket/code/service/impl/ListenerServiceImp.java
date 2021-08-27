@@ -9,7 +9,7 @@ import com.smartmarket.code.model.OrderProduct;
 import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.SagaState;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
-import com.smartmarket.code.service.ListenerService;
+import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.GetKeyPairUtil;
 import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -48,32 +48,34 @@ public class ListenerServiceImp implements ListenerService {
     LogServiceImpl logService;
 
     @Autowired
-    DataBaseUserServiceImp dataBaseUserServiceImp;
+    DataBaseUserService dataBaseUserService;
 
     @Autowired
-    DataBaseClientServiceImp dataBaseClientServiceImp;
+    DataBaseUserRoleService dataBaseUserRoleService;
 
     @Autowired
-    DataBaseConsumerServiceImp dataBaseConsumerServiceImp;
+    DataBaseClientService dataBaseClientService;
+
+    @Autowired
+    DataBaseConsumerService dataBaseConsumerService;
 
     @Autowired
     OrderProductRepository orderProductRepository;
 
-    @Value("${kafka.topic.clients}")
-    String topicClients;
-
     @Value("${kafka.topic.users}")
     String topicUsers;
-
-    @Value("${kafka.topic.consumers}")
-    String topicConsumers;
 
     @Value("${kafka.topic.travelinsuranceoutbox}")
     String topicTravelInsuranceOutbox;
 
-    int countReadUser = 0;
-    int countReadClient =0;
-    int countReadConsumer =0;
+    @Value("${kafka.topic.user_role}")
+    String topicUserRole;
+
+//    @Value("${kafka.topic.clients}")
+//    String topicClients;
+//
+//    @Value("${kafka.topic.consumers}")
+//    String topicConsumers;
 
 
     //published when the consumer appears to be blocked in the poll method.
@@ -290,7 +292,6 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-
 //    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
@@ -305,28 +306,22 @@ public class ListenerServiceImp implements ListenerService {
                         JSONObject sourceObj = payloadObj.getJSONObject("source");
                         op = payloadObj.getString("op");
 
+                        Map<String, Object> keyPairs = new HashMap<>();
                         if (!payloadObj.isNull("after")) {
                             JSONObject afterObj = payloadObj.getJSONObject("after");
 
                             //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                countReadUser=0;
-                                dataBaseUserServiceImp.createDatabaseUser(keyPairs);
+                                dataBaseUserService.createDatabaseUser(keyPairs);
                             }
                             if (op.equals("u")) {
-                                countReadUser=0;
-                                dataBaseUserServiceImp.updateDatabaseUser(keyPairs);
+                                dataBaseUserService.updateDatabaseUser(keyPairs);
                             }
-                            if (op.equals("r")) {
-                                // truncate all table
-                                // create table from key-value
-                                //check timeout (if timeout>= n --> read consecutively --> reset countReadUser=0 ?
-                                countReadUser ++;
-                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
-                            }
+//                            if (op.equals("r")) {
+//                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
+//                            }
                         } else {
                             System.out.println("afterObj is null");
                         }
@@ -335,20 +330,17 @@ public class ListenerServiceImp implements ListenerService {
                             JSONObject beforeObj = payloadObj.getJSONObject("before");
 
                             //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                countReadUser=0;
-                                dataBaseUserServiceImp.deleteDatabaseUser(keyPairs);
+                                dataBaseUserService.deleteDatabaseUser(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            countReadUser=0;
-                            dataBaseUserServiceImp.truncateDatabaseUser();
+                            dataBaseUserService.truncateDatabaseUser();
                         }
 
                     } else {
@@ -396,8 +388,8 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    //    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
-    public void listenClient(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
+    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+    public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -410,25 +402,22 @@ public class ListenerServiceImp implements ListenerService {
                         JSONObject sourceObj = payloadObj.getJSONObject("source");
                         op = payloadObj.getString("op");
 
+                        Map<String, Object> keyPairs = new HashMap<>();
                         if (!payloadObj.isNull("after")) {
                             JSONObject afterObj = payloadObj.getJSONObject("after");
 
                             //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                countReadClient=0;
-                                dataBaseClientServiceImp.createDatabaseClient(keyPairs);
+                                dataBaseUserRoleService.createDatabaseUserRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                countReadClient=0;
-                                dataBaseClientServiceImp.updateDatabaseClient(keyPairs);
+                                dataBaseUserRoleService.updateDatabaseUserRole(keyPairs);
                             }
-                            if (op.equals("r")) {
-                                countReadClient ++;
-                                dataBaseClientServiceImp.readAndUpdateDatabaseClient(keyPairs,countReadClient);
-                            }
+//                            if (op.equals("r")) {
+//                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
+//                            }
                         } else {
                             System.out.println("afterObj is null");
                         }
@@ -437,121 +426,17 @@ public class ListenerServiceImp implements ListenerService {
                             JSONObject beforeObj = payloadObj.getJSONObject("before");
 
                             //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                countReadClient=0;
-                                dataBaseClientServiceImp.deleteDatabaseClient(keyPairs);
+                                dataBaseUserRoleService.deleteDatabaseUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            countReadClient=0;
-                            dataBaseClientServiceImp.truncateDatabaseClient();
-                        }
-
-                    } else {
-                        System.out.println("payload is null");
-                    }
-                }else{
-                    System.out.println("record.value is null");
-                }
-            }
-
-            //Commit after processed record in batch (records)
-            acknowledgment.acknowledge();
-
-        } catch (CommitFailedException ex) {
-            // Do giữa các lần poll, thời gian xử lý của consumer lâu quá,
-            // nên coordinator tưởng là consumer chết rồi-->Không commit được
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
-                    "clients", op ,dateTimeFormatter.format(currentTime),
-                    "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
-
-        }catch (KafkaException ex){
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
-                    "clients", op , dateTimeFormatter.format(currentTime),
-                    ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
-        }catch (Exception ex) {
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-            LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
-                    "clients", op , dateTimeFormatter.format(currentTime),
-                    ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
-        }
-        finally {
-//          In the case of an error, we want to make sure that we commit before we close and exit.
-            acknowledgment.acknowledge();
-//            System.out.println("Closed consumer and we are done");
-        }
-    }
-
-
-    //    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
-    public void listenConsumer(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
-        String op ="";
-        try {
-            for (ConsumerRecord<String, String> record : records) {
-                System.out.println(record.offset());
-                if(record.value() != null) {
-                    String valueRecord = record.value();
-                    JSONObject valueObj = new JSONObject(valueRecord);
-                    if (!valueObj.isNull("payload")) {
-                        JSONObject payloadObj = valueObj.getJSONObject("payload");
-                        JSONObject sourceObj = payloadObj.getJSONObject("source");
-                        op = payloadObj.getString("op");
-
-                        if (!payloadObj.isNull("after")) {
-                            JSONObject afterObj = payloadObj.getJSONObject("after");
-
-                            //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
-                            getKeyPairUtil.getKeyPair(afterObj, keyPairs);
-
-                            if (op.equals("c")) {
-                                countReadConsumer=0;
-                                dataBaseConsumerServiceImp.createDatabaseConsumer(keyPairs);
-                            }
-                            if (op.equals("u")) {
-                                countReadConsumer=0;
-                                dataBaseConsumerServiceImp.updateDatabaseConsumer(keyPairs);
-                            }
-                            if (op.equals("r")) {
-                                countReadConsumer ++;
-                                dataBaseConsumerServiceImp.readAndUpdateDatabaseConsumer(keyPairs,countReadConsumer);
-                            }
-                        } else {
-                            System.out.println("afterObj is null");
-                        }
-
-                        if (!payloadObj.isNull("before")) {
-                            JSONObject beforeObj = payloadObj.getJSONObject("before");
-
-                            //Get key-pair in afterObj
-                            Map<String, Object> keyPairs = new HashMap<>();
-                            getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
-
-                            if (op.equals("d")) {
-                                countReadConsumer=0;
-                                dataBaseConsumerServiceImp.deleteDatabaseConsumer(keyPairs);
-                            }
-                        } else {
-                            System.out.println("beforeObj is null");
-                        }
-
-                        if (op.equals("t")) {
-                            countReadConsumer=0;
-                            dataBaseConsumerServiceImp.truncateDatabaseConsumer();
+                            dataBaseUserRoleService.truncateDatabaseUserRole();
                         }
 
                     } else {
@@ -570,24 +455,24 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
-                    "consumers", op , dateTimeFormatter.format(currentTime),
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
+                    "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
-                    "consumers", op , dateTimeFormatter.format(currentTime),
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
+                    "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
 
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
-                    "consumers", op , dateTimeFormatter.format(currentTime),
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
+                    "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createKafkaLogException(kafkaExceptionObject);
         }
@@ -597,4 +482,198 @@ public class ListenerServiceImp implements ListenerService {
 //            System.out.println("Closed consumer and we are done");
         }
     }
+
+
+
+    //    @KafkaListener(id = "${kafka.groupID.clients}",topics = "${kafka.topic.clients}")
+//    public void listenClient(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
+//        String op ="";
+//        try {
+//            for (ConsumerRecord<String, String> record : records) {
+//                System.out.println(record.offset());
+//                if(record.value() != null) {
+//                    String valueRecord = record.value();
+//                    JSONObject valueObj = new JSONObject(valueRecord);
+//                    if (!valueObj.isNull("payload")) {
+//                        JSONObject payloadObj = valueObj.getJSONObject("payload");
+//                        JSONObject sourceObj = payloadObj.getJSONObject("source");
+//                        op = payloadObj.getString("op");
+//
+//                        if (!payloadObj.isNull("after")) {
+//                            JSONObject afterObj = payloadObj.getJSONObject("after");
+//
+//                            //Get key-pair in afterObj
+//                            Map<String, Object> keyPairs = new HashMap<>();
+//                            getKeyPairUtil.getKeyPair(afterObj, keyPairs);
+//
+//                            if (op.equals("c")) {
+//                                dataBaseClientServiceImp.createDatabaseClient(keyPairs);
+//                            }
+//                            if (op.equals("u")) {
+//                                dataBaseClientServiceImp.updateDatabaseClient(keyPairs);
+//                            }
+//                            if (op.equals("r")) {
+//                                dataBaseClientServiceImp.readAndUpdateDatabaseClient(keyPairs,countReadClient);
+//                            }
+//                        } else {
+//                            System.out.println("afterObj is null");
+//                        }
+//
+//                        if (!payloadObj.isNull("before")) {
+//                            JSONObject beforeObj = payloadObj.getJSONObject("before");
+//
+//                            //Get key-pair in afterObj
+//                            Map<String, Object> keyPairs = new HashMap<>();
+//                            getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
+//
+//                            if (op.equals("d")) {
+//                                dataBaseClientServiceImp.deleteDatabaseClient(keyPairs);
+//                            }
+//                        } else {
+//                            System.out.println("beforeObj is null");
+//                        }
+//
+//                        if (op.equals("t")) {
+//                            dataBaseClientServiceImp.truncateDatabaseClient();
+//                        }
+//
+//                    } else {
+//                        System.out.println("payload is null");
+//                    }
+//                }else{
+//                    System.out.println("record.value is null");
+//                }
+//            }
+//
+//            //Commit after processed record in batch (records)
+//            acknowledgment.acknowledge();
+//
+//        } catch (CommitFailedException ex) {
+//            // Do giữa các lần poll, thời gian xử lý của consumer lâu quá,
+//            // nên coordinator tưởng là consumer chết rồi-->Không commit được
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
+//                    "clients", op ,dateTimeFormatter.format(currentTime),
+//                    "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//
+//        }catch (KafkaException ex){
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
+//                    "clients", op , dateTimeFormatter.format(currentTime),
+//                    ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//        }catch (Exception ex) {
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicClients,
+//                    "clients", op , dateTimeFormatter.format(currentTime),
+//                    ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//        }
+//        finally {
+////          In the case of an error, we want to make sure that we commit before we close and exit.
+//            acknowledgment.acknowledge();
+////            System.out.println("Closed consumer and we are done");
+//        }
+//    }
+//
+//
+//    //    @KafkaListener(id = "${kafka.groupID.consumers}",topics = "${kafka.topic.consumers}")
+//    public void listenConsumer(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
+//        String op ="";
+//        try {
+//            for (ConsumerRecord<String, String> record : records) {
+//                System.out.println(record.offset());
+//                if(record.value() != null) {
+//                    String valueRecord = record.value();
+//                    JSONObject valueObj = new JSONObject(valueRecord);
+//                    if (!valueObj.isNull("payload")) {
+//                        JSONObject payloadObj = valueObj.getJSONObject("payload");
+//                        JSONObject sourceObj = payloadObj.getJSONObject("source");
+//                        op = payloadObj.getString("op");
+//
+//                        if (!payloadObj.isNull("after")) {
+//                            JSONObject afterObj = payloadObj.getJSONObject("after");
+//
+//                            //Get key-pair in afterObj
+//                            Map<String, Object> keyPairs = new HashMap<>();
+//                            getKeyPairUtil.getKeyPair(afterObj, keyPairs);
+//
+//                            if (op.equals("c")) {
+//                                dataBaseConsumerServiceImp.createDatabaseConsumer(keyPairs);
+//                            }
+//                            if (op.equals("u")) {
+//                                dataBaseConsumerServiceImp.updateDatabaseConsumer(keyPairs);
+//                            }
+//                            if (op.equals("r")) {
+//                                dataBaseConsumerServiceImp.readAndUpdateDatabaseConsumer(keyPairs,countReadConsumer);
+//                            }
+//                        } else {
+//                            System.out.println("afterObj is null");
+//                        }
+//
+//                        if (!payloadObj.isNull("before")) {
+//                            JSONObject beforeObj = payloadObj.getJSONObject("before");
+//
+//                            //Get key-pair in afterObj
+//                            Map<String, Object> keyPairs = new HashMap<>();
+//                            getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
+//
+//                            if (op.equals("d")) {
+//                                dataBaseConsumerServiceImp.deleteDatabaseConsumer(keyPairs);
+//                            }
+//                        } else {
+//                            System.out.println("beforeObj is null");
+//                        }
+//
+//                        if (op.equals("t")) {
+//                            dataBaseConsumerServiceImp.truncateDatabaseConsumer();
+//                        }
+//
+//                    } else {
+//                        System.out.println("payload is null");
+//                    }
+//                }else{
+//                    System.out.println("record.value is null");
+//                }
+//            }
+//
+//            //Commit after processed record in batch (records)
+//            acknowledgment.acknowledge();
+//
+//        }catch (CommitFailedException ex) {
+//            // Do giữa các lần poll, thời gian xử lý của consumer lâu quá,
+//            // nên coordinator tưởng là consumer chết rồi-->Không commit được
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
+//                    "consumers", op , dateTimeFormatter.format(currentTime),
+//                    "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//
+//        }catch (KafkaException ex){
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
+//                    "consumers", op , dateTimeFormatter.format(currentTime),
+//                    ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//
+//        } catch (Exception ex) {
+//            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+//            LocalDateTime currentTime = LocalDateTime.now();
+//            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicConsumers,
+//                    "consumers", op , dateTimeFormatter.format(currentTime),
+//                    ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
+//            logService.createKafkaLogException(kafkaExceptionObject);
+//        }
+//        finally {
+////          In the case of an error, we want to make sure that we commit before we close and exit.
+//            acknowledgment.acknowledge();
+////            System.out.println("Closed consumer and we are done");
+//        }
+//    }
 }

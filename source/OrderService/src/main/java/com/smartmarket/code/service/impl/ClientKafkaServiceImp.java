@@ -34,15 +34,15 @@ public class ClientKafkaServiceImp implements ClientKafkaService {
     }
 
     public int updateConsumerClientKafka(Long id,String clientId,String secret,String consumerId) {
-        return clientRepository.updateConsumerClientKafka(id,clientId,secret,consumerId);
+        return clientRepository.updateClientKafka(id,clientId,secret,consumerId);
     }
 
     public int deleteConsumerClientKafka(String clientId) {
-        return clientRepository.deleteConsumerClientKafka(clientId);
+        return clientRepository.deleteClientKafka(clientId);
     }
 
     public int truncateConsumerClientKafka() {
-        return clientRepository.truncateConsumerClientKafka();
+        return clientRepository.truncateClientKafka();
     }
 
 }

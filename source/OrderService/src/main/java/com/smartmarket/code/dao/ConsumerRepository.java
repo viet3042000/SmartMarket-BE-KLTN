@@ -18,13 +18,13 @@ public interface ConsumerRepository extends JpaRepository<Consumers, String> {
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL
     @Query(value = "UPDATE consumers set created_at =:createAt where consumer_id =:consumerId", nativeQuery = true)
-    public int updateConsumerClientKafka(@Param("consumerId") String consumerId, @Param("createAt") Date createAt) ;
+    public int updateConsumerKafka(@Param("consumerId") String consumerId, @Param("createAt") Date createAt) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "DELETE FROM consumers where consumer_id =:consumerId", nativeQuery = true)
-    public int deleteConsumerClientKafka(@Param("consumerId") String consumerId) ;
+    public int deleteConsumerKafka(@Param("consumerId") String consumerId) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "TRUNCATE TABLE consumers", nativeQuery = true)
-    public int truncateConsumerClientKafka() ;
+    public int truncateConsumerKafka() ;
 }

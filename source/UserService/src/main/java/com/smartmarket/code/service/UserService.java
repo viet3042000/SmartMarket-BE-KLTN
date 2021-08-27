@@ -9,11 +9,11 @@ public interface UserService {
 
     public User update(User object) ;
 
-    public User delete(Long id) ;
+    public User delete(String username) ;
 
     Optional<User> findByUsername(String username);
 
     public Optional<User> findByUserId(Long userId) ;
 
-    Long findUserIdByUsername(String username);
+    public Optional<User> findUserIdByUsername(String username);
 }

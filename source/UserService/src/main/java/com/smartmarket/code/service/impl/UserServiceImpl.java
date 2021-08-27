@@ -43,8 +43,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User delete(Long id) {
-        User userDelete = userRepository.findByUserId(id).orElse(null);
+    public User delete(String username) {
+        User userDelete = userRepository.findUserByUsername(username).orElse(null);
         if (userDelete != null) {
             userRepository.delete(userDelete);
             userRoleRepository.deleteUserRoleByUserId(userDelete.getId());
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long findUserIdByUsername(String username) {
-        return userRepository.findUserIdByUsername(username);
+    public Optional<User> findUserIdByUsername(String username) {
+        return userRepository.findUserByUsername(username);
     }
 }

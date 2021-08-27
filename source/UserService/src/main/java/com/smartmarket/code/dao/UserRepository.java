@@ -26,14 +26,14 @@ public interface UserRepository extends JpaRepository<User, String> {
 	public Optional<User> findByUsername(@Param("username") String username);
 
 	// Đây là JPQL (Hibernate) --> dùng tên biến của User
-	@Query(value = "from User u where u.userName =:username and u.id <> :idUpdate ")
-	public Optional<User> checkUserExist(@Param("username") String username ,@Param("idUpdate") Long idUpdate);
+	@Query(value = "from User u where u.userName =:username")
+	public Optional<User> checkUserExist(@Param("username") String username);
 
 	@Query(value = "from User u where u.id =:id")
 	public Optional<User> findByUserId(@Param("id") Long id);
 
-	@Query(value = "select u.id from User u where u.userName =:username")
-	public Long findUserIdByUsername(@Param("username") String username);
+	@Query(value = "from User u where u.userName =:username")
+	public Optional<User> findUserByUsername(@Param("username") String username);
 
 
 	@Modifying(clearAutomatically = true)

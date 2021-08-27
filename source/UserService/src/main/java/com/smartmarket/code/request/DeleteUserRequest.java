@@ -9,6 +9,6 @@ import java.io.Serializable;
 @Setter
 public class DeleteUserRequest implements Serializable {
 
-    private Long id;
+    private String userName;
 
 }

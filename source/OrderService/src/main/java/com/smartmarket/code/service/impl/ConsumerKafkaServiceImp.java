@@ -36,14 +36,14 @@ public class ConsumerKafkaServiceImp implements ConsumerKafkaService {
     }
 
     public int updateConsumerKafka(String consumerId,Date createAt){
-        return consumerRepository.updateConsumerClientKafka(consumerId,createAt);
+        return consumerRepository.updateConsumerKafka(consumerId,createAt);
     }
 
     public int deleteConsumerKafka(String consumerId){
-        return consumerRepository.deleteConsumerClientKafka(consumerId);
+        return consumerRepository.deleteConsumerKafka(consumerId);
     }
 
     public int truncateConsumerKafka(){
-        return consumerRepository.truncateConsumerClientKafka();
+        return consumerRepository.truncateConsumerKafka();
     }
 }
