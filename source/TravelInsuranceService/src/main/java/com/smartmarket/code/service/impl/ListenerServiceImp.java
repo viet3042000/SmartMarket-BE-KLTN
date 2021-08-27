@@ -10,7 +10,7 @@ import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
 import com.smartmarket.code.dao.TravelInsuranceRepository;
-import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.TravelInsurance;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
@@ -223,13 +223,21 @@ public class ListenerServiceImp implements ListenerService {
                                 }
 
                                 if(type.equals("updateTravelInsuranceBIC")){
+                                    String orderId = "";
+
+                                    Optional<BICTransaction> bicTransaction = bicTransactionRepository.findBICTransactionSuccessByOrderRef(detail.getJSONObject("orders").getString("orderReference"));
+                                    if(bicTransaction.isPresent()) {
+                                        orderId= bicTransaction.get().getOrderId();
+                                        detail.getJSONObject("orders").put("orderId", orderId);
+                                    }
+
                                     Optional<TravelInsurance> travelInsurance = travelInsuranceRepository.findById(detail.getJSONObject("orders").getString("orderReference"));
                                     if(travelInsurance.isPresent()) {
                                         TravelInsurance t = travelInsurance.get();
                                         t.setState(TravelInsuranceState.UPDATING);
                                         travelInsuranceRepository.save(t);
 
-                                        UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest = g.fromJson(d, UpdateTravelInsuranceBICRequest.class);
+                                        UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest = g.fromJson(detail.toString(), UpdateTravelInsuranceBICRequest.class);
                                         BaseDetail baseDetail = new BaseDetail();
                                         baseDetail.setDetail(updateTravelInsuranceBICRequest);
                                         baseDetail.setRequestId(jsonPayload.getString("requestId"));

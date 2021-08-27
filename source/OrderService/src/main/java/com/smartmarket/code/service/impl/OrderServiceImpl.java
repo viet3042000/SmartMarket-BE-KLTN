@@ -126,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
                 userName = (String) claims.get("user_name");
             }else{
                 ResponseError responseError = new ResponseError();
+                responseError.setOrderId(orderId.toString());
                 responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
                 responseError.setResponseTime(createTravelInsuranceBICRequest.getRequestTime());
                 responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -164,6 +165,7 @@ public class OrderServiceImpl implements OrderService {
             outBox.setPayload(j.toString());
             outboxRepository.save(outBox);
 
+            response.setOrderId(orderId.toString());
             response.setResponseId(createTravelInsuranceBICRequest.getRequestId());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -252,6 +254,7 @@ public class OrderServiceImpl implements OrderService {
                 userName = (String) claims.get("user_name");
             }else{
                 ResponseError responseError = new ResponseError();
+                responseError.setOrderId(orderReference);
                 responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
                 responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
                 responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -267,6 +270,7 @@ public class OrderServiceImpl implements OrderService {
                     orderRepository.save(order);
                 } else {
                     ResponseError responseError = new ResponseError();
+                    responseError.setOrderId(orderReference);
                     responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
                     responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
                     responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -275,6 +279,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }else{
                 ResponseError responseError = new ResponseError();
+                responseError.setOrderId(orderReference);
                 responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
                 responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
                 responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -316,6 +321,7 @@ public class OrderServiceImpl implements OrderService {
             outBox.setPayload(j.toString());
             outboxRepository.save(outBox);
 
+            response.setOrderId(orderReference);
             response.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -401,6 +407,7 @@ public class OrderServiceImpl implements OrderService {
                 userName = (String) claims.get("user_name");
             }else{
                 ResponseError responseError = new ResponseError();
+                responseError.setOrderId(orderReference);
                 responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
                 responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
                 responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -414,6 +421,7 @@ public class OrderServiceImpl implements OrderService {
                 OrdersServiceEntity order = orders.get();
                 if(!order.getUserName().equals(userName)) {
                     ResponseError responseError = new ResponseError();
+                    responseError.setOrderId(orderReference);
                     responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
                     responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
                     responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -422,6 +430,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }else{
                 ResponseError responseError = new ResponseError();
+                responseError.setOrderId(orderReference);
                 responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
                 responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
                 responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
@@ -463,6 +472,7 @@ public class OrderServiceImpl implements OrderService {
             outBox.setPayload(j.toString());
             outboxRepository.save(outBox);
 
+            response.setOrderId(orderReference);
             response.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);

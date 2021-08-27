@@ -26,7 +26,7 @@ public class OrderUpdate {
 //    private String orderReference;
 
     //order id in travelinsuranceservice
-    private String orderId;
+//    private String orderId;
 
     @NotBlank(message = "ordBillFirstName is require")
     @Size(max = 255, message = "ordBillFirstName should be less than or equal to 255 characters")

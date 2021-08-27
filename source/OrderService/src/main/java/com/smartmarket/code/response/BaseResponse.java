@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Setter
 public class BaseResponse implements Serializable {
     private String responseId;
+    private String orderId;
     private String responseTime;
     private String resultCode;
     private String resultMessage;

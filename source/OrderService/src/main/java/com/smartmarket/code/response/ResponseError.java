@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResponseError {
-
+    private String orderId;
     private String responseId;
     private String responseTime;
     private String resultCode;

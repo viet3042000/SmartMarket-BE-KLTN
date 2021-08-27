@@ -135,7 +135,7 @@ public class MapperUtils {
 
         if (orders != null) {
 //            ordersBIC.setOrderReference(orders.getOrderReference());
-            ordersBIC.setOrderid(Long.parseLong(orders.getOrderId()));
+//            ordersBIC.setOrderid(Long.parseLong(orders.getOrderId()));
             ordersBIC.setOrdbillfirstname(orders.getOrdBillFirstName());
             ordersBIC.setOrdbillmobile(orders.getOrdBillMobile());
             ordersBIC.setOrdbillstreet1(orders.getOrdBillStreet1().trim().equals("") ? "No Address" : orders.getOrdBillStreet1());

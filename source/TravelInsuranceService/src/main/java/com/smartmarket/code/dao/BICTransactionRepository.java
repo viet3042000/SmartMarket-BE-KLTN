@@ -21,6 +21,13 @@ public interface BICTransactionRepository extends JpaRepository<BICTransaction, 
     public Optional<BICTransaction> findBICTransactionSuccessByOrderID(@Param("orderId") String orderId);
 
 
+    @Query(value = "SELECT * FROM bic_transaction bict where bict.order_reference = :orderReference" +
+            "    and bict.result_code= '000'" +
+            "    and bict.type = 'CREATE'" +
+            "    and bict.bic_result_code= '200 OK' " , nativeQuery = true)
+    public Optional<BICTransaction> findBICTransactionSuccessByOrderRef(@Param("orderReference") String orderReference);
+
+
     @Query(value = "SELECT * FROM bic_transaction bict where bict.order_id = :orderId" +
             "    and bict.order_reference =:order_reference" +
             "    and bict.request_id =:request_id" +
