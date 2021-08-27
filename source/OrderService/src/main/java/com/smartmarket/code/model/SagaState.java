@@ -51,4 +51,8 @@ public class SagaState {
     @Version
     @Column(name = "version")
     private int version;
+
+    //order_id
+    @Column(name = "aggregateid")
+    private String aggregateId;
 }

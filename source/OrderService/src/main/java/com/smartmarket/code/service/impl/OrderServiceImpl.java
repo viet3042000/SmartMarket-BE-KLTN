@@ -150,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
             }
             sagaState.setPayload(j.toString());
             sagaState.setStatus(SagaStateStatus.STARTED);
+            sagaState.setAggregateId(orderId.toString());
             sagaStateRepository.save(sagaState);
 
             outBox.setCreatedLogtimestamp(createAt);
@@ -302,6 +303,7 @@ public class OrderServiceImpl implements OrderService {
             }
             sagaState.setPayload(payload);
             sagaState.setStatus(SagaStateStatus.STARTED);
+            sagaState.setAggregateId(orderIdString);
             sagaStateRepository.save(sagaState);
 
             Outbox outBox = new Outbox();
@@ -452,6 +454,7 @@ public class OrderServiceImpl implements OrderService {
             }
             sagaState.setPayload(payload);
             sagaState.setStatus(SagaStateStatus.STARTED);
+            sagaState.setAggregateId(orderIdString);
             sagaStateRepository.save(sagaState);
 
             Outbox outBox = new Outbox();
