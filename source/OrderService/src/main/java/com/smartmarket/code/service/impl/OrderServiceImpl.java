@@ -549,7 +549,7 @@ public class OrderServiceImpl implements OrderService {
 
                 //set response data to client
                 response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
-                response.setDetail(allOrders);
+                response.setDetail(allOrders.getContent());
                 response.setPage(page);
                 response.setTotalPage(totalPage);
                 response.setTotal(allOrders.getTotalElements());
