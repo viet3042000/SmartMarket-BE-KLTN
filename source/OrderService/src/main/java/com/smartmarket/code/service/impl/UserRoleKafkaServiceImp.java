@@ -49,7 +49,30 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
         return userRoleRepository.save(userRole);
     }
 
-    public int updateUserRoleKafka(Long userId,Long roleId, Long enabled,Long id) {
+
+    public int updateUserRoleKafka(Map<String, Object> keyPairs) {
+        Long id = 0L;
+        Long userId =0L;
+        Long roleId =0L;
+        Long enabled =0L;
+        String createAt = "";
+
+        //convert string --> date with formart tương ứng
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("id")) {
+                id = ((Number)keyPairs.get(k)).longValue();
+            }
+            if (k.equals("user_id")) {
+                userId = ((Number)keyPairs.get(k)).longValue();
+            }
+            if (k.equals("role_id")) {
+                roleId = ((Number)keyPairs.get(k)).longValue();
+            }
+            if (k.equals("enabled")) {
+                enabled = ((Number)keyPairs.get(k)).longValue();
+            }
+        }
         return userRoleRepository.updateUserRoleKafka(userId, roleId, enabled,id);
     }
 

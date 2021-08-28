@@ -15,11 +15,8 @@ public class UserProfile implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_id_seq")
-    @SequenceGenerator(sequenceName = "user_id_sequence", allocationSize = 1, name = "user_id_seq")
     private Long id;
 
-    //@Id la primary key
     @Column(name = "user_name")
     private String userName;
 
