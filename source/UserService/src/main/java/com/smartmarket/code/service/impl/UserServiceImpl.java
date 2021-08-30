@@ -23,8 +23,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(User object) {
         object.setEnabled(Constant.STATUS.ACTIVE);
-        object.setPassword(object.getPassword());
-        object.setUserName(object.getUserName());
+//        object.setPassword(object.getPassword());
+//        object.setUserName(object.getUserName());
 
         return userRepository.save(object);
     }

@@ -36,7 +36,7 @@ public class RoleServiceImpl implements RoleService {
             roleUpdate.setEnabled(updateRoleRequestBaseDetail.getDetail().getRole().getEnabled());
             roleRepository.save(roleUpdate);
         }else {
-            throw new Exception("Role_id is not exist");
+            throw new Exception("Role_name is not exist");
         }
         return roleUpdate;
     }

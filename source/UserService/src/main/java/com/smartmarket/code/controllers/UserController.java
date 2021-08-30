@@ -185,10 +185,10 @@ public class UserController {
             User userUpdate = user.get();
             UserProfile userProfileUpdate = new UserProfile();
 
-//            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
             userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
-//            userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
+//            User userUpdated = userService.update(userUpdate);
+            User userUpdated = userRepository.save(userUpdate);
 
             userProfileUpdate.setFullName(updateUserRequestBaseDetail.getDetail().getUser().getFullName());
             userProfileUpdate.setBirthDate(updateUserRequestBaseDetail.getDetail().getUser().getBirthDate());
@@ -201,7 +201,6 @@ public class UserController {
             userProfileUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
 
             UserProfile userProfileUpdated = userProfileService.update(userProfileUpdate,user.get().getUserName());
-            User userUpdated = userService.update(userUpdate);
 
             userRoleService.deleteByUserId(user.get().getId());
             ArrayList<Long> roles = updateUserRequestBaseDetail.getDetail().getRoles();
