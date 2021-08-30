@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -58,10 +60,11 @@ public class RoleController {
     @PostMapping(value = "/create-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createRole(@Valid @RequestBody BaseDetail<CreateRoleRequest> createRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         BaseResponse response = new BaseResponse();
-
         try {
             Role roleCreate =  new Role();
             roleCreate.setRoleName(createRoleRequestBaseDetail.getDetail().getRole().getRoleName());
+            roleCreate.setCreatedLogtimestamp(new Date());
+            roleCreate.setDesc(createRoleRequestBaseDetail.getDetail().getRole().getDesc());
             roleService.create(roleCreate) ;
             //set response data to client
             response.setDetail(roleCreate);
@@ -110,15 +113,11 @@ public class RoleController {
     }
 
     @PostMapping(value = "/update-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateRole(@Valid @RequestBody BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> updateRole(@Valid @RequestBody BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         BaseResponse response = new BaseResponse();
 
         try {
-            Role roleUpdate =  new Role();
-            roleUpdate.setRoleName(updateRoleRequestBaseDetail.getDetail().getRole().getRoleName());
-            roleUpdate.setId(updateRoleRequestBaseDetail.getDetail().getRole().getId());
-
-            roleService.update(roleUpdate) ;
+            Role roleUpdate = roleService.update(updateRoleRequestBaseDetail) ;
             //set response data to client
             response.setDetail(roleUpdate);
             response.setResponseId(updateRoleRequestBaseDetail.getRequestId());
@@ -163,13 +162,14 @@ public class RoleController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
     @PostMapping(value = "/delete-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> deleteRole(@Valid @RequestBody BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> deleteRole(@Valid @RequestBody BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         BaseResponse response = new BaseResponse();
 
         try {
-
-            Role roleDelete = roleService.delete(deleteRoleRequestBaseDetail.getDetail().getId()) ;
+//            Role roleDelete = roleService.delete(deleteRoleRequestBaseDetail.getDetail().getId()) ;
+            Role roleDelete = roleService.deleteByRoleName(deleteRoleRequestBaseDetail.getDetail().getRoleName()) ;
             //set response data to client
             response.setDetail(roleDelete);
             response.setResponseId(deleteRoleRequestBaseDetail.getRequestId());

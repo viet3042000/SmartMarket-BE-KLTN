@@ -9,6 +9,8 @@ import java.io.Serializable;
 @Setter
 public class DeleteRoleRequest implements Serializable {
 
-    private Long id;
+//    private Long id;
+
+    private String roleName;
 
 }

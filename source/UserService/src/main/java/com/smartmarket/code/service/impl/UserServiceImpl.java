@@ -30,24 +30,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(User object) {
+    public User update(User object) throws Exception {
         User userUpdate = userRepository.findByUserId(object.getId()).orElse(null);
-        if (userUpdate != null) {
+        if (userUpdate!=null) {
             object.setEnabled(object.getEnabled());
             object.setPassword(object.getPassword());
             object.setUserName(object.getUserName());
+        }else {
+            throw new Exception("User_id is not exist");
         }
         userRepository.save(object);
         return userUpdate;
-
     }
 
     @Override
-    public User delete(String username) {
+    public User delete(String username) throws Exception {
         User userDelete = userRepository.findUserByUsername(username).orElse(null);
         if (userDelete != null) {
             userRepository.delete(userDelete);
             userRoleRepository.deleteUserRoleByUserId(userDelete.getId());
+        }else{
+            throw new Exception("User_name is not exist");
         }
         return userDelete;
     }

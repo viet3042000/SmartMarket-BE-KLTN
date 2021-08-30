@@ -8,10 +8,12 @@ import lombok.Setter;
 @Setter
 public class RoleUpdate {
 
-    private Long id;
+//    private Long id;
 
     private String roleName;
 
     private Long enabled;
+
+    private String desc;
 
 }

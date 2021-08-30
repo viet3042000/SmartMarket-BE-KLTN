@@ -165,7 +165,7 @@ public class UserController {
 
     @Transactional
     @PostMapping(value = "/update-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         BaseResponse response = new BaseResponse();
 
         try {
@@ -185,7 +185,7 @@ public class UserController {
             User userUpdate = user.get();
             UserProfile userProfileUpdate = new UserProfile();
 
-            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
+//            userUpdate.setUserName(updateUserRequestBaseDetail.getDetail().getUser().getUserName());
             userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
 //            userUpdate.setId(updateUserRequestBaseDetail.getDetail().getUser().getId());
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
@@ -262,7 +262,7 @@ public class UserController {
 
     @Transactional
     @PostMapping(value = "/delete-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         //time start
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 

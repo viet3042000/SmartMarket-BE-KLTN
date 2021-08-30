@@ -7,9 +7,9 @@ public interface UserService {
 
     public User create(User object) ;
 
-    public User update(User object) ;
+    public User update(User object) throws Exception;
 
-    public User delete(String username) ;
+    public User delete(String username) throws Exception;
 
     Optional<User> findByUsername(String username);
 
