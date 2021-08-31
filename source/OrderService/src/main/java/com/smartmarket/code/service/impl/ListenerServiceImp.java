@@ -68,11 +68,11 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     OrderProductRepository orderProductRepository;
 
-    @Value("${kafka.topic.users}")
-    String topicUsers;
-
     @Value("${kafka.topic.travelinsuranceoutbox}")
     String topicTravelInsuranceOutbox;
+
+    @Value("${kafka.topic.users}")
+    String topicUsers;
 
     @Value("${kafka.topic.user_role}")
     String topicUserRole;
@@ -280,7 +280,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         } catch (KafkaException ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -288,14 +288,14 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicTravelInsuranceOutbox,
                     "outbox", op, dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         } finally {
 //          In the case of an error, we want to make sure that we commit before we leave.
             acknowledgment.acknowledge();
@@ -374,7 +374,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -382,7 +382,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -390,7 +390,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUsers,
                     "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we close and exit.
@@ -470,7 +470,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
                     "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -478,7 +478,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
                     "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -486,7 +486,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserRole,
                     "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we close and exit.
@@ -563,7 +563,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserProfile,
                     "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -571,7 +571,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserProfile,
                     "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -579,7 +579,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicUserProfile,
                     "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we close and exit.
@@ -657,7 +657,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicRole,
                     "users", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -665,7 +665,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicRole,
                     "users", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
 
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -673,7 +673,7 @@ public class ListenerServiceImp implements ListenerService {
             ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicRole,
                     "users", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
-            logService.createKafkaLogException(kafkaExceptionObject);
+            logService.createListenerLogExceptionException(kafkaExceptionObject);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we close and exit.
