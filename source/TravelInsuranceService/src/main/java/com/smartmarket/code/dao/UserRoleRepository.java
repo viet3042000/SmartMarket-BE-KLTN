@@ -18,9 +18,6 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
     @Query(value = "from UserRole u where u.id =:id")
     public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
 
-    @Query(value = "select u.roleId from UserRole u where u.userId =:userId")
-    public ArrayList<Long> findListRoleByUserId(@Param("userId") Long userId);
-
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL --> dùng tên biến theo DB
     @Query(value = "UPDATE user_role set role_name =:role_name," +
