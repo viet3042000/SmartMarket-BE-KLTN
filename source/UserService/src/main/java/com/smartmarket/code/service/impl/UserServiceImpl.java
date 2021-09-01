@@ -23,9 +23,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(User object) {
         object.setEnabled(Constant.STATUS.ACTIVE);
-//        object.setPassword(object.getPassword());
-//        object.setUserName(object.getUserName());
-
         return userRepository.save(object);
     }
 
@@ -48,7 +45,7 @@ public class UserServiceImpl implements UserService {
         User userDelete = userRepository.findUserByUsername(username).orElse(null);
         if (userDelete != null) {
             userRepository.delete(userDelete);
-            userRoleRepository.deleteUserRoleByUserId(userDelete.getId());
+            userRoleRepository.deleteUserRoleByUserName(userDelete.getUserName());
         }else{
             throw new Exception("User_name is not exist");
         }

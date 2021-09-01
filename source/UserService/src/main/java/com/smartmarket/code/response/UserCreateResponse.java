@@ -32,7 +32,7 @@ public class UserCreateResponse {
 
     private Long enabled;
 
-    private ArrayList<Long> roles ;
+    private String role ;
 
 
 

@@ -13,8 +13,6 @@ import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.response.ResponseError;
 //import com.smartmarket.code.service.BICTransactionExceptionService;
 //import com.smartmarket.code.service.BICTransactionService;
-import com.smartmarket.code.service.BICTransactionExceptionService;
-import com.smartmarket.code.service.BICTransactionService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.EJson;
@@ -53,16 +51,10 @@ public class RestControllerHandleException {
     LogServiceImpl logService;
 
     @Autowired
-    BICTransactionService bicTransactionService;
-
-    @Autowired
     HostConstants hostConstants;
 
     @Autowired
     SetResponseUtils setResponseUtils;
-
-    @Autowired
-    BICTransactionExceptionService bicTransactionExceptionService;
 
     @Autowired
     ConfigurableEnvironment environment;
@@ -293,33 +285,6 @@ public class RestControllerHandleException {
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
-
-
-        //add BICTransaction
-        try {
-            //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
-        } catch (CannotCreateTransactionException e) {
-            //logException
-            ServiceExceptionObject soaExceptionObject =
-                    new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                            messageTimestamp, "travelinsuranceservice", operationName, "1",
-                            request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
-                            Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
-            logService.createSOALogException(soaExceptionObject);
-
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime, "BIC", "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetailResponse, null, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request),operationName);
-            logService.createSOALog2(soaObject);
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
@@ -431,61 +396,9 @@ public class RestControllerHandleException {
             InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
             response = setResponseUtils.setResponseInvalidFormatJsonException(response, invalidFormatException);
 
-            //add BICTransaction
-            try {
-                //add BICTransaction
-                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
-            } catch (CannotCreateTransactionException e) {
-                //logException
-                ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                                messageTimestamp, "travelinsuranceservice", operationName, "1",
-                                request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
-                                Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
-                logService.createSOALogException(soaExceptionObject);
-
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-
-                //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "BIC", "smartMarket", "client",
-                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                        "response", transactionDetailResponse, null, response.getResultCode(),
-                        response.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
-                logService.createSOALog2(soaObject);
-
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
-
         }else {
             response = setResponseUtils.setResponseHttpMessageNotReadableException(response, ex);
-
-            //add BICTransaction
-            try {
-                //add BICTransaction
-                bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.INVALID_INPUT_DATA, HttpStatus.BAD_REQUEST.toString());
-            } catch (CannotCreateTransactionException e) {
-                //logException
-                ServiceExceptionObject soaExceptionObject =
-                        new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                                messageTimestamp, "travelinsuranceservice", operationName, "1",
-                                request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
-                                Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
-                logService.createSOALogException(soaExceptionObject);
-
-                String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-
-                //logResponse vs Client
-                ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "BIC", "smartMarket", "client",
-                        messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                        "response", transactionDetailResponse, null, response.getResultCode(),
-                        response.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
-                logService.createSOALog2(soaObject);
-
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
         }
-
-
 
         //logException
         ServiceExceptionObject soaExceptionObject =
@@ -579,33 +492,6 @@ public class RestControllerHandleException {
 
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
-
-        //add BICTransaction
-        try {
-            //add BICTransaction
-            bicTransactionExceptionService.createBICTransactionFromRequest(request, ResponseCode.CODE.GENERAL_ERROR, HttpStatus.BAD_REQUEST.toString());
-        } catch (CannotCreateTransactionException e) {
-
-            //logException
-            ServiceExceptionObject soaExceptionObject =
-                    new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", requestId, requestTime, null,
-                            messageTimestamp, "travelinsuranceservice", operationName, "1",
-                            request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
-                            Throwables.getStackTraceAsString(e), Utils.getClientIp(request));
-            logService.createSOALogException(soaExceptionObject);
-
-            String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog", requestId, requestTime, "BIC", "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDuration,
-                    "response", transactionDetailResponse, null, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request),operationName);
-            logService.createSOALog2(soaObject);
-
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
 
         //logException
         ServiceExceptionObject soaExceptionObject =

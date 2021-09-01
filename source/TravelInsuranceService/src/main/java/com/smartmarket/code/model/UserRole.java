@@ -17,11 +17,11 @@ public class UserRole implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "user_name")
+    private String userName;
 
-    @Column(name = "role_id")
-    private Long roleId;
+    @Column(name = "role_name")
+    private String roleName;
 
     @Column(name = "create_date" ,  columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)

@@ -32,11 +32,11 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
             if (k.equals("id")) {
                 userRole.setId(((Number)keyPairs.get(k)).longValue());
             }
-            if (k.equals("user_id")) {
-                userRole.setUserId(((Number)keyPairs.get(k)).longValue());
+            if (k.equals("user_name")) {
+                userRole.setUserName((String) keyPairs.get(k));
             }
-            if (k.equals("role_id")) {
-                userRole.setRoleId(((Number)keyPairs.get(k)).longValue());
+            if (k.equals("role_name")) {
+                userRole.setRoleName((String) keyPairs.get(k));
             }
             if (k.equals("enabled")) {
                 userRole.setEnabled(((Number)keyPairs.get(k)).longValue());
@@ -52,10 +52,8 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
 
     public int updateUserRoleKafka(Map<String, Object> keyPairs) {
         Long id = 0L;
-        Long userId =0L;
-        Long roleId =0L;
+        String roleName ="";
         Long enabled =0L;
-        String createAt = "";
 
         //convert string --> date with formart tương ứng
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -63,17 +61,14 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
             if (k.equals("id")) {
                 id = ((Number)keyPairs.get(k)).longValue();
             }
-            if (k.equals("user_id")) {
-                userId = ((Number)keyPairs.get(k)).longValue();
-            }
-            if (k.equals("role_id")) {
-                roleId = ((Number)keyPairs.get(k)).longValue();
+            if (k.equals("role_name")) {
+                roleName = (String) keyPairs.get(k);
             }
             if (k.equals("enabled")) {
                 enabled = ((Number)keyPairs.get(k)).longValue();
             }
         }
-        return userRoleRepository.updateUserRoleKafka(userId, roleId, enabled,id);
+        return userRoleRepository.updateUserRoleKafka(roleName, enabled,id);
     }
 
     public int deleteUserRoleKafka(Long id) {

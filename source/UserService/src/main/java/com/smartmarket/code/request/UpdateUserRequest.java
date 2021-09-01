@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class UpdateUserRequest implements Serializable {
 
     private UserUpdate user;
-    private ArrayList<Long> roles ;
+    private String role;
 
 
 }

@@ -20,11 +20,14 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 	@Query(value = "from UserRole u where u.id =:id")
 	public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
 
-	@Query(value = "select u.roleId from UserRole u where u.userId =:userId")
-	public ArrayList<Long> findListRoleByUserId(@Param("userId") Long userId);
+	@Query(value = "from UserRole u where u.userName =:userName")
+	public Optional<UserRole> findByUserName(@Param("userName") String userName);
+
+	@Query(value = "select u.roleName from UserRole u where u.userName =:userName")
+	public String findRoleByUserName(@Param("userName") String userName);
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM user_role where user_id =:userId", nativeQuery = true)
-	public int deleteUserRoleByUserId(@Param("userId") Long userId) ;
+	@Query(value = "DELETE FROM user_role where user_name =:userName", nativeQuery = true)
+	public int deleteUserRoleByUserName(@Param("userName") String userName) ;
 
 }

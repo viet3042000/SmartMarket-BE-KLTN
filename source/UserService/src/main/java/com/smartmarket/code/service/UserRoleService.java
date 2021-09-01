@@ -8,10 +8,10 @@ public interface UserRoleService {
 
     public UserRole create(UserRole object) ;
 
-    public UserRole update(UserRole object) ;
+    public UserRole update(String userName, String role, Long enabled) throws Exception;
 
     public UserRole delete(UserRole id) ;
 
-    public int deleteByUserId(Long id) ;
+    public int deleteByUserName(String userName);
 
 }

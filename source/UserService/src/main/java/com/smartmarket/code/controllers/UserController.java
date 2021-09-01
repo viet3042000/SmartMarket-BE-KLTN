@@ -14,7 +14,6 @@ import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.UserCreateResponse;
-import com.smartmarket.code.service.RoleService;
 import com.smartmarket.code.service.UserProfileService;
 import com.smartmarket.code.service.UserRoleService;
 import com.smartmarket.code.service.UserService;
@@ -31,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
@@ -42,7 +43,6 @@ import javax.validation.Valid;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -74,6 +74,12 @@ public class UserController {
     @Autowired
     UserRoleService userRoleService;
 
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+
     @Transactional
     @PostMapping(value = "/create-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
@@ -92,7 +98,7 @@ public class UserController {
 
 
             userCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
-            userCreate.setPassword(createUserRequestBaseDetail.getDetail().getUser().getPassword());
+            userCreate.setPassword(bCryptPasswordEncoder.encode(createUserRequestBaseDetail.getDetail().getUser().getPassword()));
 
             userProfileCreate.setFullName(createUserRequestBaseDetail.getDetail().getUser().getFullName());
             userProfileCreate.setBirthDate(createUserRequestBaseDetail.getDetail().getUser().getBirthDate());
@@ -106,17 +112,10 @@ public class UserController {
             User userCreated = userService.create(userCreate);
             UserProfile userProfileCreated = userProfileService.create(userProfileCreate);
 
-            ArrayList<Long> roles = createUserRequestBaseDetail.getDetail().getRoles();
-
-            if (roles != null && roles.size() > 0) {
-                for (int i = 0; i < roles.size(); i++) {
-
-                    UserRole userRoleCreate = new UserRole();
-                    userRoleCreate.setUserId(userCreated.getId());
-                    userRoleCreate.setRoleId(roles.get(i));
-                    userRoleService.create(userRoleCreate);
-                }
-            }
+            UserRole userRoleCreate = new UserRole();
+            userRoleCreate.setUserName(userCreated.getUserName());
+            userRoleCreate.setRoleName(createUserRequestBaseDetail.getDetail().getRole());
+            userRoleService.create(userRoleCreate);
 
 
             //set response data to client
@@ -185,7 +184,7 @@ public class UserController {
             User userUpdate = user.get();
             UserProfile userProfileUpdate = new UserProfile();
 
-            userUpdate.setPassword(updateUserRequestBaseDetail.getDetail().getUser().getPassword());
+            userUpdate.setPassword(bCryptPasswordEncoder.encode(updateUserRequestBaseDetail.getDetail().getUser().getPassword()));
             userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
 //            User userUpdated = userService.update(userUpdate);
             User userUpdated = userRepository.save(userUpdate);
@@ -202,18 +201,16 @@ public class UserController {
 
             UserProfile userProfileUpdated = userProfileService.update(userProfileUpdate,user.get().getUserName());
 
-            userRoleService.deleteByUserId(user.get().getId());
-            ArrayList<Long> roles = updateUserRequestBaseDetail.getDetail().getRoles();
 
-            if (roles != null && roles.size() > 0) {
-                for (int i = 0; i < roles.size(); i++) {
+            userRoleService.update(user.get().getUserName(),updateUserRequestBaseDetail.getDetail().getRole(),
+                                   updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
 
-                    UserRole userRoleCreate = new UserRole();
-                    userRoleCreate.setUserId(userUpdated.getId());
-                    userRoleCreate.setRoleId(roles.get(i));
-                    userRoleService.create(userRoleCreate);
-                }
-            }
+//            UserRole userRoleUpdate = userRoleRepository.findByUserName(user.get().getUserName()).orElse(null);
+//            if (userRoleUpdate != null) {
+//                userRoleUpdate.setRoleName(updateUserRequestBaseDetail.getDetail().getRole());
+//                userRoleUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
+//            }
+//            userRoleRepository.save(userRoleUpdate);
 
             //set response data to client
             response.setDetail(userUpdate);
@@ -280,6 +277,7 @@ public class UserController {
         try {
             User userDelete = userService.delete(deleteUserRequestBaseDetail.getDetail().getUserName());
             UserProfile userProfileDelete = userProfileService.deleteByUserName(userDelete.getUserName());
+            userRoleService.deleteByUserName(userDelete.getUserName());
 
             //set response data to client
             response.setDetail(userDelete);
@@ -376,7 +374,8 @@ public class UserController {
                     UserCreateResponse userCreateResponse  = new UserCreateResponse() ;
                     userCreateResponse.setId(user.getId());
                     Optional<UserProfile> userProfile = userProfileService.findByUsername(user.getUserName()) ;
-                    ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.getId()) ;
+//                    ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.getId()) ;
+                    String role = userRoleRepository.findRoleByUserName(user.getUserName());
 
                     if(userProfile.isPresent()){
                         userCreateResponse.setFullName(userProfile.get().getFullName());
@@ -390,7 +389,7 @@ public class UserController {
                         userCreateResponse.setPassword(user.getPassword());
                         userCreateResponse.setEnabled(userProfile.get().getEnabled());
 
-                        userCreateResponse.setRoles(roles);
+                        userCreateResponse.setRole(role);
                     }
 
 
@@ -503,9 +502,10 @@ public class UserController {
                 userCreateResponse.setPassword(user.get().getPassword());
                 userCreateResponse.setEnabled(userProfile.get().getEnabled());
 
-                ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.get().getId()) ;
+//                ArrayList<Long> roles =  userRoleRepository.findListRoleByUserId(user.get().getId()) ;
+                String role = userRoleRepository.findRoleByUserName(user.get().getUserName());
 
-                userCreateResponse.setRoles(roles);
+                userCreateResponse.setRole(role);
 
             }
 

@@ -12,6 +12,6 @@ import java.util.ArrayList;
 public class CreateUserRequest implements Serializable {
 
     private UserCreate user;
-    private ArrayList<Long> roles ;
+    private String role ;
 
 }

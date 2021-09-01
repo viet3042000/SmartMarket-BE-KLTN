@@ -19,13 +19,11 @@ public class UserRole implements Serializable {
 	@SequenceGenerator(sequenceName = "user_role_sequence", allocationSize = 1, name = "user_role_seq")
 	private Long id;
 
-	//@Id la primary key
+	@Column(name = "user_name")
+	private String userName;
 
-	@Column(name = "user_id")
-	private Long userId;
-
-	@Column(name = "role_id")
-	private Long roleId;
+	@Column(name = "role_name")
+	private String roleName;
 
 	@Column(name = "create_date" ,  columnDefinition= "TIMESTAMP WITH TIME ZONE")
 	@Temporal(TemporalType.TIMESTAMP)

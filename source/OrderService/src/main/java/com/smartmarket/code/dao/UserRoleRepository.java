@@ -16,17 +16,11 @@ import java.util.Optional;
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
-    @Query(value = "from UserRole u where u.id =:id")
-    public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
-
-    @Query(value = "select u.roleId from UserRole u where u.userId =:userId")
-    public ArrayList<Long> findListRoleByUserId(@Param("userId") Long userId);
-
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL --> dùng tên biến theo DB
-    @Query(value = "UPDATE user_role set user_id =:user_id, role_id =:role_id," +
+    @Query(value = "UPDATE user_role set role_name =:role_name," +
                    " enabled=:enabled where id = :id",nativeQuery = true)
-    public int updateUserRoleKafka(@Param("user_id") Long userId, @Param("role_id") Long roleId,
+    public int updateUserRoleKafka(@Param("role_name") String roleName,
                                    @Param("enabled") Long enabled,@Param("id") Long id) ;
 
     @Modifying(clearAutomatically = true)

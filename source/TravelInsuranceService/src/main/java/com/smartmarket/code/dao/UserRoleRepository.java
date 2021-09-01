@@ -23,9 +23,9 @@ public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL --> dùng tên biến theo DB
-    @Query(value = "UPDATE user_role set user_id =:user_id, role_id =:role_id," +
-                   " enabled=:enabled where id = :id",nativeQuery = true)
-    public int updateUserRoleKafka(@Param("user_id") Long userId, @Param("role_id") Long roleId,
+    @Query(value = "UPDATE user_role set role_name =:role_name," +
+            " enabled=:enabled where id = :id",nativeQuery = true)
+    public int updateUserRoleKafka(@Param("role_name") String roleName,
                                    @Param("enabled") Long enabled,@Param("id") Long id) ;
 
     @Modifying(clearAutomatically = true)
