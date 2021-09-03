@@ -21,6 +21,6 @@ public interface OrderRepository extends JpaRepository<OrdersServiceEntity, Stri
     @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
     public Optional<OrdersServiceEntity> findByOrderId(@Param("order_id") String orderId);
 
-    @Query(value = "SELECT * FROM orders WHERE user_name=:user_name and type=:type",nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE user_name=:user_name and type=:type order by created_logtimestamp ASC",nativeQuery = true)
     public Page<OrdersServiceEntity> findByUserName(@Param("user_name") String userName, @Param("type") String type, Pageable pageable);
 }
