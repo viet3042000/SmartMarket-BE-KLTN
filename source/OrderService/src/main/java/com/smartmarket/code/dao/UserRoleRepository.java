@@ -1,5 +1,6 @@
 package com.smartmarket.code.dao;
 
+import com.smartmarket.code.model.OrdersServiceEntity;
 import com.smartmarket.code.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,6 +16,9 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
+
+    @Query(value = "SELECT * FROM user_role WHERE user_name=:user_name", nativeQuery = true)
+    public Optional<UserRole> findByUserName(@Param("user_name") String userName);
 
     @Modifying(clearAutomatically = true)
     // Đây là Native SQL --> dùng tên biến theo DB

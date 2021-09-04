@@ -133,4 +133,15 @@ public class SetResponseUtils {
             return responseError ;
         }
 
+        //OrderService
+        public ResponseError setResponseErrorOrderService(String orderId, String message, String requestId, String requestTime){
+            ResponseError responseError = new ResponseError();
+            responseError.setOrderId(orderId);
+            responseError.setResponseId(requestId);
+            responseError.setResponseTime(requestTime);
+            responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
+            responseError.setResultMessage(message);
+            return responseError;
+        }
+
 }

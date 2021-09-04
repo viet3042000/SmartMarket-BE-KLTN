@@ -5,15 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.*;
-import com.smartmarket.code.dao.OrderProductRepository;
-import com.smartmarket.code.dao.OrderRepository;
-import com.smartmarket.code.dao.OutboxRepository;
-import com.smartmarket.code.dao.SagaStateRepository;
+import com.smartmarket.code.dao.*;
 import com.smartmarket.code.exception.*;
-import com.smartmarket.code.model.OrderProduct;
-import com.smartmarket.code.model.Outbox;
-import com.smartmarket.code.model.OrdersServiceEntity;
-import com.smartmarket.code.model.SagaState;
+import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.*;
@@ -23,10 +17,7 @@ import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.ResponseError;
 import com.smartmarket.code.service.OrderService;
-import com.smartmarket.code.util.DateTimeUtils;
-import com.smartmarket.code.util.JwtUtils;
-import com.smartmarket.code.util.MapperUtils;
-import com.smartmarket.code.util.Utils;
+import com.smartmarket.code.util.*;
 import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,10 +57,19 @@ public class OrderServiceImpl implements OrderService {
     OrderProductRepository orderProductRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserRoleRepository userRoleRepository;
+
+    @Autowired
     ConfigurableEnvironment environment;
 
     @Autowired
     MapperUtils mapperUtils;
+
+    @Autowired
+    SetResponseUtils setResponseUtils;
 
     @Autowired
     LogServiceImpl logService;
@@ -120,26 +120,43 @@ public class OrderServiceImpl implements OrderService {
             //get user token
             Map<String, Object> claims = null;
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            claims = JwtUtils.getClaimsMap(authentication);
-            //get clientid from claims
-            if (claims != null) {
-                userName = (String) claims.get("user_name");
-            }else{
-                ResponseError responseError = new ResponseError();
-                responseError.setOrderId(orderId.toString());
-                responseError.setResponseId(createTravelInsuranceBICRequest.getRequestId());
-                responseError.setResponseTime(createTravelInsuranceBICRequest.getRequestTime());
-                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                responseError.setResultMessage("userName is null");
+            claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed CustomAuthorizeRequestFilter
+
+            userName = (String) claims.get("user_name");
+            User user = userRepository.findByUsername(userName).orElse(null);
+            if(user == null){
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderId.toString(),
+                                                                "userName is not exist in orderService",
+                                                                createTravelInsuranceBICRequest.getRequestId(),
+                                                                createTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
-            orders.setUserName(userName);
 
+            orders.setUserName(userName);
             Date date = new Date();
             String stringCreateAt = formatter.format(date);
             Date createAt = formatter.parse(stringCreateAt);
             orders.setCreatedLogtimestamp(createAt);
-            orderRepository.save(orders);
+
+            UserRole userRole = userRoleRepository.findByUserName(userName).orElse(null);
+            if(userRole!= null){
+                if("CUSTOMER".equals(userRole.getRoleName())){
+                    orderRepository.save(orders);
+                }else {
+                    ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderId.toString(),
+                                                                    "userRole is not CUSTOMER",
+                                                                    createTravelInsuranceBICRequest.getRequestId(),
+                                                                    createTravelInsuranceBICRequest.getRequestTime());
+                    return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderId.toString(),
+                                                                "userRole is null",
+                                                                createTravelInsuranceBICRequest.getRequestId(),
+                                                                createTravelInsuranceBICRequest.getRequestTime());
+                return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
+            }
+
 
             sagaState.setCreatedLogtimestamp(createAt);
             sagaState.setId(createTravelInsuranceBICRequest.getRequestId());
@@ -250,16 +267,14 @@ public class OrderServiceImpl implements OrderService {
             Map<String, Object> claims = null;
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             claims = JwtUtils.getClaimsMap(authentication);
-            //get clientid from claims
-            if (claims != null) {
-                userName = (String) claims.get("user_name");
-            }else{
-                ResponseError responseError = new ResponseError();
-                responseError.setOrderId(orderReference);
-                responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
-                responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
-                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                responseError.setResultMessage("userName is null");
+
+            userName = (String) claims.get("user_name");
+            User user = userRepository.findByUsername(userName).orElse(null);
+            if(user == null){
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                                                                "userName is not exist in orderService",
+                                                                updateTravelInsuranceBICRequest.getRequestId(),
+                                                                updateTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
@@ -270,21 +285,17 @@ public class OrderServiceImpl implements OrderService {
                     order.setPayloadUpdate(payload);
                     orderRepository.save(order);
                 } else {
-                    ResponseError responseError = new ResponseError();
-                    responseError.setOrderId(orderReference);
-                    responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
-                    responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
-                    responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                    responseError.setResultMessage("Order does not exist with user");
+                    ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                                                                    "Order does not exist with user",
+                                                                    updateTravelInsuranceBICRequest.getRequestId(),
+                                                                    updateTravelInsuranceBICRequest.getRequestTime());
                     return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                 }
             }else{
-                ResponseError responseError = new ResponseError();
-                responseError.setOrderId(orderReference);
-                responseError.setResponseId(updateTravelInsuranceBICRequest.getRequestId());
-                responseError.setResponseTime(updateTravelInsuranceBICRequest.getRequestTime());
-                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                responseError.setResultMessage("Order does not exist or is processing");
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                                                                "Order does not exist or is processing",
+                                                                updateTravelInsuranceBICRequest.getRequestId(),
+                                                                updateTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
@@ -404,39 +415,33 @@ public class OrderServiceImpl implements OrderService {
             Map<String, Object> claims = null;
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             claims = JwtUtils.getClaimsMap(authentication);
-            //get clientid from claims
-            if (claims != null) {
-                userName = (String) claims.get("user_name");
-            }else{
-                ResponseError responseError = new ResponseError();
-                responseError.setOrderId(orderReference);
-                responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
-                responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
-                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                responseError.setResultMessage("userName is null");
+
+            userName = (String) claims.get("user_name");
+            User user = userRepository.findByUsername(userName).orElse(null);
+            if(user == null){
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                                                                "userName is not exist in orderService",
+                                                                queryTravelInsuranceBICRequest.getRequestId(),
+                                                                queryTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
-//            OrdersServiceEntity orders = orderRepository.findByOrderId(UUID.fromString(orderReferenceString));
             Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(orderIdString);
             if(orders.isPresent() && orders.get().getState().equals("Succeeded")) {
                 OrdersServiceEntity order = orders.get();
                 if(!order.getUserName().equals(userName)) {
-                    ResponseError responseError = new ResponseError();
-                    responseError.setOrderId(orderReference);
-                    responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
-                    responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
-                    responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                    responseError.setResultMessage("Order does not exist with user");
+                    ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                                                                    "Order does not exist with user",
+                                                                    queryTravelInsuranceBICRequest.getRequestId(),
+                                                                    queryTravelInsuranceBICRequest.getRequestTime());
+
                     return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
                 }
             }else{
-                ResponseError responseError = new ResponseError();
-                responseError.setOrderId(orderReference);
-                responseError.setResponseId(queryTravelInsuranceBICRequest.getRequestId());
-                responseError.setResponseTime(queryTravelInsuranceBICRequest.getRequestTime());
-                responseError.setResultCode(ResponseCode.CODE.TRANSACTION_REFUSED);
-                responseError.setResultMessage("Order does not exist or is processing");
+                ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
+                        "Order does not exist or is processing",
+                        queryTravelInsuranceBICRequest.getRequestId(),
+                        queryTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
             }
 
