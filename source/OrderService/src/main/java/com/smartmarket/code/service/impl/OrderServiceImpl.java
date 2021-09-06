@@ -126,7 +126,7 @@ public class OrderServiceImpl implements OrderService {
             User user = userRepository.findByUsername(userName).orElse(null);
             if(user == null){
                 ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderId.toString(),
-                                                                "userName is not exist in orderService",
+                                                                "userName does not exist in orderService",
                                                                 createTravelInsuranceBICRequest.getRequestId(),
                                                                 createTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -260,7 +260,7 @@ public class OrderServiceImpl implements OrderService {
                 orderReference = orderProduct.getProductId();
             }else {
                 ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
-                        "orderProduct is not exist",
+                        "orderProduct does not exist",
                         updateTravelInsuranceBICRequest.getRequestId(),
                         updateTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -278,7 +278,7 @@ public class OrderServiceImpl implements OrderService {
             User user = userRepository.findByUsername(userName).orElse(null);
             if(user == null){
                 ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
-                                                                "userName is not exist in orderService",
+                                                                "userName does not exist in orderService",
                                                                 updateTravelInsuranceBICRequest.getRequestId(),
                                                                 updateTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -430,7 +430,7 @@ public class OrderServiceImpl implements OrderService {
                 orderReference = orderProduct.getProductId();
             }else {
                 ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
-                        "orderProduct is not exist",
+                        "orderProduct does not exist",
                         queryTravelInsuranceBICRequest.getRequestId(),
                         queryTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
@@ -449,7 +449,7 @@ public class OrderServiceImpl implements OrderService {
             User user = userRepository.findByUsername(userName).orElse(null);
             if(user == null){
                 ResponseError responseError = setResponseUtils.setResponseErrorOrderService(orderReference,
-                                                                "userName is not exist in orderService",
+                                                                "userName does not exist in orderService",
                                                                 queryTravelInsuranceBICRequest.getRequestId(),
                                                                 queryTravelInsuranceBICRequest.getRequestTime());
                 return new ResponseEntity<>(responseError, HttpStatus.BAD_REQUEST);
