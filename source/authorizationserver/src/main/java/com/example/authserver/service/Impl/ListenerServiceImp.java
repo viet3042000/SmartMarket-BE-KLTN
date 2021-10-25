@@ -44,7 +44,7 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     DataBaseRoleService dataBaseRoleService;
 
-    @Value("${kafka.topic.users}")
+//    @Value("${kafka.topic.users}")
 //    String topicUsers ;
     String topicUsers ="userservice.public.users";
 

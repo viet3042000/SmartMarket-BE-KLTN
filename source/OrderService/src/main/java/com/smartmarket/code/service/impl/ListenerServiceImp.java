@@ -81,7 +81,7 @@ public class ListenerServiceImp implements ListenerService {
 //    String topicConsumers;
 
 
-    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
+//    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
         //=order ref
@@ -461,7 +461,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
+//    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
