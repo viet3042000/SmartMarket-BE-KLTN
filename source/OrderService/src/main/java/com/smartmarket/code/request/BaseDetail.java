@@ -15,5 +15,4 @@ public class BaseDetail<T> extends BaseRequest implements Serializable {
     @NotNull(message = "detail is required")
     private @Valid T  detail ;
 
-
 }

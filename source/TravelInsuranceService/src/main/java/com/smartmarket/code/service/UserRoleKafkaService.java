@@ -8,9 +8,9 @@ import java.util.Map;
 public interface UserRoleKafkaService {
     public UserRole createUserRoleKafka(Map<String, Object> keyPairs) throws ParseException;
 
-    public int updateUserRoleKafka(Map<String, Object> keyPairs);
+    public UserRole updateUserRoleKafka(Map<String, Object> keyPairs)throws ParseException;
 
-    public int deleteUserRoleKafka(Long id) ;
+    public int deleteUserRoleKafka(String username) ;
 
     public int truncateUserRoleKafka() ;
 }

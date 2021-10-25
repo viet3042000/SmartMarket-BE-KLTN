@@ -23,14 +23,13 @@ public class DataBaseUserRoleServiceImp implements DataBaseUserRoleService {
     }
 
     public void deleteDatabaseUserRole(Map<String, Object> keyPairs){
-        Long id = 0L;
-
+        String username = "";
         for (String k : keyPairs.keySet()) {
-            if (k.equals("id")) {
-                id = ((Number)keyPairs.get(k)).longValue();
+            if (k.equals("user_name")) {
+                username = (String) keyPairs.get(k);
             }
         }
-        userRoleKafkaService.deleteUserRoleKafka(id);
+        userRoleKafkaService.deleteUserRoleKafka(username);
     }
 
     public void truncateDatabaseUserRole(){

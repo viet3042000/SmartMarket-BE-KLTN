@@ -24,7 +24,7 @@ public class Role implements Serializable {
 	private String roleName;
 
 	@Column(name = "enabled")
-	private Long enabled;
+	private Integer enabled;
 
 	@Column(name = "description")
 	private String desc;

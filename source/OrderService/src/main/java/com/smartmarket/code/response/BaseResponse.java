@@ -15,4 +15,5 @@ public class BaseResponse implements Serializable {
     private String responseTime;
     private String resultCode;
     private String resultMessage;
+    private Object detail;
 }

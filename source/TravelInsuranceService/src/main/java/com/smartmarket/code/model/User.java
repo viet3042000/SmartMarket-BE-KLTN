@@ -12,20 +12,24 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class User implements Serializable {
-
+//	@Id
 	@Column(name = "id")
 	private Long id;
 
-	//@Id la primary key
 	@Id
 	@Column(name = "user_name")
-	private String username;
+	private String userName;
 
 	@Column(name = "user_password")
-	@JsonIgnore
 	private String password;
 
 	@Column(name = "enabled")
-	private Long enabled;
+	private Integer enabled;
+
+	@Column(name = "provider")
+	private String provider;
+
+	@Column(name = "email")
+	private String email;
 
 }

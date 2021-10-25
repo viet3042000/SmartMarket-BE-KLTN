@@ -196,38 +196,38 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 }
             }
 
-            if (type.equals("getTravelInsuranceBIC")) {
-                QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
-                BaseDetail baseDetail = new BaseDetail();
-                baseDetail.setDetail(queryTravelInsuranceBICRequest);
-                baseDetail.setRequestId(jsonPayload.getString("requestId"));
-                baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
-                baseDetail.setTargetId(jsonPayload.getString("targetId"));
-
-                // get result from API create.
-                ResponseEntity<String> responseEntity = travelInsuranceService.getOrderOutbox(baseDetail, clientIp, clientId, startTime, hostName);
-                ObjectMapper mapper = new ObjectMapper();
-                String responseBody = mapper.writeValueAsString(responseEntity);
-                JSONObject jsonBody = new JSONObject(responseBody);
-                jsonBody.put("requestId", requestId);
-                int statusCodeValue = jsonBody.getInt("statusCodeValue");
-
-                outBox.setCreatedLogtimestamp(createAt);
-                outBox.setAggregateId(aggregateId);
-                outBox.setAggregateType(AggregateType.Order);
-                outBox.setType(type);
-                //insert to outbox
-                if (statusCodeValue == 200) {
-                    //payload = responsebody+ status+requestId
-                    jsonBody.put("status", "success");
-                    outBox.setPayload(jsonBody.toString());
-                } else {
-                    //payload = responsebody+ status+requestId
-                    jsonBody.put("status", "failure");
-                    outBox.setPayload(jsonBody.toString());
-                }
-                outboxRepository.save(outBox);
-            }
+//            if (type.equals("getTravelInsuranceBIC")) {
+//                QueryTravelInsuranceBICRequest queryTravelInsuranceBICRequest = g.fromJson(d, QueryTravelInsuranceBICRequest.class);
+//                BaseDetail baseDetail = new BaseDetail();
+//                baseDetail.setDetail(queryTravelInsuranceBICRequest);
+//                baseDetail.setRequestId(jsonPayload.getString("requestId"));
+//                baseDetail.setRequestTime(jsonPayload.getString("requestTime"));
+//                baseDetail.setTargetId(jsonPayload.getString("targetId"));
+//
+//                // get result from API create.
+//                ResponseEntity<String> responseEntity = travelInsuranceService.getOrderOutbox(baseDetail, clientIp, clientId, startTime, hostName);
+//                ObjectMapper mapper = new ObjectMapper();
+//                String responseBody = mapper.writeValueAsString(responseEntity);
+//                JSONObject jsonBody = new JSONObject(responseBody);
+//                jsonBody.put("requestId", requestId);
+//                int statusCodeValue = jsonBody.getInt("statusCodeValue");
+//
+//                outBox.setCreatedLogtimestamp(createAt);
+//                outBox.setAggregateId(aggregateId);
+//                outBox.setAggregateType(AggregateType.Order);
+//                outBox.setType(type);
+//                //insert to outbox
+//                if (statusCodeValue == 200) {
+//                    //payload = responsebody+ status+requestId
+//                    jsonBody.put("status", "success");
+//                    outBox.setPayload(jsonBody.toString());
+//                } else {
+//                    //payload = responsebody+ status+requestId
+//                    jsonBody.put("status", "failure");
+//                    outBox.setPayload(jsonBody.toString());
+//                }
+//                outboxRepository.save(outBox);
+//            }
         }
     }
 }

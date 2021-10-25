@@ -13,15 +13,16 @@ import java.util.Date;
 @Setter
 public class Role implements Serializable {
 
-    @Id
+//    @Id
     @Column(name = "id")
     private Long id;
 
+    @Id
     @Column(name = "role_name")
     private String roleName;
 
     @Column(name = "enabled")
-    private Long enabled;
+    private Integer enabled;
 
     @Column(name = "description")
     private String desc;

@@ -10,22 +10,35 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 
 public interface OrderService {
+    //user
+    //1 order = 1 type product
     public ResponseEntity<?> createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
+    //user
+    //update order đã được BIC tạo thành công
     public ResponseEntity<?> updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
                                              HttpServletRequest request,
                                              HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
+    //user + admin
+    //get order of user trong orderservice
     public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
-    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
-                                                     HttpServletRequest request,
-                                                     HttpServletResponse responseSelvet) throws JsonProcessingException;
+
+    //user + admin
+    public ResponseEntity<?> getAllOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
+                                         HttpServletRequest request,
+                                         HttpServletResponse responseSelvet) throws JsonProcessingException;
+
+    //admin
+    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
+                                               HttpServletRequest request,
+                                               HttpServletResponse responseSelvet) throws JsonProcessingException;
 }
 
 

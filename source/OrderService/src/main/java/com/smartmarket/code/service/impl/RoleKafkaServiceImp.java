@@ -34,7 +34,7 @@ public class RoleKafkaServiceImp implements RoleKafkaService {
                 role.setDesc((String) keyPairs.get(k));
             }
             if (k.equals("enabled")) {
-                role.setEnabled(((Number)keyPairs.get(k)).longValue());
+                role.setEnabled(((Number)keyPairs.get(k)).intValue());
             }
             if (k.equals("created_logtimestamp")) {
                 String createAt = (String)keyPairs.get(k);
@@ -44,32 +44,37 @@ public class RoleKafkaServiceImp implements RoleKafkaService {
         return roleRepository.save(role);
     }
 
-    public int updateRoleKafka(Map<String, Object> keyPairs) throws ParseException{
-        String roleName="";
-        String desc="";
-        Long enabled =0L;
+    public Role updateRoleKafka(Map<String, Object> keyPairs) throws ParseException{
+        Role role = new Role();
 
         //convert string --> date with formart tương ứng
+        //2021-08-27 17:21:52.132+07
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         for (String k : keyPairs.keySet()) {
+            if (k.equals("id")) {
+                role.setId(((Number)keyPairs.get(k)).longValue());
+            }
             if (k.equals("role_name")) {
-                roleName = (String) keyPairs.get(k);
+                role.setRoleName((String) keyPairs.get(k));
             }
             if (k.equals("description")) {
-                desc = (String) keyPairs.get(k);
+                role.setDesc((String) keyPairs.get(k));
             }
             if (k.equals("enabled")) {
-                enabled = ((Number)keyPairs.get(k)).longValue();
+                role.setEnabled(((Number)keyPairs.get(k)).intValue());
+            }
+            if (k.equals("created_logtimestamp")) {
+                String createAt = (String)keyPairs.get(k);
+                role.setCreatedLogtimestamp(formatter.parse(createAt));
             }
         }
-        return roleRepository.updateRoleKafka(roleName,desc,enabled);
+        return roleRepository.save(role);
     }
 
 
     public int deleteRoleKafka(String roleName) {
         return roleRepository.deleteRoleKafka(roleName);
     }
-
 
     public int truncateRoleKafka() {
         return roleRepository.truncateRoleKafka();

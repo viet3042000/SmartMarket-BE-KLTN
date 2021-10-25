@@ -22,7 +22,7 @@ public class UserCreateResponse {
 
     private String address;
 
-    private Long gender;
+    private Integer gender;
 
     private String identifyNumber;
 
@@ -30,10 +30,8 @@ public class UserCreateResponse {
 
     private String fullName;
 
-    private Long enabled;
+    private int enabled;
 
     private String role ;
-
-
 
 }

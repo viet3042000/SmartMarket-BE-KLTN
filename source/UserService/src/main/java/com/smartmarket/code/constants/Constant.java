@@ -5,8 +5,8 @@ public class Constant {
     public static final String TYPE_CREATE =  "CREATE" ;
     public static final String TYPE_UPDATE =  "UPDATE" ;
 
-    public class STATUS {
-        public static final long ACTIVE =  1 ;
-        public static final long INACTIVE =  0 ;
+    public static class STATUS {
+        public static final Integer ACTIVE =  1 ;
+        public static final Integer INACTIVE =  0 ;
     }
 }

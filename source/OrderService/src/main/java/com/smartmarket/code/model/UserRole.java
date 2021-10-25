@@ -13,10 +13,11 @@ import java.util.Date;
 @Setter
 public class UserRole implements Serializable {
 
-    @Id
+//    @Id
     @Column(name = "id")
     private Long id;
 
+    @Id
     @Column(name = "user_name")
     private String userName;
 
@@ -28,6 +29,6 @@ public class UserRole implements Serializable {
     private Date createDate;
 
     @Column(name = "enabled")
-    private Long enabled;
+    private Integer enabled;
 
 }

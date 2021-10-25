@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface UserProfileRepository extends JpaRepository<UserProfile, Long> {
+public interface UserProfileRepository extends JpaRepository<UserProfile, String> {
 
     // Đây là JPQL (Hibernate) --> dùng tên biến của User
     @Query(value = "from UserProfile u where u.userName =:userName")
@@ -24,15 +24,15 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
             " phone_number=:phone_number, address=:address, identify_number=:identify_number," +
             " birth_date=:birth_date, full_name=:full_name," +
             " enabled=:enabled where id = :id",nativeQuery = true)
-    public int updateUserProfileKafka(@Param("user_name") String userName,@Param("email") String email, @Param("gender") Long gender,
-                                      @Param("enabled") Long enabled,@Param("id") Long id,@Param("phone_number") String phoneNumber,
+    public int updateUserProfileKafka(@Param("user_name") String userName,@Param("email") String email, @Param("gender") Integer gender,
+                                      @Param("enabled") Integer enabled,@Param("id") Long id,@Param("phone_number") String phoneNumber,
                                       @Param("address") String address, @Param("identify_number") String identifyNumber,
                                       @Param("birth_date") String birthDate,@Param("full_name") String fullName) ;
 
 
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM user_profile where id =:id", nativeQuery = true)
-    public int deleteUserProfileById(@Param("id") Long id) ;
+    @Query(value = "DELETE FROM user_profile where user_name =:user_name", nativeQuery = true)
+    public int deleteUserProfileByUserName(@Param("user_name") String username) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "TRUNCATE TABLE user_profile",  nativeQuery = true)

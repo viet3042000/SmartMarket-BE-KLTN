@@ -6,12 +6,10 @@ import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.Role;
-import com.smartmarket.code.model.User;
-import com.smartmarket.code.model.UserProfile;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
-import com.smartmarket.code.response.UserCreateResponse;
+import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.RoleService;
 import com.smartmarket.code.service.impl.LogServiceImpl;
 import com.smartmarket.code.util.DateTimeUtils;
@@ -37,13 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.net.ConnectException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Optional;
-import java.util.function.Function;
 
 
-//@RefreshScope
 @RestController
 @RequestMapping("/user-service/v1/")
 public class RoleController {
@@ -52,27 +47,21 @@ public class RoleController {
     RoleService roleService;
 
     @Autowired
-    LogServiceImpl logService;
-
-    @Autowired
-    ConfigurableEnvironment environment;
+    AuthorizationService authorizationService;
 
     @PostMapping(value = "/create-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createRole(@Valid @RequestBody BaseDetail<CreateRoleRequest> createRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        BaseResponse response = new BaseResponse();
         try {
-            Role roleCreate =  new Role();
-            roleCreate.setRoleName(createRoleRequestBaseDetail.getDetail().getRole().getRoleName());
-            roleCreate.setCreatedLogtimestamp(new Date());
-            roleCreate.setDesc(createRoleRequestBaseDetail.getDetail().getRole().getDesc());
-            roleService.create(roleCreate) ;
-            //set response data to client
-            response.setDetail(roleCreate);
-            response.setResponseId(createRoleRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-
+            ArrayList<String> roles = authorizationService.getRoles();
+            if(roles != null) {
+                if (roles.contains("ADMIN")) {
+                    return roleService.createRole(createRoleRequestBaseDetail,request,responseSelvet);
+                }else {
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, createRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
             if (ex instanceof ResourceAccessException) {
@@ -105,25 +94,21 @@ public class RoleController {
                 throw ex ;
             }
         }
-
-
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(value = "/update-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateRole(@Valid @RequestBody BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
-
         try {
-            Role roleUpdate = roleService.update(updateRoleRequestBaseDetail) ;
-            //set response data to client
-            response.setDetail(roleUpdate);
-            response.setResponseId(updateRoleRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+            ArrayList<String> roles = authorizationService.getRoles();
+            if(roles != null) {
+                if (roles.contains("ADMIN")) {
+                    return roleService.updateRole(updateRoleRequestBaseDetail,request,responseSelvet);
+                }else {
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, updateRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
 
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -157,25 +142,22 @@ public class RoleController {
                 throw ex ;
             }
         }
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @PostMapping(value = "/delete-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> deleteRole(@Valid @RequestBody BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
-
         try {
-//            Role roleDelete = roleService.delete(deleteRoleRequestBaseDetail.getDetail().getId()) ;
-            Role roleDelete = roleService.deleteByRoleName(deleteRoleRequestBaseDetail.getDetail().getRoleName()) ;
-            //set response data to client
-            response.setDetail(roleDelete);
-            response.setResponseId(deleteRoleRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+            ArrayList<String> roles = authorizationService.getRoles();
+            if(roles != null) {
+                if (roles.contains("ADMIN")) {
+                    return roleService.deleteRole(deleteRoleRequestBaseDetail,request,responseSelvet);
+                }else {
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, deleteRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, deleteRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
 
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -209,9 +191,6 @@ public class RoleController {
                 throw ex ;
             }
         }
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -219,55 +198,17 @@ public class RoleController {
     public ResponseEntity<?> getListRole(@Valid @RequestBody BaseDetail<QueryRoleRequest> getListRoleRequestBaseDetail ,
                               HttpServletRequest request,
                               HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
-
-        Page<Role> pageResult = null;
-        Long total = null ;
-        Long page =  getListRoleRequestBaseDetail.getDetail().getPage()  ;
-        Long size =  getListRoleRequestBaseDetail.getDetail().getSize()   ;
-        int totalPage = 0 ;
-
-        Pageable pageable = PageRequest.of(page.intValue() - 1 , size.intValue());
-
-        BaseResponse response = new BaseResponse();
-        // declare value for log
-        //get time log
-        String logTimestamp = DateTimeUtils.getCurrentDate();
-        String messageTimestamp = logTimestamp;
-        ObjectMapper mapper = new ObjectMapper();
-        String responseStatus = Integer.toString(responseSelvet.getStatus());
-
-        String requestURL = request.getRequestURL().toString();
-        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
         try {
-
-            pageResult = roleService.getList(pageable);
-
-            total = pageResult.getTotalElements() ;
-            page =  getListRoleRequestBaseDetail.getDetail().getPage();
-            totalPage =(int) Math.ceil((double) total/size) ;
-            //set response data to client
-            response.setDetail(pageResult.getContent());
-            response.setPage(page);
-            response.setTotalPage(Long.valueOf(totalPage));
-            response.setTotal(total);
-
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
-            //calculate time duration
-            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
-            //logResponse vs Client
-            ServiceObject soaObject = new ServiceObject("serviceLog", getListRoleRequestBaseDetail.getRequestId(), getListRoleRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
-                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
-            logService.createSOALog2(soaObject);
+            ArrayList<String> roles = authorizationService.getRoles();
+            if(roles != null) {
+                if (roles.contains("ADMIN")) {
+                    return roleService.getListRole(getListRoleRequestBaseDetail,request,responseSelvet);
+                }else {
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, getListRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                }
+            }else {
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, getListRoleRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
 
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
@@ -301,11 +242,6 @@ public class RoleController {
                 throw ex;
             }
         }
-
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
 
 }

@@ -30,6 +30,6 @@ public class UserRole implements Serializable {
 	private Date createDate;
 
 	@Column(name = "enabled")
-	private Long enabled;
+	private Integer enabled;
 
 }

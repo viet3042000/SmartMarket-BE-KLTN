@@ -13,10 +13,11 @@ import java.util.Date;
 @Setter
 public class UserProfile implements Serializable {
 
-    @Id
+//    @Id
     @Column(name = "id")
     private Long id;
 
+    @Id
     @Column(name = "user_name")
     private String userName;
 
@@ -30,7 +31,7 @@ public class UserProfile implements Serializable {
     private String address;
 
     @Column(name = "gender")
-    private Long gender;
+    private Integer gender;
 
     @Column(name = "identify_number")
     private String identifyNumber;
@@ -46,6 +47,6 @@ public class UserProfile implements Serializable {
     private Date createDate;
 
     @Column(name = "enabled")
-    private Long enabled;
+    private Integer enabled;
 
 }

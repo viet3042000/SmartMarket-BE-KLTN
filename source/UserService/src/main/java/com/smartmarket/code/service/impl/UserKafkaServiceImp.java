@@ -25,7 +25,7 @@ public class UserKafkaServiceImp implements UserKafkaService {
                 user.setPassword((String) keyPairs.get(k));
             }
             if (k.equals("enabled")) {
-                user.setEnabled(((Number)keyPairs.get(k)).longValue());
+                user.setEnabled(((Number)keyPairs.get(k)).intValue());
             }
             if (k.equals("id")) {
                 user.setId(((Number)keyPairs.get(k)).longValue());

@@ -8,6 +8,6 @@ public interface DataBaseUserService {
     public void updateDatabaseUser( Map<String, Object> keyPairs) throws ParseException;
     public void deleteDatabaseUser(Map<String, Object> keyPairs);
     public void truncateDatabaseUser();
-    public void readAndUpdateDatabaseUser(Map<String, Object> keyPairs, int countReadUser);
+//    public void readAndUpdateDatabaseUser(Map<String, Object> keyPairs, int countReadUser);
 
 }

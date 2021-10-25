@@ -84,7 +84,8 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
         httpServletResponse.setHeader("Access-Control-Max-Age", "3600");
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
 
-        String[] pathActuator = {"/actuator/*"} ;
+        String[] pathActuator = {"/actuator/*","/user/user-service/v1/register-user", "/home",
+                                "/user/user-service/v1/forgot-password","/user/user-service/v1/reset-password"} ;
 
         try {
 
@@ -103,69 +104,77 @@ public class CustomAuthorizeRequestFilter extends OncePerRequestFilter {
                 claims = JwtUtils.getClaimsMap(authentication);
                 String clientId = null;
 
-                //get clientid from claims
-                if (claims != null) {
-                    clientId = (String) claims.get("client_id");
-                } else {
-                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Not found client id in token");
-                    return;
-                }
+                //
+                List<String> yourList = new ArrayList<String>(claims.keySet());
+                if(yourList.contains("client_id")) {
 
-                //find client by clientName
-
-                Optional<Client> client = clientService.findByclientName(clientId);
-                Optional<ClientDetail> clientDetail = clientDetailService.findByclientIdName(clientId) ;
-                if (client.isPresent() == true && clientDetail.isPresent() == true ) {
-                    urlSet = urlService.findUrlByClientName(client.get().getClientId());
-
-                    //check url access
-                    if (urlSet == null) {
-                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id allowed api not found in database");
+                    //get clientid from claims
+                    if (claims != null) {
+                        clientId = (String) claims.get("client_id");
+                    } else {
+                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Not found client id in token");
                         return;
                     }
 
-                } else {
-                    httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id not found in database");
-                    return;
-                }
+                    //find client by clientName
 
+                    Optional<Client> client = clientService.findByclientName(clientId);
+                    Optional<ClientDetail> clientDetail = clientDetailService.findByclientIdName(clientId);
+                    if (client.isPresent() == true && clientDetail.isPresent() == true) {
+                        urlSet = urlService.findUrlByClientName(client.get().getClientId());
 
-                //verify ip
-                boolean verifyIp = false;
-                String[] ipAccessArr = Utils.getArrayIP(clientDetail.get().getIpAccess());
-                for (int i = 0; i < ipAccessArr.length; i++) {
-                    if (ipAccessArr[0].equalsIgnoreCase("ALL")) {
-                        verifyIp = true;
-                        break;
+                        //check url access
+                        if (urlSet == null) {
+                            httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id allowed api not found in database");
+                            return;
+                        }
+
+                    } else {
+                        httpServletResponse.sendError(HttpStatus.UNAUTHORIZED.value(), "Client id not found in database");
+                        return;
                     }
-                    if (ipRequest.equals(ipAccessArr[i])) {
-                        verifyIp = true;
-                        break;
-                    }
-                }
 
-                if (verifyIp == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "IP client id is not allowed to access API");
-                    return;
-                }
 
-                boolean verifyEndpoint = false;
-
-                if (client.isPresent() == true && urlSet != null) {
-                    for (Url url1 : urlSet) {
-
-                        String path = url1.getPath();
-                        if (matcher.match(path, URLRequest)) {
-                            verifyEndpoint = true;
+                    //verify ip
+                    boolean verifyIp = false;
+                    String[] ipAccessArr = Utils.getArrayIP(clientDetail.get().getIpAccess());
+                    for (int i = 0; i < ipAccessArr.length; i++) {
+                        if (ipAccessArr[0].equalsIgnoreCase("ALL")) {
+                            verifyIp = true;
                             break;
-
+                        }
+                        if (ipRequest.equals(ipAccessArr[i])) {
+                            verifyIp = true;
+                            break;
                         }
                     }
-                }
 
-                if (verifyEndpoint == false) {
-                    httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API");
-                    return;
+                    if (verifyIp == false) {
+                        httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "IP client id is not allowed to access API");
+                        return;
+                    }
+
+                    boolean verifyEndpoint = false;
+
+                    if (client.isPresent() == true && urlSet != null) {
+                        for (Url url1 : urlSet) {
+
+                            String path = url1.getPath();
+                            if (matcher.match(path, URLRequest)) {
+                                verifyEndpoint = true;
+                                break;
+
+                            }
+                        }
+                    }
+
+                    if (verifyEndpoint == false) {
+                        httpServletResponse.sendError(HttpStatus.FORBIDDEN.value(), "Client id is not allowed to access API");
+                        return;
+                    }
+
+                }else{
+                    System.out.println("API use token of GG/FB");
                 }
             }
 

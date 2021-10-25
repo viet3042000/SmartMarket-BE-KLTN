@@ -3,16 +3,17 @@ package com.smartmarket.code.request.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 
 @Getter
 @Setter
 public class RoleUpdate {
 
-//    private Long id;
-
+    @NotNull(message = "roleName is required")
     private String roleName;
 
-    private Long enabled;
+    private Integer enabled;
 
     private String desc;
 

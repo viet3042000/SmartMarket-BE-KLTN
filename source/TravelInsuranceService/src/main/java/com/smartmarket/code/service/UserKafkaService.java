@@ -7,7 +7,7 @@ import java.util.Map;
 public interface UserKafkaService {
     public User createUserKafka(Map<String, Object> keyPairs) ;
 
-    public int updateUserKafka(String username,String password,Long enabled) ;
+    public User updateUserKafka(Map<String, Object> keyPairs) ;
 
     public int deleteUserKafka(String username) ;
 

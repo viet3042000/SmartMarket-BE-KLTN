@@ -253,6 +253,7 @@ public class RestControllerHandleException {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) throws IOException {
         long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
@@ -370,6 +371,46 @@ public class RestControllerHandleException {
     }
 
 
+//    //Trường hợp sai format json request
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<?> globalHttpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex, HttpServletRequest request, WebRequest webRequest) throws IOException {
+//        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+//        Date date = new Date();
+//        String logTimestamp = formatter.format(date);
+//        String messageTimestamp = logTimestamp;
+//
+//        //set response to client
+//        ResponseError response = new ResponseError();
+//        String responseBody = mapper.writeValueAsString(response);
+//        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//        String requestURL = request.getRequestURL().toString();
+//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+//
+//        //logException
+//        ServiceExceptionObject soaExceptionObject =
+//                new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
+//                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+//                        request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
+//                        Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
+//        logService.createSOALogException(soaExceptionObject);
+//
+//        String timeDuration = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+//
+//        //logResponse vs Client
+//        ServiceObject soaObject = new ServiceObject("serviceLog", null, null, "BIC", "smartMarket", "client",
+//                messageTimestamp, "travelinsuranceservice", "1", timeDuration,
+//                "response", transactionDetailResponse, null, response.getResultCode(),
+//                response.getResultMessage(), logTimestamp, request.getRemoteHost(),Utils.getClientIp(request),operationName);
+//        logService.createSOALog2(soaObject);
+//
+//        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//    }
+
+
     //Trường hợp sai format json request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> globalHttpMessageNotReadableExceptionHandler(HttpMessageNotReadableException ex, HttpServletRequest request, WebRequest webRequest) throws IOException {
@@ -389,10 +430,18 @@ public class RestControllerHandleException {
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
+        if(ex.getCause() instanceof InvalidFormatException){
+            InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
+            response = setResponseUtils.setResponseInvalidFormatJsonException(response, invalidFormatException);
+
+        }else {
+            response = setResponseUtils.setResponseHttpMessageNotReadableException(response, ex);
+        }
+
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);

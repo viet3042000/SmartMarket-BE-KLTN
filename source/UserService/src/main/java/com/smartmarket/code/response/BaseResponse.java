@@ -17,8 +17,8 @@ public class BaseResponse implements Serializable {
     private String resultMessage;
     private String detailErrorCode;
     private String detailErrorMessage;
-    private Long page;
-    private Long totalPage;
+    private int page;
+    private int totalPage;
     private Long total;
     private Object detail;
 

@@ -104,13 +104,13 @@ public class CustomEntryPoint implements AuthenticationEntryPoint {
                 response.getOutputStream()
                         .println(objectMapper.writeValueAsString(responseError));
             }else{
+                responseError =  setResponseUtils.setResponseCustomEntryPoint(responseError,null) ;
                 response.getOutputStream()
                         .println(objectMapper.writeValueAsString(responseError));
             }
 
         }
         catch (Exception ex) {
-
 
             String requestId = "cannot get requestId";
             if(Utils.isJSONValid(jsonString)){

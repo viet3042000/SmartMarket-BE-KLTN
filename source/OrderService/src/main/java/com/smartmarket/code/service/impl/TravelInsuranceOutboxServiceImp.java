@@ -8,7 +8,7 @@ import com.smartmarket.code.dao.OrderProductRepository;
 import com.smartmarket.code.dao.OrderRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
 import com.smartmarket.code.model.OrderProduct;
-import com.smartmarket.code.model.OrdersServiceEntity;
+import com.smartmarket.code.model.Orders;
 import com.smartmarket.code.model.SagaState;
 import com.smartmarket.code.service.TravelInsuranceOutboxService;
 import org.json.JSONObject;
@@ -42,11 +42,11 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
         if (type.equals("createTravelInsuranceBIC")) {
             String orderReference = j.getString("OrderReference");
 
-            Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(aggregateId);
+            Optional<Orders> orders = orderRepository.findByOrderId(aggregateId);
             Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
             OrderProduct orderProduct = new OrderProduct();
             if (orders.isPresent() && sagaState.isPresent()) {
-                OrdersServiceEntity order = orders.get();
+                Orders order = orders.get();
                 order.setFinishedLogtimestamp(finishedAt);
 
                 SagaState st = sagaState.get();
@@ -109,28 +109,28 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
             }
         }
 
-        if (type.equals("getTravelInsuranceBIC")) {
-            Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
-
-            if (sagaState.isPresent()) {
-                SagaState st = sagaState.get();
-                st.setFinishedLogtimestamp(finishedAt);
-                st.setType(type);
-                st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
-                JSONObject s = new JSONObject();
-                //insert to outbox
-                if (status.equals("success")) {
-                    s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
-                    st.setStepState(s.toString());
-                    st.setStatus(SagaStateStatus.SUCCEEDED);
-                } else {
-                    s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
-                    st.setStepState(s.toString());
-                    st.setStatus(SagaStateStatus.ABORTED);
-                }
-                sagaStateRepository.save(st);
-            }
-        }
+//        if (type.equals("getTravelInsuranceBIC")) {
+//            Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
+//
+//            if (sagaState.isPresent()) {
+//                SagaState st = sagaState.get();
+//                st.setFinishedLogtimestamp(finishedAt);
+//                st.setType(type);
+//                st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
+//                JSONObject s = new JSONObject();
+//                //insert to outbox
+//                if (status.equals("success")) {
+//                    s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
+//                    st.setStepState(s.toString());
+//                    st.setStatus(SagaStateStatus.SUCCEEDED);
+//                } else {
+//                    s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
+//                    st.setStepState(s.toString());
+//                    st.setStatus(SagaStateStatus.ABORTED);
+//                }
+//                sagaStateRepository.save(st);
+//            }
+//        }
 
     }
 }

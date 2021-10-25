@@ -14,32 +14,18 @@ public class DataBaseUserServiceImp implements DataBaseUserService {
     @Autowired
     UserKafkaService userKafkaService;
 
+
     public void createDatabaseUser(Map<String, Object> keyPairs) throws ParseException{
         userKafkaService.createUserKafka(keyPairs);
     }
     public void updateDatabaseUser(Map<String, Object> keyPairs) throws ParseException{
-        String username = "";
-        String password = "";
-        Long enabled = 0L;
-
-        for (String k : keyPairs.keySet()) {
-            if (k.equals("user_name")) {
-                username =(String)  keyPairs.get(k);
-            }
-            if (k.equals("user_password")) {
-                password =(String)  keyPairs.get(k);
-            }
-            if (k.equals("enabled")) {
-                enabled = (((Number)keyPairs.get(k)).longValue());
-            }
-        }
-        userKafkaService.updateUserKafka(username,password,enabled);
+        userKafkaService.updateUserKafka(keyPairs);
     }
     public void deleteDatabaseUser(Map<String, Object> keyPairs){
         String username = "";
         for (String k : keyPairs.keySet()) {
             if (k.equals("user_name")) {
-                username = (String)  keyPairs.get(k);
+                username = (String) keyPairs.get(k);
             }
         }
         userKafkaService.deleteUserKafka(username);

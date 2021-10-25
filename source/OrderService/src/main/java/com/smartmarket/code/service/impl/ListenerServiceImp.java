@@ -17,14 +17,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+
 import java.util.Map;
 
-@Component
+
+@Service
 public class ListenerServiceImp implements ListenerService {
 
     @Autowired
@@ -79,19 +81,6 @@ public class ListenerServiceImp implements ListenerService {
 //    String topicConsumers;
 
 
-    //published when the consumer appears to be blocked in the poll method.
-//    @EventListener
-//    public void handleNonResponsiveConsumerEvent(NonResponsiveConsumerEvent event) {
-//        System.out.println("ERROR_KAFKA_NONRESPONSIVECONSUMEREVENT " + event.getListenerId() + " LOG_MSG_DELIMITER " + event.toString());
-////        event.getConsumer().paused();
-//    }
-//
-//    @EventListener
-//    public void handleContextRefreshed(ContextRefreshedEvent event) throws InterruptedException {
-//        System.out.println("Cannot connect to Kafka");
-//    }
-
-
     @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
@@ -144,105 +133,6 @@ public class ListenerServiceImp implements ListenerService {
 
                                 if (op.equals("c")) {
                                     travelInsuranceOutboxService.processMessageFromTravelOutbox(j,requestId,status,aggregateId,type);
-
-                                    //optimize_start_point
-//                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//                                    Date date = new Date();
-//                                    String stringFinishedAt = formatter.format(date);
-//                                    Date finishedAt = formatter.parse(stringFinishedAt);
-//                                    if (type.equals("createTravelInsuranceBIC")) {
-//                                        orderReference = j.getString("OrderReference");
-//
-//                                        Optional<OrdersServiceEntity> orders = orderRepository.findByOrderId(aggregateId);
-//                                        Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
-//                                        OrderProduct orderProduct = new OrderProduct();
-//                                        if (orders.isPresent() && sagaState.isPresent()) {
-//                                            OrdersServiceEntity order = orders.get();
-//                                            order.setFinishedLogtimestamp(finishedAt);
-//
-//                                            SagaState st = sagaState.get();
-//                                            st.setType(type);
-//                                            st.setFinishedLogtimestamp(finishedAt);
-//                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
-//                                            JSONObject s = new JSONObject();
-//                                            //insert to outbox
-//                                            if (status.equals("success")) {
-//                                                order.setState(OrderEntityState.SUCCEEDED);
-//
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.SUCCEEDED);
-//
-//                                                orderProduct.setOrderId(aggregateId);
-//                                                orderProduct.setProductId(orderReference);
-//                                                orderProduct.setProductName("TravelInsuranceBIC");
-//                                                orderProduct.setState("Succeeded");
-//                                                orderProduct.setFinishedLogtimestamp(finishedAt);
-//                                            } else {
-//                                                order.setState(OrderEntityState.ABORTED);
-//
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.ABORTED);
-//
-//                                                orderProduct.setOrderId(aggregateId);
-//                                                orderProduct.setProductId(orderReference);
-//                                                orderProduct.setProductName("TravelInsuranceBIC");
-//                                                orderProduct.setState("Aborted");
-//                                                orderProduct.setFinishedLogtimestamp(finishedAt);
-//                                            }
-//                                            orderProductRepository.save(orderProduct);
-//                                            orderRepository.save(order);
-//                                            sagaStateRepository.save(st);
-//                                        }
-//                                    }
-//
-//                                    if (type.equals("updateTravelInsuranceBIC")) {
-//                                        Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
-//
-//                                        if (sagaState.isPresent()) {
-//                                            SagaState st = sagaState.get();
-//                                            st.setFinishedLogtimestamp(finishedAt);
-//                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
-//                                            st.setType(type);
-//                                            JSONObject s = new JSONObject();
-//                                            //insert to outbox
-//                                            if (status.equals("success")) {
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.SUCCEEDED);
-//                                            } else {
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.ABORTED);
-//                                            }
-//                                            sagaStateRepository.save(st);
-//                                        }
-//                                    }
-//
-//                                    if (type.equals("getTravelInsuranceBIC")) {
-//                                        Optional<SagaState> sagaState = sagaStateRepository.findById(requestId);
-//
-//                                        if (sagaState.isPresent()) {
-//                                            SagaState st = sagaState.get();
-//                                            st.setFinishedLogtimestamp(finishedAt);
-//                                            st.setType(type);
-//                                            st.setCurrentStep(AggregateType.TRAVEL_INSURANCE);
-//                                            JSONObject s = new JSONObject();
-//                                            //insert to outbox
-//                                            if (status.equals("success")) {
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.SUCCEEDED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.SUCCEEDED);
-//                                            } else {
-//                                                s.put(AggregateType.TRAVEL_INSURANCE, SagaStateStepState.ABORTED);
-//                                                st.setStepState(s.toString());
-//                                                st.setStatus(SagaStateStatus.ABORTED);
-//                                            }
-//                                            sagaStateRepository.save(st);
-//                                        }
-//                                    }
-                                    //optimize_end_point
                                 }
                             }
 
@@ -292,7 +182,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -319,9 +209,6 @@ public class ListenerServiceImp implements ListenerService {
                             if (op.equals("u")) {
                                 dataBaseUserService.updateDatabaseUser(keyPairs);
                             }
-//                            if (op.equals("r")) {
-//                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
-//                            }
                         } else {
                             System.out.println("afterObj is null");
                         }
@@ -388,7 +275,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -415,9 +302,6 @@ public class ListenerServiceImp implements ListenerService {
                             if (op.equals("u")) {
                                 dataBaseUserRoleService.updateDatabaseUserRole(keyPairs);
                             }
-//                            if (op.equals("r")) {
-//                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
-//                            }
                         } else {
                             System.out.println("afterObj is null");
                         }
@@ -484,7 +368,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.user_profile}",topics = "${kafka.topic.user_profile}")
+//    @KafkaListener(id = "${kafka.groupID.user_profile}",topics = "${kafka.topic.user_profile}")
     public void listenUserProfile(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {

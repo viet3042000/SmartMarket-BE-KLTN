@@ -2,6 +2,7 @@ package com.smartmarket.code.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.json.JSONObject;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,33 @@ public class JwtUtils {
         }
         return claims ;
     }
+
+
+    public static Map<String, Object> getClaimsMapFromKeycloakAuthenticationToken(Authentication authentication){
+        Map<String, Object> claims = null;
+        if( authentication != null ){
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+            Map<String, Object> map =
+                    objectMapper.convertValue(authentication.getPrincipal(), Map.class);
+
+            Map<String, Object> mapIdToken = (Map<String, Object>) map.get("keycloakSecurityContext");
+
+            // create a token object to represent the token that is in use.
+            Jwt jwt = JwtHelper.decode((String) mapIdToken.get("tokenString"));
+            // jwt.getClaims() will return a JSON object of all the claims in your token
+            // Convert claims JSON object into a Map so we can get the value of a field
+            try {
+                claims = objectMapper.readValue(jwt.getClaims(), Map.class);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return claims ;
+    }
+
 
     public static String getTokenFromResponse(JSONObject jsonObject){
         JSONObject data = null ;

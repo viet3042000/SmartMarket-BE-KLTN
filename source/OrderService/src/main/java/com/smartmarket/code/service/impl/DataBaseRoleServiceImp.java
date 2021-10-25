@@ -13,11 +13,10 @@ import java.util.Map;
 
 @Service
 public class DataBaseRoleServiceImp implements DataBaseRoleService {
+
     @Autowired
     RoleKafkaService roleKafkaService;
 
-    @Autowired
-    private RoleRepository roleRepository;
 
     public void createDatabaseRole(Map<String, Object> keyPairs) throws ParseException {
         roleKafkaService.createRoleKafka(keyPairs);

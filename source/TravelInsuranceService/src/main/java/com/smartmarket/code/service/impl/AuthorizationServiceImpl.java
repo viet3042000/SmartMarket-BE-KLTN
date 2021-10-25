@@ -26,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -338,19 +339,18 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         return token ;
     }
 
+    public ArrayList<String> getRoles(){
+        Map<String, Object> claims = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String nameOfAuthentication = authentication.getClass().getName();
+        if(nameOfAuthentication.contains("KeycloakAuthenticationToken")) {
+            claims = JwtUtils.getClaimsMapFromKeycloakAuthenticationToken(authentication);
+        }else {
+            claims = JwtUtils.getClaimsMap(authentication);
+        }
+        ArrayList<String> roles = (ArrayList<String>) claims.get("roles");
+
+        return roles;
+    }
+
 }
-
-//    public static void main(String[] args) throws ParseException {
-//        Long current  = DateTimeUtils.getCurrenTime() ;
-//        Long test = new Date().getTime() ;
-//        System.out.println(current);
-//        String dateStr=  "03/06/2021 02:29:06 PM" ;
-//        Date date1=new SimpleDateFormat("dd/MM/yyyy hh:mm:ss aaa").parse(dateStr);
-//        System.out.println("test");
-//
-//        Long dateTimeSystem = DateTimeUtils.getCurrenTime() ;
-//        Long dateTimeZone = DateTimeUtils.getCurrentDateRaw().getTime() ;
-//        System.out.println("end");
-//    }
-
-//}

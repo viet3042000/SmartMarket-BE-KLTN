@@ -1,9 +1,13 @@
 package com.smartmarket.code.controllers;
 
+import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.request.entity.User;
 import com.smartmarket.code.response.Response;
+import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import com.smartmarket.code.util.APIUtils;
+import com.smartmarket.code.util.JwtUtils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
@@ -15,21 +19,22 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-//@RequestScope
 public class HelloController {
 
     public static final Logger logger = LoggerFactory.getLogger(HelloController.class);
@@ -39,8 +44,6 @@ public class HelloController {
 
     @Value("${config}")
     private String config;
-//    @Autowired
-//    AuthorizationService authorizationService ;
 
     @Autowired
     APIUtils apiUtils;
@@ -48,41 +51,49 @@ public class HelloController {
     @Autowired
     CachingServiceImpl cachingService;
 
-    //    @PreAuthorize("@authorizationServiceImpl.AuthorUserAccess(#userid.userId)")
-//    @PostMapping(value = "/hello", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-//    public ResponseEntity<?> hello(@RequestBody User userid) throws JsonProcessingException {
+    @Autowired
+    AuthorizationService authorizationService;
 
-//        Response response = new Response();
-//
-//        UserLoginBIC userLoginBIC = new UserLoginBIC();
-//        userLoginBIC.setUsername("bic-dsvn@bic.vn");
-//        userLoginBIC.setPassword("vWKqgmocYrQOqrWoVXkQ");
-//        userLoginBIC.setDomainname("vetautructuyen.com.vn");
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//
-//        String bodyrequest = mapper.writeValueAsString(userLoginBIC);
-//
-//
-//        //post
-//        String path = "https://app.bic.vn/EbizApiTest/api/v1/token/login";
-//        ResponseEntity<String> jsonResult = apiUtils.postDataByApiBody("https://app.bic.vn/EbizApiTest/api/v1/token/login", null, bodyrequest, null);
-//
-//        String token = JwtUtils.getTokenFromResponse(new JSONObject(jsonResult.getBody()));
-//
-//        //get api
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("id", "102295");
-//        ResponseEntity<String> jsonResult2 = apiUtils.getApiWithParam("https://app.bic.vn/EbizApiTest/api/v1/TRV/Get/", map, null, token);
-//        System.out.println(userid);
-//        List<String> data = new ArrayList<>();
-//        data.add("hop");
-//        response.setCode(1);
-//        response.setData(data);
-//        logger.info("dday la log test");
-//        return new ResponseEntity<>(response, HttpStatus.OK);
 
-//    }
+    @RequestMapping("/reset-password-form")
+    public String demoResetPassword(){
+        return "demoResetPassword";
+    }
+
+
+    @RequestMapping("/home")
+    public String home(){
+        try {
+            ArrayList<String> roles = authorizationService.getRoles();
+
+            if (roles.contains("CUSTOMER")) {
+                return "home";
+            } else {
+                throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception ex) {
+            //catch invalid input exception
+            if(ex instanceof NullPointerException){
+                throw new NullPointerException(ex.getMessage());
+            }
+            else if (ex instanceof InvalidInputException) {
+                throw new InvalidInputException(ex.getMessage(), null);
+            }
+            else if (ex instanceof CustomException) {
+                CustomException customException = (CustomException) ex;
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), null, customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+            } else {
+                throw ex;
+            }
+        }
+
+    }
+
+    @RequestMapping("/login")
+    public String login(){
+        return "login";
+    }
+
 
 
     @PostMapping(value = "/hello/getcache", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})

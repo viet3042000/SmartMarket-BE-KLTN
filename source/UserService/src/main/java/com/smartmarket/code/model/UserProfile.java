@@ -19,7 +19,6 @@ public class UserProfile implements Serializable {
 	@SequenceGenerator(sequenceName = "user_id_sequence", allocationSize = 1, name = "user_id_seq")
 	private Long id;
 
-	//@Id la primary key
 	@Column(name = "user_name")
 	private String userName;
 
@@ -33,7 +32,7 @@ public class UserProfile implements Serializable {
 	private String address;
 
 	@Column(name = "gender")
-	private Long gender;
+	private Integer gender;
 
 	@Column(name = "identify_number")
 	private String identifyNumber;
@@ -49,6 +48,6 @@ public class UserProfile implements Serializable {
 	private Date createDate;
 
 	@Column(name = "enabled")
-	private Long enabled;
+	private Integer enabled;
 
 }

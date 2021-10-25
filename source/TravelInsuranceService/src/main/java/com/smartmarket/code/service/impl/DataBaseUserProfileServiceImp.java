@@ -26,14 +26,13 @@ public class DataBaseUserProfileServiceImp implements DataBaseUserProfileService
     }
 
     public void deleteDatabaseUserProfile(Map<String, Object> keyPairs){
-        Long id = 0L;
-
+        String username = "";
         for (String k : keyPairs.keySet()) {
-            if (k.equals("id")) {
-                id = ((Number)keyPairs.get(k)).longValue();
+            if (k.equals("user_name")) {
+                username = (String) keyPairs.get(k);
             }
         }
-        userProfileKafkaService.deleteUserProfileKafka(id);
+        userProfileKafkaService.deleteUserProfileKafka(username);
     }
 
     public void truncateDatabaseUserProfile(){

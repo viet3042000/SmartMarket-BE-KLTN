@@ -118,6 +118,12 @@ public class DateTimeUtils {
         return Long.toString(elapsed) ;
     }
 
+    public static Long getElapsedTime(long startTime){
+        long endTime = System.currentTimeMillis() ;
+        long elapsed = endTime - startTime;
+        return elapsed;
+    }
+
     public static Long getStartTimeFromRequest(HttpServletRequest request){
         Long startTime =  null ;
         if(request != null ){

@@ -4,11 +4,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-@Component
+@Service
 public class GetKeyPairUtil {
     public void getKeyPair(JSONObject jsonObject, Map<String, Object> keyPairs) throws JSONException {
         //Get key-pair in afterObj
@@ -17,10 +20,9 @@ public class GetKeyPairUtil {
         while(keys.hasNext()) {
             String key = keys.next();
             Object o = jsonObject.get(key);
-
-            // do something with jsonObject here
-            Object value = o; // Here's your value
-            keyPairs.put(key, o);
+            if(!JSONObject.NULL.equals(o)) {
+                keyPairs.put(key,o);
+            }
         }
     }
 }

@@ -13,21 +13,21 @@ import java.util.Optional;
 
 @Transactional
 @Repository
-public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
+public interface UserRoleRepository extends JpaRepository<UserRole, String> {
 
     @Query(value = "from UserRole u where u.id =:id")
     public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
 
-    @Modifying(clearAutomatically = true)
-    // Đây là Native SQL --> dùng tên biến theo DB
-    @Query(value = "UPDATE user_role set role_name =:role_name," +
-            " enabled=:enabled where id = :id",nativeQuery = true)
-    public int updateUserRoleKafka(@Param("role_name") String roleName,
-                                   @Param("enabled") Long enabled,@Param("id") Long id) ;
+//    @Modifying(clearAutomatically = true)
+//    // Đây là Native SQL --> dùng tên biến theo DB
+//    @Query(value = "UPDATE user_role set role_name =:role_name," +
+//            " enabled=:enabled where id = :id",nativeQuery = true)
+//    public int updateUserRoleKafka(@Param("role_name") String roleName,
+//                                   @Param("enabled") int enabled,@Param("id") Long id) ;
 
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM user_role where id =:id", nativeQuery = true)
-    public int deleteUserRoleById(@Param("id") Long id) ;
+    @Query(value = "DELETE FROM user_role where user_name =:user_name", nativeQuery = true)
+    public int deleteUserRoleByUserName(@Param("user_name") String username) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "TRUNCATE TABLE user_role",  nativeQuery = true)

@@ -1,69 +1,539 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.constants.Constant;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.dao.PasswordResetTokenRepository;
+import com.smartmarket.code.dao.UserProfileRepository;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.dao.UserRoleRepository;
+import com.smartmarket.code.exception.*;
+import com.smartmarket.code.model.PasswordResetToken;
 import com.smartmarket.code.model.User;
+import com.smartmarket.code.model.UserProfile;
+import com.smartmarket.code.model.UserRole;
+import com.smartmarket.code.model.entitylog.ServiceObject;
+import com.smartmarket.code.request.*;
+import com.smartmarket.code.response.BaseResponse;
+import com.smartmarket.code.response.UserCreateResponse;
+//import com.smartmarket.code.service.KeycloakAdminClientService;
+import com.smartmarket.code.service.UserProfileService;
+import com.smartmarket.code.service.UserRoleService;
 import com.smartmarket.code.service.UserService;
+import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.JwtUtils;
+import com.smartmarket.code.util.Utils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
-import java.util.Optional;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.function.Function;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserRepository userRepository ;
+    UserService userService;
 
     @Autowired
-    UserRoleRepository userRoleRepository ;
+    UserProfileService userProfileService;
+
+    @Autowired
+    LogServiceImpl logService;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserRoleRepository userRoleRepository;
+
+    @Autowired
+    ConfigurableEnvironment environment;
+
+    @Autowired
+    UserRoleService userRoleService;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    JavaMailSender javaMailSender;
+
+    @Autowired
+    TemplateEngine templateEngine;
+
+    @Autowired
+    PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
+    UserProfileRepository userProfileRepository;
+
+//    @Autowired
+//    KeycloakAdminClientService keycloakAdminClientService;
 
 
-    @Override
-    public User create(User object) {
-        object.setEnabled(Constant.STATUS.ACTIVE);
-        return userRepository.save(object);
+    public ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+        BaseResponse response = new BaseResponse();
+
+        String username = createUserRequestBaseDetail.getDetail().getUser().getUserName();
+
+        Optional<User> userExist = userRepository.findByUsername(username);
+
+        if (userExist.isPresent()) {
+            throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+//            check email
+        User user = userRepository.findByEmailAndProvider(createUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        if(user != null) {
+            throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        User userCreate = new User();
+        userCreate.setUserName(username);
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createUserRequestBaseDetail.getDetail().getUser().getPassword()));
+        userCreate.setProvider(createUserRequestBaseDetail.getDetail().getUser().getProvider());
+        userCreate.setEmail(createUserRequestBaseDetail.getDetail().getUser().getEmail());
+        userCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userRepository.save(userCreate);
+
+        userProfileService.create(createUserRequestBaseDetail);
+        userRoleService.create(createUserRequestBaseDetail);
+
+//            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
+
+        //set response data to client
+        response.setDetail(userCreate);
+        response.setResponseId(createUserRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Override
-    public User update(User object) throws Exception {
-        User userUpdate = userRepository.findByUserId(object.getId()).orElse(null);
-        if (userUpdate!=null) {
-            object.setEnabled(object.getEnabled());
-            object.setPassword(object.getPassword());
-            object.setUserName(object.getUserName());
+
+    public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        String userName = updateUserRequestBaseDetail.getDetail().getUser().getUserName();
+
+        User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
+
+        if(userUpdate == null){
+            throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+//            check email
+        User userFoundByEmail = userRepository.findByEmailAndProvider(updateUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        if(userFoundByEmail != null) {
+            if(!userName.equals(userFoundByEmail.getUserName())) {
+                throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        userUpdate.setEmail(updateUserRequestBaseDetail.getDetail().getUser().getEmail());
+        userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userRepository.save(userUpdate);
+
+
+        UserProfile userProfileUpdate = userProfileRepository.findByUsername(userName).orElse(null);
+        if (userProfileUpdate == null) {
+            throw new CustomException("userProfile does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+        userProfileService.update(userProfileUpdate,updateUserRequestBaseDetail);
+
+
+        UserRole userRoleUpdate = userRoleRepository.findByUserName(userName).orElse(null);
+        if (userRoleUpdate == null) {
+            throw new CustomException("UserRole does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+        userRoleService.update(userRoleUpdate,updateUserRequestBaseDetail);
+
+        //set response data to client
+        response.setDetail(userUpdate);
+        response.setResponseId(updateUserRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+        //time start
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        BaseResponse response = new BaseResponse();
+        // declare value for log
+        //get time log
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+        ObjectMapper mapper = new ObjectMapper();
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
+        String userName = deleteUserRequestBaseDetail.getDetail().getUserName();
+
+        User userDelete = userRepository.findByUsername(userName).orElse(null) ;
+
+        if(userDelete == null){
+            throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+        userRepository.delete(userDelete);
+
+
+        UserProfile userProfileDelete = userProfileRepository.findByUsername(userName).orElse(null);
+        if (userProfileDelete == null) {
+            throw new CustomException("userProfile does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+        userProfileRepository.delete(userProfileDelete);
+
+        UserRole userRoleDelete = userRoleRepository.findByUserName(userName).orElse(null);
+        if (userRoleDelete == null) {
+            throw new CustomException("UserRole does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+        userRoleRepository.delete(userRoleDelete);
+
+//            keycloakAdminClientService.deleteUser(userDelete.getUserName());
+
+        //set response data to client
+        response.setDetail(userDelete);
+        response.setResponseId(deleteUserRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        String responseBody = mapper.writeValueAsString(response);
+        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+
+        //calculate time duration
+        String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog", deleteUserRequestBaseDetail.getRequestId(), deleteUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
+        logService.createSOALog2(soaObject);
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
+                                         HttpServletRequest request,
+                                         HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        Page<User> pageResult = null;
+        Page<UserCreateResponse> userCreateResponsePage = null;
+
+        int page =  getListUserRequestBaseDetail.getDetail().getPage()  ;
+        int size =  getListUserRequestBaseDetail.getDetail().getSize()   ;
+        int totalPage = 0 ;
+
+        Pageable pageable = PageRequest.of(page - 1 , size);
+
+        BaseResponse response = new BaseResponse();
+        // declare value for log
+        //get time log
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+        ObjectMapper mapper = new ObjectMapper();
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
+        pageResult = userRepository.findAllUser(pageable);
+
+        userCreateResponsePage = pageResult.map(new Function<User, UserCreateResponse>() {
+            @Override
+            public UserCreateResponse apply(User user) {
+                UserCreateResponse userCreateResponse  = new UserCreateResponse() ;
+                userCreateResponse.setId(user.getId());
+                Optional<UserProfile> userProfile = userProfileService.findByUsername(user.getUserName()) ;
+                String role = userRoleRepository.findRoleByUserName(user.getUserName());
+
+                if(userProfile.isPresent()){
+                    userCreateResponse.setFullName(userProfile.get().getFullName());
+                    userCreateResponse.setBirthDate(userProfile.get().getBirthDate());
+                    userCreateResponse.setIdentifyNumber(userProfile.get().getIdentifyNumber());
+                    userCreateResponse.setGender(userProfile.get().getGender());
+                    userCreateResponse.setAddress(userProfile.get().getAddress());
+                    userCreateResponse.setPhoneNumber(userProfile.get().getPhoneNumber());
+                    userCreateResponse.setEmail(userProfile.get().getEmail());
+                    userCreateResponse.setUserName(userProfile.get().getUserName());
+                    userCreateResponse.setPassword(user.getPassword());
+                    userCreateResponse.setEnabled(userProfile.get().getEnabled());
+
+                    userCreateResponse.setRole(role);
+                }
+
+                return userCreateResponse;
+            }
+        });
+
+
+        page =  getListUserRequestBaseDetail.getDetail().getPage();
+        totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
+        //set response data to client
+        response.setDetail(userCreateResponsePage.getContent());
+//        response.setDetail(pageResult.getContent());
+        response.setPage(page);
+        response.setTotalPage(totalPage);
+        response.setTotal(pageResult.getTotalElements());
+
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        String responseBody = mapper.writeValueAsString(response);
+        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+        //calculate time duration
+        String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog", getListUserRequestBaseDetail.getRequestId(), getListUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
+        logService.createSOALog2(soaObject);
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest>  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
+
+        BaseResponse response = new BaseResponse();
+        // declare value for log
+        //get time log
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+        ObjectMapper mapper = new ObjectMapper();
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
+        UserCreateResponse userCreateResponse = new UserCreateResponse() ;
+
+        String userName = getDetailUserRequestBaseDetail.getDetail().getUserName();
+
+        User user = userRepository.findByUsername(userName).orElse(null);
+
+        if(user == null){
+            throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<UserProfile> userProfile = userProfileService.findByUsername(userName);
+
+        userCreateResponse.setId(user.getId());
+        userCreateResponse.setFullName(userProfile.get().getFullName());
+        userCreateResponse.setBirthDate(userProfile.get().getBirthDate());
+        userCreateResponse.setIdentifyNumber(userProfile.get().getIdentifyNumber());
+        userCreateResponse.setGender(userProfile.get().getGender());
+        userCreateResponse.setAddress(userProfile.get().getAddress());
+        userCreateResponse.setPhoneNumber(userProfile.get().getPhoneNumber());
+        userCreateResponse.setEmail(userProfile.get().getEmail());
+        userCreateResponse.setUserName(userName);
+        userCreateResponse.setPassword(user.getPassword());
+        userCreateResponse.setEnabled(userProfile.get().getEnabled());
+
+        String role = userRoleRepository.findRoleByUserName(userName);
+        userCreateResponse.setRole(role);
+
+        //set response data to client
+        response.setDetail(userCreateResponse);
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        String responseBody = mapper.writeValueAsString(response);
+        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+        //calculate time duration
+        String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+        //logResponse vs Client
+        ServiceObject soaObject = new ServiceObject("serviceLog", null, null, null, "smartMarket", "client",
+                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
+        logService.createSOALog2(soaObject);
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    //front end check 2 password is difference before
+    public ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        //get user token
+        Map<String, Object> claims = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String nameOfAuthentication = authentication.getClass().getName();
+        if(nameOfAuthentication.contains("KeycloakAuthenticationToken")) {
+            claims = JwtUtils.getClaimsMapFromKeycloakAuthenticationToken(authentication);
         }else {
-            throw new Exception("User_id is not exist");
+            claims = JwtUtils.getClaimsMap(authentication);
         }
-        userRepository.save(object);
-        return userUpdate;
-    }
 
-    @Override
-    public User delete(String username) throws Exception {
-        User userDelete = userRepository.findUserByUsername(username).orElse(null);
-        if (userDelete != null) {
-            userRepository.delete(userDelete);
-            userRoleRepository.deleteUserRoleByUserName(userDelete.getUserName());
-        }else{
-            throw new Exception("User_name is not exist");
+        String userName = (String) claims.get("user_name");
+
+        User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
+
+        if(userUpdate ==null){
+            throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
-        return userDelete;
+
+        if(bCryptPasswordEncoder.matches(updatePasswordRequestBaseDetail.getDetail().getOldPassword(),userUpdate.getPassword())){
+//                if (updatePasswordRequestBaseDetail.getDetail().getOldPassword().equals(updatePasswordRequestBaseDetail.getDetail().getNewPassword())){
+//                    throw new CustomException("newPassword equals with oldPassword", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//                }
+            userUpdate.setPassword(bCryptPasswordEncoder.encode(updatePasswordRequestBaseDetail.getDetail().getNewPassword()));
+            userRepository.save(userUpdate);
+
+//                keycloakAdminClientService.changePassword(userUpdate,updatePasswordRequestBaseDetail.getDetail().getNewPassword());
+
+            //set response data to client
+            response.setDetail(userUpdate);
+            response.setResponseId(updatePasswordRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+        }else {
+            throw new CustomException("oldPassword didn't exist", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Override
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+
+    public ResponseEntity<?> forgotpassword(@Valid @RequestBody BaseDetail<ForgotPasswordRequest> forgotPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        Optional<User> user = userRepository.findByEmailAndProvider(forgotPasswordRequestBaseDetail.getDetail().getEmail());
+        if(!user.isPresent()) {
+            throw new CustomException("Email does not match with all users", HttpStatus.BAD_REQUEST, forgotPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String role = userRoleRepository.findRoleByUserName(user.get().getUserName());
+        if(role != null) {
+            if (!role.equals("CUSTOMER")) {
+                throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, forgotPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+            }
+        }else {
+            throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, forgotPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        User userReset = user.get();
+
+        //send message to email
+        MimeMessage message = javaMailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+        mimeMessageHelper.setFrom("viet3040200@gmail.com");
+        mimeMessageHelper.setTo(forgotPasswordRequestBaseDetail.getDetail().getEmail());
+        mimeMessageHelper.setSubject("Password reset");
+
+        Context context = new Context();
+        context.setVariable("username", userReset.getUserName());
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setToken(token);
+        passwordResetToken.setUserName(userReset.getUserName());
+        Date date = new Date();
+        long timeInSecs = date.getTime();
+        Date afterAdding = new Date(timeInSecs + 120000);
+        passwordResetToken.setExpiredTime(afterAdding);
+        passwordResetTokenRepository.save(passwordResetToken);
+
+        //url of reset password page (fake)
+        String url = "http://localhost:8081/reset-password-form?token="+token;
+        context.setVariable("url", url);
+
+        String process = templateEngine.process("Email-Template", context);
+        mimeMessageHelper.setText(process, true);
+        javaMailSender.send(message);
+
+        //set response data to client
+        response.setDetail(userReset);
+        response.setResponseId(forgotPasswordRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Override
-    public Optional<User> findByUserId(Long userId) {
-        return userRepository.findByUserId(userId);
+
+    public ResponseEntity<?> resetpassword(@Valid @RequestBody BaseDetail<ResetPasswordRequest> resetPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+        BaseResponse response = new BaseResponse();
+
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(resetPasswordRequestBaseDetail.getDetail().getToken()).orElse(null);
+        if(passwordResetToken == null){
+            throw new CustomException("Token does not exist", HttpStatus.BAD_REQUEST, resetPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        Long timeDuration = DateTimeUtils.getElapsedTime(passwordResetToken.getExpiredTime().getTime());
+        if(timeDuration > 120000){
+            throw new CustomException("Token expired", HttpStatus.BAD_REQUEST, resetPasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<User> user = userRepository.findByUsername(passwordResetToken.getUserName());
+        if (!user.isPresent()) {
+            throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, resetPasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+        User userReset = user.get();
+
+        if(bCryptPasswordEncoder.matches(resetPasswordRequestBaseDetail.getDetail().getNewPassword(),userReset.getPassword())){
+            throw new CustomException("NewPassword existed", HttpStatus.BAD_REQUEST, resetPasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+        userReset.setPassword(bCryptPasswordEncoder.encode(resetPasswordRequestBaseDetail.getDetail().getNewPassword()));
+        userRepository.save(userReset);
+
+        //set response data to client
+        response.setDetail(userReset);
+        response.setResponseId(resetPasswordRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Override
-    public Optional<User> findUserIdByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
 }

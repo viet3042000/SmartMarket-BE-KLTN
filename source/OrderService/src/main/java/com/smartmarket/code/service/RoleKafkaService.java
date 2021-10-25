@@ -9,7 +9,7 @@ import java.util.Map;
 public interface RoleKafkaService {
     public Role createRoleKafka(Map<String, Object> keyPairs) throws ParseException;
 
-    public int updateRoleKafka(Map<String, Object> keyPairs) throws ParseException;
+    public Role updateRoleKafka(Map<String, Object> keyPairs) throws ParseException;
 
     public int deleteRoleKafka(String roleName) ;
 

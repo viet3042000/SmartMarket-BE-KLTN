@@ -26,6 +26,12 @@ public class User implements Serializable {
 	private String password;
 
 	@Column(name = "enabled")
-	private Long enabled;
+	private Integer enabled;
+
+	@Column(name = "provider")
+	private String provider;
+
+	@Column(name = "email")
+	private String email;
 
 }
