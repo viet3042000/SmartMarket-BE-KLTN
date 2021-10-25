@@ -12,7 +12,7 @@ import java.util.UUID;
 @Table(name = "orders")
 @Getter
 @Setter
-public class OrdersServiceEntity implements Serializable {
+public class Orders implements Serializable {
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
 //	@SequenceGenerator(sequenceName = "order_sequence", allocationSize = 1, name = "order_seq")

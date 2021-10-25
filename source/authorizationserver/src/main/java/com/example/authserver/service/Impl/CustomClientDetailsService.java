@@ -1,18 +1,16 @@
-package com.example.authserver.service;
+package com.example.authserver.service.Impl;
 
-import java.util.List;
-import java.util.Set;
-
+import com.example.authserver.entities.ClientEntity;
+import com.example.authserver.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.stereotype.Service;
 
-import com.example.authserver.entities.ClientEntity;
-import com.example.authserver.repository.ClientRepository;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class CustomClientDetailsService implements ClientDetailsService {
@@ -24,7 +22,7 @@ public class CustomClientDetailsService implements ClientDetailsService {
 	public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
 		ClientEntity client = clientRepository.findByClientId(clientId);
 		
-	    var baseClientDetails = new BaseClientDetails();                   
+	    var baseClientDetails = new BaseClientDetails();
 	    baseClientDetails.setClientId(client.getClientId());                           
 	    baseClientDetails.setClientSecret(client.getClientSecret());                       
 	    baseClientDetails.setAuthorizedGrantTypes(List.of(client.getAuthorizedGrantTypes().split("##")));

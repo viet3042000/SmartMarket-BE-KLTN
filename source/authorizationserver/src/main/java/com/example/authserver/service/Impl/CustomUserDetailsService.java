@@ -1,17 +1,12 @@
-package com.example.authserver.service;
+package com.example.authserver.service.Impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.example.authserver.entities.User;
+import com.example.authserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.example.authserver.entities.UserEntity;
-import com.example.authserver.repository.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -22,11 +17,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		UserEntity userFromDB = userRepository.findByUserName(username);		
+		User userFromDB = userRepository.findByUserName(username);
 		UserDetails user;
         if (userFromDB != null && userFromDB.getId() > 0){
-        	user = User.withUsername(userFromDB.getUserName())
-                    .password(userFromDB.getUserPassword())
+        	user = org.springframework.security.core.userdetails.User.withUsername(userFromDB.getUserName())
+                    .password(userFromDB.getPassword())
                     .authorities("read")
                     .build();
             return user;
