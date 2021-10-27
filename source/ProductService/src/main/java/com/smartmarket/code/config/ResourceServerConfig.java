@@ -1,19 +1,27 @@
 package com.smartmarket.code.config;
 
+import org.keycloak.adapters.KeycloakConfigResolver;
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
+import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtIssuerAuthenticationManagerResolver;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -26,11 +34,7 @@ import java.util.Base64;
         prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
-
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
-
-//    @Value("${publicKey}")
-//    private String publicKey;
 
     @Autowired
     private CustomAuthorizeRequestFilter customAuthorizeRequestFilter;
@@ -41,10 +45,11 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     ConfigurableEnvironment environment;
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        //congfig Oauth2 resoucre server decode jwt
+//        congfig Oauth2 resoucre server decode jwt
         http
             .oauth2ResourceServer(
                     oauth2ResourceServer -> {
@@ -56,7 +61,7 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
                     }
             );
 
-        //        CSRF protection is enabled by default
+//        CSRF protection is enabled by default
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/actuator/*").permitAll();
 
@@ -82,11 +87,5 @@ public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
             throw new RuntimeException("Wrong public key");
         }
     }
-//
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
 
 }

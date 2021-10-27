@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Email</title>
+</head>
+<body>
+<!--<div> Your username is <b th:text="${username}"></b></div>-->
+
+<div>
+    <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản <b th:text="${username}" style="color:blue"></b> của bạn cho địa chỉ email này.</p>
+
+    <p>Để bắt đầu quá trình đặt lại mật khẩu cho tài khoản của bạn, hãy nhấp vào liên kết bên dưới.</p>
+
+    <a th:href="${url}">Reset your password</a>
+
+    <p>Liên kết này chỉ có thể được sử dụng một lần. Nếu bạn không đưa ra yêu cầu này, bạn có thể bỏ qua email này.</p>
+</div>
+
+</body>
+</html>

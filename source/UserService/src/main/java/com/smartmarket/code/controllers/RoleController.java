@@ -40,7 +40,7 @@ import java.util.Date;
 
 
 @RestController
-@RequestMapping("/user-service/v1/")
+@RequestMapping("/user/user-service/v1/")
 public class RoleController {
 
     @Autowired
