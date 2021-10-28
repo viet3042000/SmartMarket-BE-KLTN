@@ -20,7 +20,7 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
 //    @Query(value = "from Url u join ClientUrl cu on cu.urlId = u.id where cu.clientId = :clientId  ")
 //    public Set<Url> findUrlByClientIdActive(@Param("clientId") Long clientId);
 
-    @Query(value = "from Url u join UserUrl uu on uu.urlId = u.id where uu.userId = :userId  ")
-    public Set<Url> findUrlByUserIdActive(@Param("userId") Long userId);
+//    @Query(value = "from Url u join UserUrl uu on uu.urlId = u.id where uu.userId = :userId  ")
+//    public Set<Url> findUrlByUserIdActive(@Param("userId") Long userId);
 
 }

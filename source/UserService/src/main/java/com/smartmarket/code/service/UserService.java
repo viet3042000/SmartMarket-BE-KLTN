@@ -26,7 +26,7 @@ public interface UserService {
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 
-    //user
+    //user + admin
     ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest>  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException;
 
     //user

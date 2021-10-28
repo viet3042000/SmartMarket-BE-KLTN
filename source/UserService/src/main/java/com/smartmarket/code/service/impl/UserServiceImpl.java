@@ -93,12 +93,9 @@ public class UserServiceImpl implements UserService {
 
 
     public ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        BaseResponse response = new BaseResponse();
 
         String username = createUserRequestBaseDetail.getDetail().getUser().getUserName();
-
         Optional<User> userExist = userRepository.findByUsername(username);
-
         if (userExist.isPresent()) {
             throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
@@ -123,6 +120,7 @@ public class UserServiceImpl implements UserService {
 //            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userCreate);
         response.setResponseId(createUserRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
@@ -134,12 +132,9 @@ public class UserServiceImpl implements UserService {
 
 
     public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
 
         String userName = updateUserRequestBaseDetail.getDetail().getUser().getUserName();
-
         User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
-
         if(userUpdate == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
@@ -156,13 +151,11 @@ public class UserServiceImpl implements UserService {
         userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
         userRepository.save(userUpdate);
 
-
         UserProfile userProfileUpdate = userProfileRepository.findByUsername(userName).orElse(null);
         if (userProfileUpdate == null) {
             throw new CustomException("userProfile does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
         userProfileService.update(userProfileUpdate,updateUserRequestBaseDetail);
-
 
         UserRole userRoleUpdate = userRoleRepository.findByUserName(userName).orElse(null);
         if (userRoleUpdate == null) {
@@ -171,6 +164,7 @@ public class UserServiceImpl implements UserService {
         userRoleService.update(userRoleUpdate,updateUserRequestBaseDetail);
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userUpdate);
         response.setResponseId(updateUserRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
@@ -182,29 +176,18 @@ public class UserServiceImpl implements UserService {
 
 
     public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        //time start
-        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
-
-        BaseResponse response = new BaseResponse();
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
-        String responseStatus = Integer.toString(responseSelvet.getStatus());
-
-        String requestURL = request.getRequestURL().toString();
-        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         String userName = deleteUserRequestBaseDetail.getDetail().getUserName();
-
         User userDelete = userRepository.findByUsername(userName).orElse(null) ;
-
         if(userDelete == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
         userRepository.delete(userDelete);
-
 
         UserProfile userProfileDelete = userProfileRepository.findByUsername(userName).orElse(null);
         if (userProfileDelete == null) {
@@ -221,6 +204,7 @@ public class UserServiceImpl implements UserService {
 //            keycloakAdminClientService.deleteUser(userDelete.getUserName());
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userDelete);
         response.setResponseId(deleteUserRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
@@ -232,14 +216,19 @@ public class UserServiceImpl implements UserService {
 
 
         //calculate time duration
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog", deleteUserRequestBaseDetail.getRequestId(), deleteUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                messageTimestamp, "userservice", "1", timeDurationResponse,
                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
         logService.createSOALog2(soaObject);
-
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -248,8 +237,6 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-
-        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
 
         Page<User> pageResult = null;
         Page<UserCreateResponse> userCreateResponsePage = null;
@@ -260,19 +247,13 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(page - 1 , size);
 
-        BaseResponse response = new BaseResponse();
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
-        String responseStatus = Integer.toString(responseSelvet.getStatus());
-
-        String requestURL = request.getRequestURL().toString();
-        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
         pageResult = userRepository.findAllUser(pageable);
-
         userCreateResponsePage = pageResult.map(new Function<User, UserCreateResponse>() {
             @Override
             public UserCreateResponse apply(User user) {
@@ -304,6 +285,7 @@ public class UserServiceImpl implements UserService {
         page =  getListUserRequestBaseDetail.getDetail().getPage();
         totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userCreateResponsePage.getContent());
 //        response.setDetail(pageResult.getContent());
         response.setPage(page);
@@ -318,10 +300,16 @@ public class UserServiceImpl implements UserService {
         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
         //calculate time duration
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog", getListUserRequestBaseDetail.getRequestId(), getListUserRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                messageTimestamp, "userservice", "1", timeDurationResponse,
                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
         logService.createSOALog2(soaObject);
@@ -332,31 +320,21 @@ public class UserServiceImpl implements UserService {
 
 
     public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest>  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
-        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
-
-        BaseResponse response = new BaseResponse();
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
-        String responseStatus = Integer.toString(responseSelvet.getStatus());
-
-        String requestURL = request.getRequestURL().toString();
-        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
-        UserCreateResponse userCreateResponse = new UserCreateResponse() ;
 
         String userName = getDetailUserRequestBaseDetail.getDetail().getUserName();
-
         User user = userRepository.findByUsername(userName).orElse(null);
-
         if(user == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);
         }
 
         Optional<UserProfile> userProfile = userProfileService.findByUsername(userName);
 
+        UserCreateResponse userCreateResponse = new UserCreateResponse() ;
         userCreateResponse.setId(user.getId());
         userCreateResponse.setFullName(userProfile.get().getFullName());
         userCreateResponse.setBirthDate(userProfile.get().getBirthDate());
@@ -373,6 +351,7 @@ public class UserServiceImpl implements UserService {
         userCreateResponse.setRole(role);
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userCreateResponse);
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -382,14 +361,19 @@ public class UserServiceImpl implements UserService {
         JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
         //calculate time duration
+        long startTimeLogFilter = DateTimeUtils.getStartTimeFromRequest(request);
         String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTimeLogFilter);
+
+        String responseStatus = Integer.toString(responseSelvet.getStatus());
+        String requestURL = request.getRequestURL().toString();
+        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
+
         //logResponse vs Client
         ServiceObject soaObject = new ServiceObject("serviceLog", null, null, null, "smartMarket", "client",
-                messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                messageTimestamp, "userservice", "1", timeDurationResponse,
                 "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                 response.getResultMessage(), logTimestamp, request.getRemoteHost(), Utils.getClientIp(request), operationName);
         logService.createSOALog2(soaObject);
-
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -397,8 +381,6 @@ public class UserServiceImpl implements UserService {
 
     //front end check 2 password is difference before
     public ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
-
         //get user token
         Map<String, Object> claims = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -417,6 +399,7 @@ public class UserServiceImpl implements UserService {
             throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
+        BaseResponse response = new BaseResponse();
         if(bCryptPasswordEncoder.matches(updatePasswordRequestBaseDetail.getDetail().getOldPassword(),userUpdate.getPassword())){
 //                if (updatePasswordRequestBaseDetail.getDetail().getOldPassword().equals(updatePasswordRequestBaseDetail.getDetail().getNewPassword())){
 //                    throw new CustomException("newPassword equals with oldPassword", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -436,14 +419,11 @@ public class UserServiceImpl implements UserService {
             throw new CustomException("oldPassword didn't exist", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     public ResponseEntity<?> forgotpassword(@Valid @RequestBody BaseDetail<ForgotPasswordRequest> forgotPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
-
         Optional<User> user = userRepository.findByEmailAndProvider(forgotPasswordRequestBaseDetail.getDetail().getEmail());
         if(!user.isPresent()) {
             throw new CustomException("Email does not match with all users", HttpStatus.BAD_REQUEST, forgotPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -490,20 +470,18 @@ public class UserServiceImpl implements UserService {
         javaMailSender.send(message);
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userReset);
         response.setResponseId(forgotPasswordRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
 
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     public ResponseEntity<?> resetpassword(@Valid @RequestBody BaseDetail<ResetPasswordRequest> resetPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-        BaseResponse response = new BaseResponse();
-
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(resetPasswordRequestBaseDetail.getDetail().getToken()).orElse(null);
         if(passwordResetToken == null){
             throw new CustomException("Token does not exist", HttpStatus.BAD_REQUEST, resetPasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -527,6 +505,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userReset);
 
         //set response data to client
+        BaseResponse response = new BaseResponse();
         response.setDetail(userReset);
         response.setResponseId(resetPasswordRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());

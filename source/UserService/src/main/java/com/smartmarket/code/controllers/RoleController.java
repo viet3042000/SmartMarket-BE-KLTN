@@ -194,7 +194,7 @@ public class RoleController {
     }
 
 
-    @PostMapping(value = "/getlist-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/get-list-role", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getListRole(@Valid @RequestBody BaseDetail<QueryRoleRequest> getListRoleRequestBaseDetail ,
                               HttpServletRequest request,
                               HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {

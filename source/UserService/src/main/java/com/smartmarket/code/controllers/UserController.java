@@ -78,7 +78,7 @@ public class UserController {
 
 
     //admin
-    @PostMapping(value = "/getlist-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @PostMapping(value = "/get-list-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
@@ -273,8 +273,8 @@ public class UserController {
 
     }
 
-    //user
-    @RequestMapping(value = "/getdetail-user")
+    //user + admin
+    @RequestMapping(value = "/get-user")
     public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest> getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();

@@ -23,7 +23,6 @@ public interface OrderService {
             throws JsonProcessingException, APIAccessException, ParseException;
 
     //user + admin
-    //get order of user trong orderservice
     public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
@@ -31,14 +30,14 @@ public interface OrderService {
 
 
     //user + admin
-    public ResponseEntity<?> getAllOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
-                                         HttpServletRequest request,
-                                         HttpServletResponse responseSelvet) throws JsonProcessingException;
+    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
+                                                HttpServletRequest request,
+                                                HttpServletResponse responseSelvet) throws JsonProcessingException;
 
     //admin
-    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
-                                               HttpServletRequest request,
-                                               HttpServletResponse responseSelvet) throws JsonProcessingException;
+    public ResponseEntity<?> getListOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
+                                          HttpServletRequest request,
+                                          HttpServletResponse responseSelvet) throws JsonProcessingException;
 }
 
 

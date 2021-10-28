@@ -11,18 +11,18 @@ import java.util.Set;
 @Service
 public class AccesUserServiceImpl implements AccesUserService {
 
-    @Autowired
-    AccessUserRepository accessUserRepository ;
-
-    @Override
-    public Set<AccessUser> findAccessUserByUserIdAndUserUrlId(Long userIdToken, Long urlId) {
-        return accessUserRepository.findAccessUserByUserIdAndUserUrlId(userIdToken,urlId);
-    }
-
-    @Override
-    public Set<AccessUser> checkAccessUser(Long userIdToken, Long urlId, Long userIdAccess) {
-        return accessUserRepository.checkAccessUser(userIdToken,urlId,userIdAccess);
-
-    }
+//    @Autowired
+//    AccessUserRepository accessUserRepository ;
+//
+//    @Override
+//    public Set<AccessUser> findAccessUserByUserIdAndUserUrlId(Long userIdToken, Long urlId) {
+//        return accessUserRepository.findAccessUserByUserIdAndUserUrlId(userIdToken,urlId);
+//    }
+//
+//    @Override
+//    public Set<AccessUser> checkAccessUser(Long userIdToken, Long urlId, Long userIdAccess) {
+//        return accessUserRepository.checkAccessUser(userIdToken,urlId,userIdAccess);
+//
+//    }
 
 }

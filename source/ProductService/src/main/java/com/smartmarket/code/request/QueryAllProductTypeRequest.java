@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class QueryAllUserRequest implements Serializable {
+public class QueryAllProductTypeRequest implements Serializable {
     @NotNull(message = "page is require")
     @Min(value = 1)
     private int page  ;

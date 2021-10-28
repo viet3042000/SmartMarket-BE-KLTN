@@ -26,13 +26,13 @@ public class UrlServiceImpl implements UrlService {
 
 
 
-    @Override
-    @Cacheable(cacheNames = "hoptest"
-            , key = "#userId"
-    )
-    public Set<Url> findUrlByUserIdActive(Long userId) {
-        return urlRepository.findUrlByUserIdActive(userId);
-    }
+//    @Override
+//    @Cacheable(cacheNames = "hoptest"
+//            , key = "#userId"
+//    )
+//    public Set<Url> findUrlByUserIdActive(Long userId) {
+//        return urlRepository.findUrlByUserIdActive(userId);
+//    }
 
 
     @Cacheable(cacheNames = "urllist", key = "#clientIdName")

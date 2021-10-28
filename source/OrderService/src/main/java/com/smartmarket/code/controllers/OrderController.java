@@ -177,13 +177,13 @@ public class OrderController {
     }
 
 
-    @PostMapping(value = "/get-all-orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getAllOrderOfUser(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    @PostMapping(value = "/get-list-orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> getListOrderOfUser(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN") ||roles.contains("CUSTOMER")) {
-                    return orderService.getAllOrderOfUser(queryAllOrdersOfUserRequest, request, responseSelvet);
+                    return orderService.getListOrderOfUser(queryAllOrdersOfUserRequest, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllOrdersOfUserRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
@@ -225,13 +225,13 @@ public class OrderController {
     }
 
 
-    @PostMapping(value = "/get-all", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    @PostMapping(value = "/get-list", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> getListOrder(@Valid @RequestBody BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return orderService.getAllOrder(queryAllOrderRequestBaseDetail, request, responseSelvet);
+                    return orderService.getListOrder(queryAllOrderRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }

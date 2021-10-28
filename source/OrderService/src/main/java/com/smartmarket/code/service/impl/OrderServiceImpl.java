@@ -68,7 +68,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     LogServiceImpl logService;
 
-    @Transactional
+    //user
     public ResponseEntity<?> createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         //get user token
@@ -162,7 +162,7 @@ public class OrderServiceImpl implements OrderService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    //user
     public ResponseEntity<?>  updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         //get user token
@@ -270,6 +270,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //user + admin
     @Override
     public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         String userName = queryTravelInsuranceBICRequest.getDetail().getUserName();
@@ -330,8 +331,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //user + admin
     @Override
-    public ResponseEntity<?> getAllOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         String userName = queryAllOrdersOfUserRequest.getDetail().getUserName();
         User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
@@ -346,7 +348,6 @@ public class OrderServiceImpl implements OrderService {
 
         int page =  queryAllOrdersOfUserRequest.getDetail().getPage()  ;
         int size =  queryAllOrdersOfUserRequest.getDetail().getSize()   ;
-
         Pageable pageable = PageRequest.of(page-1, size);
 
         //find by user name
@@ -384,7 +385,7 @@ public class OrderServiceImpl implements OrderService {
             String responseStatus = Integer.toString(status);
 
             ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                    messageTimestamp, "orderservice", "1", timeDurationResponse,
                     "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
             logService.createSOALog2(soaObject);
@@ -410,7 +411,7 @@ public class OrderServiceImpl implements OrderService {
             String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
 
             ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                    messageTimestamp, "orderservice", "1", timeDurationResponse,
                     "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
             logService.createSOALog2(soaObject);
@@ -420,17 +421,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    //admin
     @Override
-    public ResponseEntity<?> getAllOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getListOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         int totalPage = 0 ;
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
-        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
-        String hostName = request.getRemoteHost();
 
         int page =  queryAllOrderRequestBaseDetail.getDetail().getPage()  ;
         int size =  queryAllOrderRequestBaseDetail.getDetail().getSize()   ;
-
         Pageable pageable = PageRequest.of(page-1, size);
 
 //        All orders
@@ -440,6 +439,14 @@ public class OrderServiceImpl implements OrderService {
 //        All orders by type
 //        Page<Orders> allOrders =
 //                orderRepository.getAllByType(pageable,queryAllOrdersOfUserRequest.getType());
+
+        //get time log
+        String hostName = request.getRemoteHost();
+        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+        String logTimestamp = DateTimeUtils.getCurrentDate();
+        String messageTimestamp = logTimestamp;
+        int status = responseSelvet.getStatus();
+        String responseStatus = Integer.toString(status);
 
         if(!allOrders.isEmpty()) {
             totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
@@ -457,18 +464,12 @@ public class OrderServiceImpl implements OrderService {
 
             String responseBody = mapper.writeValueAsString(response);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);
-            //get time log
-            String logTimestamp = DateTimeUtils.getCurrentDate();
-            String messageTimestamp = logTimestamp;
 
             //calculate time duration
             String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
 
-            int status = responseSelvet.getStatus();
-            String responseStatus = Integer.toString(status);
-
             ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrderRequestBaseDetail.getRequestId(), queryAllOrderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                    messageTimestamp, "orderservice", "1", timeDurationResponse,
                     "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
             logService.createSOALog2(soaObject);
@@ -483,18 +484,11 @@ public class OrderServiceImpl implements OrderService {
             String responseBody = mapper.writeValueAsString(response);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
-            //get time log
-            String logTimestamp = DateTimeUtils.getCurrentDate();
-            String messageTimestamp = logTimestamp;
-
-            int status = responseSelvet.getStatus();
-            String responseStatus = Integer.toString(status);
-
             //calculate time duration
             String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
 
             ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrderRequestBaseDetail.getRequestId(), queryAllOrderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "travelinsuranceservice", "1", timeDurationResponse,
+                    messageTimestamp, "orderservice", "1", timeDurationResponse,
                     "response", transactionDetailResponse, responseStatus, response.getResultCode(),
                     response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
             logService.createSOALog2(soaObject);
