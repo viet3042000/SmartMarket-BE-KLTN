@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class ListenerServiceImp implements ListenerService {
     String topicRole;
 
 
-    //    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -138,12 +139,12 @@ public class ListenerServiceImp implements ListenerService {
         finally {
 //          In the case of an error, we want to make sure that we commit before we close and exit.
             acknowledgment.acknowledge();
-//            System.out.println("Closed consumer and we are done");
+            System.out.println("Closed consumer and we are done");
         }
     }
 
 
-    //    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -236,7 +237,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    //    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
+    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {

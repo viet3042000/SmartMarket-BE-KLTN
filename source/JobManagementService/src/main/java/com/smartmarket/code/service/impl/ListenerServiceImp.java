@@ -172,7 +172,7 @@ public class ListenerServiceImp implements ListenerService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
             ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelInsurancePendingBICTransaction,
-                    "outbox", op ,dateTimeFormatter.format(currentTime),
+                    "pending_bic_transaction", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
@@ -180,7 +180,7 @@ public class ListenerServiceImp implements ListenerService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
             ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelInsurancePendingBICTransaction,
-                    "outbox", op , dateTimeFormatter.format(currentTime),
+                    "pending_bic_transaction", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(listenerExceptionObject);
 
@@ -188,7 +188,7 @@ public class ListenerServiceImp implements ListenerService {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
             ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicTravelInsurancePendingBICTransaction,
-                    "outbox", op , dateTimeFormatter.format(currentTime),
+                    "pending_bic_transaction", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(listenerExceptionObject);
         }
