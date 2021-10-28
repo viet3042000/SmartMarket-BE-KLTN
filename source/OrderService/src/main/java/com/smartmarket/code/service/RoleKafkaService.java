@@ -1,7 +1,6 @@
 package com.smartmarket.code.service;
 
 import com.smartmarket.code.model.Role;
-import com.smartmarket.code.model.UserProfile;
 
 import java.text.ParseException;
 import java.util.Map;

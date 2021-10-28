@@ -1,10 +1,7 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.dao.RoleRepository;
-import com.smartmarket.code.dao.UserProfileRepository;
 import com.smartmarket.code.service.DataBaseRoleService;
 import com.smartmarket.code.service.RoleKafkaService;
-import com.smartmarket.code.service.UserProfileKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
