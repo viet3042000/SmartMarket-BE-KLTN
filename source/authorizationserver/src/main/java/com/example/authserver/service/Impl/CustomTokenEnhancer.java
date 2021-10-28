@@ -19,6 +19,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
 		ArrayList<String> roles = new ArrayList<String>();
 		roles.add("CUSTOMER");
 		roles.add("ADMIN");
+		roles.add("PROVIDER");
 
 		Map<String, Object> info = Map.of("iss", "http://smartmarket.com","roles", roles);
 		token.setAdditionalInformation(info);

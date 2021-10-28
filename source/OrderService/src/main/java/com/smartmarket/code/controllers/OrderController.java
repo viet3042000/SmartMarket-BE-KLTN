@@ -34,7 +34,7 @@ public class OrderController {
     @Autowired
     AuthorizationService authorizationService;
 
-
+    //user
     @PostMapping(value = "/create-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createOrder(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
@@ -82,6 +82,7 @@ public class OrderController {
         }
     }
 
+    //user
     @PostMapping(value = "/update-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateOrder(@Valid @RequestBody BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
@@ -129,6 +130,7 @@ public class OrderController {
         }
     }
 
+    //user + admin
     @PostMapping(value = "/get-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getOrder(@Valid @RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
@@ -176,7 +178,7 @@ public class OrderController {
         }
     }
 
-
+    //user + admin
     @PostMapping(value = "/get-list-orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getListOrderOfUser(@Valid @RequestBody BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
@@ -224,7 +226,7 @@ public class OrderController {
         }
     }
 
-
+    //admin
     @PostMapping(value = "/get-list", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getListOrder(@Valid @RequestBody BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
