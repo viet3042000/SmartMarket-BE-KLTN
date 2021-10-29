@@ -43,6 +43,9 @@ public class ProductKafkaServiceImpl implements ProductKafkaService {
             if (k.equals("price")) {
                 product.setPrice((String) keyPairs.get(k));
             }
+            if (k.equals("state")) {
+                product.setState((String) keyPairs.get(k));
+            }
             if (k.equals("created_logtimestamp")) {
                 String createAt = (String)keyPairs.get(k);
                 product.setCreatedLogtimestamp(formatter.parse(createAt));
@@ -75,6 +78,9 @@ public class ProductKafkaServiceImpl implements ProductKafkaService {
             }
             if (k.equals("price")) {
                 product.setPrice((String) keyPairs.get(k));
+            }
+            if (k.equals("state")) {
+                product.setState((String) keyPairs.get(k));
             }
             if (k.equals("created_logtimestamp")) {
                 String createAt = (String)keyPairs.get(k);

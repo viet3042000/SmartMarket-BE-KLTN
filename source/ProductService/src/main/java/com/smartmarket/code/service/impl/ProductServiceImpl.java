@@ -69,12 +69,8 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setType(createProductRequestBaseDetail.getDetail().getType());
         newProduct.setDesc(createProductRequestBaseDetail.getDetail().getDesc());
         newProduct.setPrice(createProductRequestBaseDetail.getDetail().getPrice());
+        newProduct.setState("PendingApprove");
 
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//        Date date = new Date();
-//        String stringCreateAt = formatter.format(date);
-//        Date createAt = formatter.parse(stringCreateAt);
-//        newProduct.setCreatedLogtimestamp(createAt);
         newProduct.setCreatedLogtimestamp(new Date());
         productRepository.save(newProduct);
 
@@ -347,5 +343,61 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    //Admin
+    public ResponseEntity<?> approvePendingProduct(@Valid @RequestBody BaseDetail<ApprovePendingProductRequest> approvePendingProductRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
+
+        String productName = approvePendingProductRequest.getDetail().getProductName();
+        Product product = productRepository.findByProductName(productName).orElse(null);
+        if(product == null){
+            throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        if(product.getState()== null){
+            throw new CustomException("productState not is null", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String newState = approvePendingProductRequest.getDetail().getState();
+        String oleState = product.getState();
+        if(!oleState.equals("PendingApprove") || oleState.equals(newState)){
+            throw new CustomException("productState not change", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        product.setState(newState);
+        productRepository.save(product);
+
+        BaseResponse response = new BaseResponse();
+        response.setDetail(product);
+        response.setResponseId(approvePendingProductRequest.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+//        if(product.getState()!= null) {
+//            String newState = approvePendingProductRequest.getDetail().getState();
+//            if(newState.equals("Approve")){
+//            if (!product.getState().equals("PendingApprove") && !product.getState().equals("Approve")) {
+//                throw new CustomException("productState not equal with PengingApprove", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//            }
+//
+//            product.setState(approvePendingProductRequest.getDetail().getState());
+//            productRepository.save(product);
+//
+//            BaseResponse response = new BaseResponse();
+//            response.setDetail(product);
+//            response.setResponseId(approvePendingProductRequest.getRequestId());
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+//
+//            return new ResponseEntity<>(response, HttpStatus.OK);
+//        }else {
+//            throw new CustomException("productState not is null", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//        }
+
     }
 }

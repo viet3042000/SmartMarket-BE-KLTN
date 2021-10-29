@@ -42,6 +42,9 @@ public class Product implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdLogtimestamp;
 
+    @Column(name = "state")
+    private String state;
+
 //    @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
 //    @Temporal(TemporalType.TIMESTAMP)
 //    private Date finishedLogtimestamp;
