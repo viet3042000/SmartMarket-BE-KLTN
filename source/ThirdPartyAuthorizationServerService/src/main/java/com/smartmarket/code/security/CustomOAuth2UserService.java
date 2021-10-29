@@ -15,9 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -106,13 +104,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             ResponseEntity<String> jsonResultCreateUser = restTemplate.exchange("http://10.14.101.202:31441/dev/user/user-service/v1/register-user", HttpMethod.POST, entity, String.class);
 
             if (jsonResultCreateUser.getStatusCodeValue() == 200) {
-                //send password to email
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setFrom("viet3042000@gmail.com");
-                message.setSubject("Your Password");
-                message.setTo(oAuth2UserInfo.getEmail());
-                message.setText(userCreate.getPassword());
-                javaMailSender.send(message);
+//                //send password to email
+//                SimpleMailMessage message = new SimpleMailMessage();
+//                message.setFrom("viet3042000@gmail.com");
+//                message.setSubject("Your Password");
+//                message.setTo(oAuth2UserInfo.getEmail());
+//                message.setText(userCreate.getPassword());
+//                javaMailSender.send(message);
 //
                 return new CustomOAuth2User(user);
             } else {
