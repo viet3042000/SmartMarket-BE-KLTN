@@ -8,10 +8,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "product_type")
+@Table(name = "product_provider")
 @Getter
 @Setter
-public class ProductType implements Serializable {
+public class ProductProvider implements Serializable {
 
 //    @Id
     @Column(name = "id")
@@ -19,8 +19,8 @@ public class ProductType implements Serializable {
 
     //BIC(=productProvider(product) = username of provider)
     @Id
-    @Column(name = "product_type_name")
-    private String productTypeName;
+    @Column(name = "product_provider_name")
+    private String productProviderName;
 
     @Column(name = "description")
     private String desc;

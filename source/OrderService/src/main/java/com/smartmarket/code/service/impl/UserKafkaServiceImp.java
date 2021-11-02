@@ -1,15 +1,12 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.dao.UserRepository;
-import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.service.UserKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class UserKafkaServiceImp implements UserKafkaService {
@@ -35,8 +32,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
         }
         return userRepository.save(user);
@@ -61,8 +58,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
         }
         return userRepository.save(user);

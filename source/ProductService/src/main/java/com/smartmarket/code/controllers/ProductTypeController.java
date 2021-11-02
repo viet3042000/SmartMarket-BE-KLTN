@@ -37,7 +37,7 @@ public class ProductTypeController {
     ProductTypeService productTypeService;
 
 
-    //Admin (sau khi phe duyet thi tao)
+    //Admin(kltn) (sau khi phe duyet thi tao)
     @PostMapping(value = "/create-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProductType(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
@@ -87,7 +87,7 @@ public class ProductTypeController {
 
     }
 
-    //Admin
+    //Admin(kltn)
     @PostMapping(value = "/update-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateProductType(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
@@ -140,7 +140,7 @@ public class ProductTypeController {
 
     }
 
-    //Admin
+    //Admin(kltn)
     @PostMapping(value = "/delete-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> deleteProductType(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
@@ -191,7 +191,7 @@ public class ProductTypeController {
     }
 
 
-    //Admin
+    //Admin(kltn)
     @RequestMapping(value = "/get-product-type")
     public ResponseEntity<?> getProductType(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
@@ -241,7 +241,7 @@ public class ProductTypeController {
     }
 
 
-    //Admin
+    //Admin(kltn)
     @PostMapping(value = "/get-list-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> getListProductType(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
                                            HttpServletRequest request,

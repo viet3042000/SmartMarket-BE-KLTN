@@ -1,18 +1,16 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.dao.UserProfileRepository;
 import com.smartmarket.code.model.UserProfile;
 import com.smartmarket.code.request.BaseDetail;
+import com.smartmarket.code.request.CreateProviderUserRequest;
 import com.smartmarket.code.request.CreateUserRequest;
 import com.smartmarket.code.request.UpdateUserRequest;
 import com.smartmarket.code.service.UserProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -35,6 +33,24 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfileCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
         userProfileCreate.setCreateDate(new Date());
         userProfileCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
+
+        return userProfileRepository.save(userProfileCreate);
+    }
+
+    @Override
+    public UserProfile createProviderAdminUser(BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail) {
+        UserProfile userProfileCreate = new UserProfile();
+
+        userProfileCreate.setFullName(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getFullName());
+        userProfileCreate.setBirthDate(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getBirthDate());
+        userProfileCreate.setIdentifyNumber(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
+        userProfileCreate.setGender(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getGender());
+        userProfileCreate.setAddress(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getAddress());
+        userProfileCreate.setPhoneNumber(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
+        userProfileCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
+        userProfileCreate.setUserName(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName());
+        userProfileCreate.setCreateDate(new Date());
+        userProfileCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
 
         return userProfileRepository.save(userProfileCreate);
     }

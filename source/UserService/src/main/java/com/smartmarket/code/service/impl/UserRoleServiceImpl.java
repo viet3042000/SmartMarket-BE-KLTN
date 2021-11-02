@@ -1,19 +1,16 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.dao.UserRoleRepository;
-import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.UserRole;
 import com.smartmarket.code.request.BaseDetail;
+import com.smartmarket.code.request.CreateProviderUserRequest;
 import com.smartmarket.code.request.CreateUserRequest;
 import com.smartmarket.code.request.UpdateUserRequest;
 import com.smartmarket.code.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Map;
 
 @Service
 public class UserRoleServiceImpl implements UserRoleService {
@@ -28,6 +25,16 @@ public class UserRoleServiceImpl implements UserRoleService {
         userRoleCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
         userRoleCreate.setRoleName(createUserRequestBaseDetail.getDetail().getRole());
         userRoleCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userRoleCreate.setCreateDate(new Date());
+        return userRoleRepository.save(userRoleCreate);
+    }
+
+    @Override
+    public UserRole createProviderAdminUser(BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail) {
+        UserRole userRoleCreate = new UserRole();
+        userRoleCreate.setUserName(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName());
+        userRoleCreate.setRoleName(createProviderAdminUserRequestBaseDetail.getDetail().getRole());
+        userRoleCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
         userRoleCreate.setCreateDate(new Date());
         return userRoleRepository.save(userRoleCreate);
     }

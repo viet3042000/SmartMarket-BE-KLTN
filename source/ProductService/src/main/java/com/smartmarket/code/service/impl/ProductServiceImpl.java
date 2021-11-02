@@ -9,12 +9,14 @@ import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Product;
 import com.smartmarket.code.model.User;
+import com.smartmarket.code.model.UserProductProvider;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductResponse;
 import com.smartmarket.code.service.ProductService;
+import com.smartmarket.code.service.UserProductProviderService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -49,18 +51,32 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ConfigurableEnvironment environment;
 
+    @Autowired
+    UserProductProviderService userProductProviderService;
+
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
-        User user = userRepository.findByUsername(createProductRequestBaseDetail.getDetail().getUserName()).orElse(null);
+        String userName = createProductRequestBaseDetail.getDetail().getUserName();
+        User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = createProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product != null){
             throw new CustomException("productName has already existed", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
+        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
+            throw new CustomException("Provider can not create product with this productProvider", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         Product newProduct = new Product();
@@ -86,15 +102,26 @@ public class ProductServiceImpl implements ProductService {
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        User user = userRepository.findByUsername(updateProductRequestBaseDetail.getDetail().getUserName()).orElse(null);
+        String userName = updateProductRequestBaseDetail.getDetail().getUserName();
+        User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String productProviderName = updateProductRequestBaseDetail.getDetail().getProductProvider();
+        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
+            throw new CustomException("Provider can not update product with this productProvider", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         product.setProductProvider(updateProductRequestBaseDetail.getDetail().getProductProvider());
@@ -115,9 +142,15 @@ public class ProductServiceImpl implements ProductService {
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        User user = userRepository.findByUsername(deleteProductRequestBaseDetail.getDetail().getUserName()).orElse(null);
+        String userName =deleteProductRequestBaseDetail.getDetail().getUserName();
+        User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = deleteProductRequestBaseDetail.getDetail().getProductName();
@@ -125,6 +158,12 @@ public class ProductServiceImpl implements ProductService {
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
+
+        String productProviderName = product.getProductProvider();
+        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
+            throw new CustomException("Provider can not delete product with this productProvider", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
         productRepository.delete(product);
 
         BaseResponse response = new BaseResponse();
@@ -144,15 +183,26 @@ public class ProductServiceImpl implements ProductService {
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        User user = userRepository.findByUsername(queryProductRequestBaseDetail.getDetail().getUserName()).orElse(null);
+        String userName =queryProductRequestBaseDetail.getDetail().getUserName();
+        User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = queryProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String productProviderName = product.getProductProvider();
+        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
+            throw new CustomException("Provider can not get product with this productProvider", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         DetailProductResponse detailProductResponse = new DetailProductResponse() ;
@@ -200,6 +250,11 @@ public class ProductServiceImpl implements ProductService {
         User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         int totalPage = 0 ;
@@ -377,27 +432,79 @@ public class ProductServiceImpl implements ProductService {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
 
-//        if(product.getState()!= null) {
-//            String newState = approvePendingProductRequest.getDetail().getState();
-//            if(newState.equals("Approve")){
-//            if (!product.getState().equals("PendingApprove") && !product.getState().equals("Approve")) {
-//                throw new CustomException("productState not equal with PengingApprove", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-//            }
+    }
+
+
+    //Admin
+//    public ResponseEntity<?> getListByState(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail,
+//                                            HttpServletRequest request,
+//                                            HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
+//        int totalPage = 0 ;
+//        BaseResponseGetAll response = new BaseResponseGetAll();
+//        ObjectMapper mapper = new ObjectMapper();
+//        String hostName = request.getRemoteHost();
 //
-//            product.setState(approvePendingProductRequest.getDetail().getState());
-//            productRepository.save(product);
+//        int page =  queryAllProductRequestBaseDetail.getDetail().getPage()  ;
+//        int size =  queryAllProductRequestBaseDetail.getDetail().getSize()   ;
+//        Pageable pageable = PageRequest.of(page-1, size);
 //
-//            BaseResponse response = new BaseResponse();
-//            response.setDetail(product);
-//            response.setResponseId(approvePendingProductRequest.getRequestId());
+//        //find by user name and type
+//        Page<Product> allProducts =
+//                productRepository.getAllByState(queryAllProductRequestBaseDetail.getDetail().getState(),pageable);
+//
+//        //get time log
+//        String logTimestamp = DateTimeUtils.getCurrentDate();
+//        String messageTimestamp = logTimestamp;
+//        int status = responseSelvet.getStatus();
+//        String responseStatus = Integer.toString(status);
+//        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+//
+//        if(!allProducts.isEmpty()) {
+//            totalPage = (int) Math.ceil((double) allProducts.getTotalElements()/size);
+//
+//            //set response data to client
+//            response.setResponseId(queryAllProductRequestBaseDetail.getRequestId());
+//            response.setDetail(allProducts.getContent());
+//            response.setPage(page);
+//            response.setTotalPage(totalPage);
+//            response.setTotal(allProducts.getTotalElements());
+//
 //            response.setResponseTime(DateTimeUtils.getCurrentDate());
 //            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
 //            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
 //
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        }else {
-//            throw new CustomException("productState not is null", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductRequestBaseDetail.getRequestId(), queryAllProductRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "productservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
+//
+//        }else{
+//            //set response data to client
+//            response.setResponseId(queryAllProductRequestBaseDetail.getRequestId());
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage("This provider has no product");
+//
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductRequestBaseDetail.getRequestId(), queryAllProductRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "productservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
 //        }
-
-    }
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 }

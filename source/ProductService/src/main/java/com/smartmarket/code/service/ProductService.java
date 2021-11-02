@@ -50,4 +50,9 @@ public interface ProductService {
                                             HttpServletRequest request, HttpServletResponse responseSelvet)
                                             throws JsonProcessingException, APIAccessException;
 
+    //Admin
+//    ResponseEntity<?> getListByState(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail,
+//                                     HttpServletRequest request, HttpServletResponse responseSelvet)
+//            throws JsonProcessingException, APIAccessException;
+
 }

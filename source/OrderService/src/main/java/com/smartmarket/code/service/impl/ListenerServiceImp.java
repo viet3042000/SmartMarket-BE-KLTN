@@ -2,7 +2,6 @@ package com.smartmarket.code.service.impl;
 
 import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.dao.OrderProductRepository;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.GetKeyPairUtil;
@@ -51,7 +50,7 @@ public class ListenerServiceImp implements ListenerService {
     DataBaseProductService dataBaseProductService;
 
     @Autowired
-    DataBaseProductTypeService dataBaseProductTypeService;
+    DataBaseProductProviderService dataBaseProductProviderService;
 
     @Value("${kafka.topic.travelinsuranceoutbox}")
     String topicTravelInsuranceOutbox;
@@ -68,8 +67,8 @@ public class ListenerServiceImp implements ListenerService {
     @Value("${kafka.topic.product}")
     String topicProduct;
 
-    @Value("${kafka.topic.product_type}")
-    String topicProductType;
+    @Value("${kafka.topic.product_provider}")
+    String topicProductProvider;
 
 //    @Value("${kafka.topic.clients}")
 //    String topicClients;
@@ -550,9 +549,8 @@ public class ListenerServiceImp implements ListenerService {
         }
     }
 
-
-    @KafkaListener(id = "${kafka.groupID.product_type}",topics = "${kafka.topic.product_type}")
-    public void listenProductType(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
+    @KafkaListener(id = "${kafka.groupID.product_provider}",topics = "${kafka.topic.product_provider}")
+    public void listenProductProvider(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -573,10 +571,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseProductTypeService.createDatabaseProductType(keyPairs);
+                                dataBaseProductProviderService.createDatabaseProductProvider(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseProductTypeService.updateDatabaseProductType(keyPairs);
+                                dataBaseProductProviderService.updateDatabaseProductProvider(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -589,14 +587,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseProductTypeService.deleteDatabaseProductType(keyPairs);
+                                dataBaseProductProviderService.deleteDatabaseProductProvider(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseProductTypeService.truncateDatabaseProductType();
+                            dataBaseProductProviderService.truncateDatabaseProductProvider();
                         }
 
                     } else {
@@ -615,7 +613,7 @@ public class ListenerServiceImp implements ListenerService {
             // nên coordinator tưởng là consumer chết rồi-->Không commit được
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductType,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductProvider,
                     "product_type", op ,dateTimeFormatter.format(currentTime),
                     "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(kafkaExceptionObject);
@@ -623,7 +621,7 @@ public class ListenerServiceImp implements ListenerService {
         }catch (KafkaException ex){
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductType,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductProvider,
                     "product_type", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(kafkaExceptionObject);
@@ -631,7 +629,7 @@ public class ListenerServiceImp implements ListenerService {
         } catch (Exception ex) {
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime currentTime = LocalDateTime.now();
-            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductType,
+            ListenerExceptionObject kafkaExceptionObject = new ListenerExceptionObject(topicProductProvider,
                     "product_type", op ,  dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(kafkaExceptionObject);

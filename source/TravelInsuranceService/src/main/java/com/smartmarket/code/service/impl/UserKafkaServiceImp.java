@@ -1,6 +1,5 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.dao.ClientRepository;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.service.UserKafkaService;
@@ -33,8 +32,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
 
         }
@@ -60,8 +59,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
         }
         return userRepository.save(user);

@@ -8,20 +8,20 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "product_type")
+@Table(name = "product_provider")
 @Getter
 @Setter
-public class ProductType implements Serializable {
+public class ProductProvider implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_type_id_seq")
-    @SequenceGenerator(sequenceName = "product_type_id_sequence", allocationSize = 1, name = "product_type_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_provider_id_seq")
+    @SequenceGenerator(sequenceName = "product_provider_id_sequence", allocationSize = 1, name = "product_provider_id_seq")
     private Long id;
 
     //BIC(=productProvider(product) = username of provider)
-    @Column(name = "product_type_name")
-    private String productTypeName;
+    @Column(name = "product_provider_name")
+    private String productProviderName;
 
     @Column(name = "description")
     private String desc;

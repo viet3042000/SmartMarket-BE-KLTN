@@ -32,8 +32,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
         }
         return userRepository.save(user);
@@ -58,8 +58,8 @@ public class UserKafkaServiceImp implements UserKafkaService {
             if (k.equals("email")) {
                 user.setEmail((String) keyPairs.get(k));
             }
-            if (k.equals("provider")) {
-                user.setProvider((String) keyPairs.get(k));
+            if (k.equals("oauth_provider")) {
+                user.setOauthProvider((String) keyPairs.get(k));
             }
         }
         return userRepository.save(user);

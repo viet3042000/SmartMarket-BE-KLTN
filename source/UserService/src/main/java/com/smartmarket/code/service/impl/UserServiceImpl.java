@@ -8,18 +8,13 @@ import com.smartmarket.code.dao.UserProfileRepository;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.dao.UserRoleRepository;
 import com.smartmarket.code.exception.*;
-import com.smartmarket.code.model.PasswordResetToken;
-import com.smartmarket.code.model.User;
-import com.smartmarket.code.model.UserProfile;
-import com.smartmarket.code.model.UserRole;
+import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.UserCreateResponse;
 //import com.smartmarket.code.service.KeycloakAdminClientService;
-import com.smartmarket.code.service.UserProfileService;
-import com.smartmarket.code.service.UserRoleService;
-import com.smartmarket.code.service.UserService;
+import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.Utils;
@@ -51,9 +46,6 @@ import java.util.function.Function;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     UserProfileService userProfileService;
@@ -88,8 +80,123 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserProfileRepository userProfileRepository;
 
+    @Autowired
+    ProductProviderService productProviderService;
+
+    @Autowired
+    UserProductProviderService userProductProviderService;
+
 //    @Autowired
 //    KeycloakAdminClientService keycloakAdminClientService;
+
+
+    //admin
+    public ResponseEntity<?> createProviderAdminUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+
+        String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
+        UserProductProvider userProductProvider = userProductProviderService.findByProductProviderName(productProviderName).orElse(null);
+        if(userProductProvider!=null){
+            throw new CustomException("Admin of this productProvider existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName();
+        Optional<User> userExist = userRepository.findByUsername(username);
+        if (userExist.isPresent()) {
+            throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+//            check email
+        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        if(user != null) {
+            throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        User userCreate = new User();
+        userCreate.setUserName(username);
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPassword()));
+        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
+        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userRepository.save(userCreate);
+
+        userProfileService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
+        userRoleService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
+        productProviderService.create(createProviderAdminUserRequestBaseDetail);
+        userProductProviderService.create(username,productProviderName);
+
+//            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
+
+        //set response data to client
+        BaseResponse response = new BaseResponse();
+        response.setDetail(userCreate);
+        response.setResponseId(createProviderAdminUserRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    //provider_admin
+    public ResponseEntity<?> createProviderUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+        //check provider of provider_admin is equal with provider in request
+
+        //get user token
+        Map<String, Object> claims = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String nameOfAuthentication = authentication.getClass().getName();
+        if(nameOfAuthentication.contains("KeycloakAuthenticationToken")) {
+            claims = JwtUtils.getClaimsMapFromKeycloakAuthenticationToken(authentication);
+        }else {
+            claims = JwtUtils.getClaimsMap(authentication);
+        }
+        String userName = (String) claims.get("user_name");
+
+        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
+        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
+            throw new CustomException("AdminProvider can not create user with this productProvider", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName();
+        Optional<User> userExist = userRepository.findByUsername(username);
+        if (userExist.isPresent()) {
+            throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+//            check email
+        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        if(user != null) {
+            throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        User userCreate = new User();
+        userCreate.setUserName(username);
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPassword()));
+        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
+        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userRepository.save(userCreate);
+
+        userProfileService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
+        userRoleService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
+        userProductProviderService.create(username,productProviderName);
+
+//            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
+
+        //set response data to client
+        BaseResponse response = new BaseResponse();
+        response.setDetail(userCreate);
+        response.setResponseId(createProviderAdminUserRequestBaseDetail.getRequestId());
+        response.setResponseTime(DateTimeUtils.getCurrentDate());
+        response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+        response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 
     public ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
@@ -109,7 +216,7 @@ public class UserServiceImpl implements UserService {
         User userCreate = new User();
         userCreate.setUserName(username);
         userCreate.setPassword(bCryptPasswordEncoder.encode(createUserRequestBaseDetail.getDetail().getUser().getPassword()));
-        userCreate.setProvider(createUserRequestBaseDetail.getDetail().getUser().getProvider());
+        userCreate.setOauthProvider(createUserRequestBaseDetail.getDetail().getUser().getProvider());
         userCreate.setEmail(createUserRequestBaseDetail.getDetail().getUser().getEmail());
         userCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
         userRepository.save(userCreate);

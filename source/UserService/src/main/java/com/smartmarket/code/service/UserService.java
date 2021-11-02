@@ -12,6 +12,12 @@ import javax.validation.Valid;
 
 public interface UserService {
 
+    //admin
+    ResponseEntity<?> createProviderAdminUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
+
+    //provider_admin
+    ResponseEntity<?> createProviderUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
+
     //user
     ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 

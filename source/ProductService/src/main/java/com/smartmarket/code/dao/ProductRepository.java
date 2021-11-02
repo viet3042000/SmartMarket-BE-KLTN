@@ -23,4 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     @Query(value = "SELECT * FROM product order by created_logtimestamp DESC",nativeQuery = true)
     public Page<Product> getAll(Pageable pageable);
+
+    @Query(value = "SELECT * FROM product WHERE order by state=:state created_logtimestamp DESC",nativeQuery = true)
+    public Page<Product> getAllByState(@Param("state") String state, Pageable pageable);
 }

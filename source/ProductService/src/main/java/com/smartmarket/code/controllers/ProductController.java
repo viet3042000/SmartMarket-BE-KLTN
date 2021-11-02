@@ -397,4 +397,56 @@ public class ProductController {
 
     }
 
+
+    //Admin
+//    @PostMapping(value = "/get-all-product-by-state", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+//    ResponseEntity<?> getListByState(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail,
+//                                            HttpServletRequest request, HttpServletResponse responseSelvet)
+//            throws JsonProcessingException, APIAccessException {
+//        try{
+//            ArrayList<String> roles = authorizationService.getRoles();
+//            if(roles != null) {
+//                if (roles.contains("ADMIN")) {
+//                    return productService.getListByState(queryAllProductRequestBaseDetail, request, responseSelvet);
+//                }else {
+//                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//                }
+//            }else {
+//                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryAllProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//            }
+//        }catch (Exception ex) {
+//            //catch truong hop chua goi dc sang BIC
+//            if (ex instanceof ResourceAccessException) {
+//                ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
+//                if (resourceAccessException.getCause() instanceof ConnectException) {
+//                    throw new APIAccessException(queryAllProductRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+//                } else {
+//                    throw new APIAccessException(queryAllProductRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+//                }
+//            }
+//
+//            //catch truong hop goi dc sang BIC nhưng loi
+//            else if (ex instanceof HttpClientErrorException) {
+//                HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
+//                throw new APIResponseException(queryAllProductRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+//            }
+//
+//            //catch invalid input exception
+//            else if (ex instanceof InvalidInputException) {
+//                throw new InvalidInputException(ex.getMessage(), queryAllProductRequestBaseDetail.getRequestId());
+//            }
+//
+//            //catch truong hop loi kết nối database
+//            else if (ex.getCause() instanceof JDBCConnectionException) {
+//                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            } else if (ex instanceof CustomException) {
+//                CustomException customException = (CustomException) ex;
+//                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryAllProductRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+//            } else {
+//                throw ex;
+//            }
+//        }
+//
+//    }
+
 }

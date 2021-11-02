@@ -3,17 +3,14 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.dao.ProductTypeRepository;
+import com.smartmarket.code.dao.ProductProviderRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.Product;
-import com.smartmarket.code.model.ProductType;
-import com.smartmarket.code.model.User;
+import com.smartmarket.code.model.ProductProvider;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
-import com.smartmarket.code.response.DetailProductResponse;
 import com.smartmarket.code.response.DetailProductTypeResponse;
 import com.smartmarket.code.service.ProductTypeService;
 import com.smartmarket.code.util.DateTimeUtils;
@@ -39,7 +36,7 @@ import java.util.Date;
 public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Autowired
-    ProductTypeRepository productTypeRepository;
+    ProductProviderRepository productProviderRepository;
 
     @Autowired
     LogServiceImpl logService;
@@ -48,22 +45,22 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     ConfigurableEnvironment environment;
 
 
-    //Admin
+    //Admin(kltn)
     public ResponseEntity<?> createProductType(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException{
         String productTypeName = createProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductType productType = productTypeRepository.findByProductTypeName(productTypeName).orElse(null);
-        if(productType != null){
+        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        if(productProvider != null){
             throw new CustomException("productTypeName has already existed", HttpStatus.BAD_REQUEST, createProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        ProductType newProductType = new ProductType();
-        newProductType.setProductTypeName(productTypeName);
-        newProductType.setDesc(createProductTypeRequestBaseDetail.getDetail().getDesc());
-        newProductType.setCreatedLogtimestamp(new Date());
-        productTypeRepository.save(newProductType);
+        ProductProvider newProductProvider = new ProductProvider();
+        newProductProvider.setProductProviderName(productTypeName);
+        newProductProvider.setDesc(createProductTypeRequestBaseDetail.getDetail().getDesc());
+        newProductProvider.setCreatedLogtimestamp(new Date());
+        productProviderRepository.save(newProductProvider);
 
         BaseResponse response = new BaseResponse();
-        response.setDetail(newProductType);
+        response.setDetail(newProductProvider);
         response.setResponseId(createProductTypeRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -72,18 +69,18 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin
+    //Admin(kltn)
     public ResponseEntity<?> updateProductType(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String productTypeName = updateProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductType productType = productTypeRepository.findByProductTypeName(productTypeName).orElse(null);
-        if(productType == null){
+        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        if(productProvider == null){
             throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
-        productType.setDesc(updateProductTypeRequestBaseDetail.getDetail().getDesc());
-        productTypeRepository.save(productType);
+        productProvider.setDesc(updateProductTypeRequestBaseDetail.getDetail().getDesc());
+        productProviderRepository.save(productProvider);
 
         BaseResponse response = new BaseResponse();
-        response.setDetail(productType);
+        response.setDetail(productProvider);
         response.setResponseId(updateProductTypeRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -92,17 +89,17 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin
+    //Admin(kltn)
     public ResponseEntity<?> deleteProductType(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String productTypeName = deleteProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductType productType = productTypeRepository.findByProductTypeName(productTypeName).orElse(null);
-        if(productType == null){
+        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        if(productProvider == null){
             throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, deleteProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
-        productTypeRepository.delete(productType);
+        productProviderRepository.delete(productProvider);
 
         BaseResponse response = new BaseResponse();
-        response.setDetail(productType);
+        response.setDetail(productProvider);
         response.setResponseId(deleteProductTypeRequestBaseDetail.getRequestId());
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -111,7 +108,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin
+    //Admin(kltn)
     public ResponseEntity<?> getProductType(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
@@ -119,15 +116,15 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         ObjectMapper mapper = new ObjectMapper();
 
         String productTypeName = queryProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductType productType = productTypeRepository.findByProductTypeName(productTypeName).orElse(null);
-        if(productType == null){
+        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        if(productProvider == null){
             throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, queryProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         DetailProductTypeResponse detailProductTypeResponse = new DetailProductTypeResponse() ;
-        detailProductTypeResponse.setId(productType.getId());
+        detailProductTypeResponse.setId(productProvider.getId());
         detailProductTypeResponse.setProductTypeName(productTypeName);
-        detailProductTypeResponse.setDesc(productType.getDesc());
+        detailProductTypeResponse.setDesc(productProvider.getDesc());
 
         //set response data to client
         BaseResponse response = new BaseResponse();
@@ -157,7 +154,7 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin
+    //Admin(kltn)
     public ResponseEntity<?> getListProductType(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
@@ -171,8 +168,8 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         Pageable pageable = PageRequest.of(page-1, size);
 
         //find by user name and type
-        Page<ProductType> allProductTypes =
-                productTypeRepository.getAll(pageable);
+        Page<ProductProvider> allProductTypes =
+                productProviderRepository.getAll(pageable);
 
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();

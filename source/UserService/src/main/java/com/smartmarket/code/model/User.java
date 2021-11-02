@@ -28,8 +28,9 @@ public class User implements Serializable {
 	@Column(name = "enabled")
 	private Integer enabled;
 
-	@Column(name = "provider")
-	private String provider;
+	//Google, Facebook
+	@Column(name = "oauth_provider")
+	private String oauthProvider;
 
 	@Column(name = "email")
 	private String email;

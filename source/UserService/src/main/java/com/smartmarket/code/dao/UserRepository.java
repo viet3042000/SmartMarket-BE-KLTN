@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 	@Query(value = "from User u where u.id =:id")
 	public Optional<User> findByUserId(@Param("id") Long id);
 
-	@Query(value = "from User u where u.email =:email and u.provider IS NULL")
+	@Query(value = "from User u where u.email =:email and u.oauthProvider IS NULL")
 	public Optional<User> findByEmailAndProvider(@Param("email") String email);
 
 
