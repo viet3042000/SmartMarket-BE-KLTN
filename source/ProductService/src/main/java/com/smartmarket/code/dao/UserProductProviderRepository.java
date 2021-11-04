@@ -20,6 +20,10 @@ public interface UserProductProviderRepository extends JpaRepository<UserProduct
     @Query(value = "Select * FROM user_product_provider where user_name =:user_name", nativeQuery = true)
     public Optional<UserProductProvider> findByUserName(@Param("user_name") String userName) ;
 
+    @Query(value = "Select * FROM user_product_provider where user_name =:user_name " +
+            "and product_provider_name =:product_provider_name", nativeQuery = true)
+    public Optional<UserProductProvider> findUser(@Param("user_name") String userName, @Param("product_provider_name") String productProviderName) ;
+
     @Modifying(clearAutomatically = true)
     @Query(value = "DELETE FROM user_product_provider where user_name =:user_name", nativeQuery = true)
     public int deleteUserProductProviderKafka(@Param("user_name") String userName) ;

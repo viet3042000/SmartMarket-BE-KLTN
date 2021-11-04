@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ProductRepository;
+import com.smartmarket.code.dao.UserProductProviderRepository;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
@@ -16,7 +17,6 @@ import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductResponse;
 import com.smartmarket.code.service.ProductService;
-import com.smartmarket.code.service.UserProductProviderService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
     ConfigurableEnvironment environment;
 
     @Autowired
-    UserProductProviderService userProductProviderService;
+    UserProductProviderRepository userProductProviderRepository;
 
 
     //Admin(kltn)+ Provider
@@ -63,20 +63,16 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
         if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = createProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product != null){
-            throw new CustomException("productName has already existed", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
-        String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
-        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
-            throw new CustomException("Provider can not create product with this productProvider", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("productName existed", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         Product newProduct = new Product();
@@ -108,20 +104,16 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        String productProviderName = updateProductRequestBaseDetail.getDetail().getProductProvider();
-        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
-            throw new CustomException("Provider can not update product with this productProvider", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        String productProviderName = product.getProductProvider();
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         product.setProductProvider(updateProductRequestBaseDetail.getDetail().getProductProvider());
@@ -148,11 +140,6 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = deleteProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -160,8 +147,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
-            throw new CustomException("Provider can not delete product with this productProvider", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         productRepository.delete(product);
@@ -189,11 +177,6 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = queryProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -201,8 +184,9 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
-            throw new CustomException("Provider can not get product with this productProvider", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         DetailProductResponse detailProductResponse = new DetailProductResponse() ;
@@ -252,7 +236,7 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
+        UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }

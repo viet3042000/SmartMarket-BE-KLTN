@@ -3,7 +3,6 @@ package com.smartmarket.code.service.impl;
 import com.smartmarket.code.service.DataBaseProductProviderService;
 import com.smartmarket.code.service.ProductProviderKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;

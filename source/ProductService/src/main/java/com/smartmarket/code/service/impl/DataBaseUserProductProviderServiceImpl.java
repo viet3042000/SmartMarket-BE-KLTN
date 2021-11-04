@@ -1,7 +1,6 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.service.DataBaseUserProductProviderService;
-import com.smartmarket.code.service.ProductProviderKafkaService;
 import com.smartmarket.code.service.UserProductProviderKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -6,7 +6,6 @@ import com.smartmarket.code.service.UserProductProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class UserProductProviderServiceImpl implements UserProductProviderService {
@@ -19,14 +18,6 @@ public class UserProductProviderServiceImpl implements UserProductProviderServic
         userProductProvider.setUserName(userName);
         userProductProvider.setProductProviderName(productProviderName);
         return userProductProviderRepository.save(userProductProvider);
-    }
-
-    public Optional<UserProductProvider> findByProductProviderName(String productProviderName){
-        return userProductProviderRepository.findByProductProviderName(productProviderName);
-    }
-
-    public Optional<UserProductProvider> findByUserName(String productProviderName){
-        return userProductProviderRepository.findByUserName(productProviderName);
     }
 
 }

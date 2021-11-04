@@ -14,8 +14,8 @@ import java.util.Date;
 public class ProductProvider implements Serializable {
 
     @Column(name = "id")
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_provider_id_seq")
-//    @SequenceGenerator(sequenceName = "product_provider_id_sequence", allocationSize = 1, name = "product_provider_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_provider_id_seq")
+    @SequenceGenerator(sequenceName = "product_provider_id_sequence", allocationSize = 1, name = "product_provider_id_seq")
     private Long id;
 
     //BIC(=productProvider(product) = username of provider)

@@ -12,7 +12,7 @@ import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductTypeResponse;
-import com.smartmarket.code.service.ProductTypeService;
+import com.smartmarket.code.service.ProductProviderService;
 import com.smartmarket.code.util.DateTimeUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -33,7 +33,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 @Service
-public class ProductTypeServiceImpl implements ProductTypeService {
+public class ProductProviderServiceImpl implements ProductProviderService {
 
     @Autowired
     ProductProviderRepository productProviderRepository;
@@ -45,8 +45,8 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     ConfigurableEnvironment environment;
 
 
-    //Admin(kltn)
-    public ResponseEntity<?> createProductType(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException{
+    //Admin
+    public ResponseEntity<?> createProductProvider(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException{
         String productTypeName = createProductTypeRequestBaseDetail.getDetail().getProductTypeName();
         ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
         if(productProvider != null){
@@ -69,8 +69,8 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)
-    public ResponseEntity<?> updateProductType(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
+    //Admin
+    public ResponseEntity<?> updateProductProvider(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String productTypeName = updateProductTypeRequestBaseDetail.getDetail().getProductTypeName();
         ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
         if(productProvider == null){
@@ -89,8 +89,8 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)
-    public ResponseEntity<?> deleteProductType(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
+    //Admin
+    public ResponseEntity<?> deleteProductProvider(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String productTypeName = deleteProductTypeRequestBaseDetail.getDetail().getProductTypeName();
         ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
         if(productProvider == null){
@@ -108,8 +108,8 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)
-    public ResponseEntity<?> getProductType(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
+    //Admin
+    public ResponseEntity<?> getProductProvider(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
@@ -154,10 +154,10 @@ public class ProductTypeServiceImpl implements ProductTypeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)
-    public ResponseEntity<?> getListProductType(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
-                                         HttpServletRequest request,
-                                         HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
+    //Admin
+    public ResponseEntity<?> getListProductProvider(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
+                                                    HttpServletRequest request,
+                                                    HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
         int totalPage = 0 ;
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();

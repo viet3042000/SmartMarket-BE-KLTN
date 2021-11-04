@@ -19,4 +19,7 @@ public class QueryAllUserRequest implements Serializable {
     @NotNull(message = "size is require")
     @Min(value = 1)
     private int size ;
+
+    //condition.
+
 }

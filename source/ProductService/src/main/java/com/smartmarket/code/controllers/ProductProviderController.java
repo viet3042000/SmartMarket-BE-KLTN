@@ -6,7 +6,7 @@ import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.service.AuthorizationService;
-import com.smartmarket.code.service.ProductTypeService;
+import com.smartmarket.code.service.ProductProviderService;
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,13 +28,13 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/product/product-service/v1/")
-public class ProductTypeController {
+public class ProductProviderController {
 
     @Autowired
     AuthorizationService authorizationService;
 
     @Autowired
-    ProductTypeService productTypeService;
+    ProductProviderService productProviderService;
 
 
     //Admin(kltn) (sau khi phe duyet thi tao)
@@ -44,7 +44,7 @@ public class ProductTypeController {
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return productTypeService.createProductType(createProductTypeRequestBaseDetail, request, responseSelvet);
+                    return productProviderService.createProductProvider(createProductTypeRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createProductTypeRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
@@ -94,7 +94,7 @@ public class ProductTypeController {
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return productTypeService.updateProductType(updateProductTypeRequestBaseDetail, request, responseSelvet);
+                    return productProviderService.updateProductProvider(updateProductTypeRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
@@ -147,7 +147,7 @@ public class ProductTypeController {
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return productTypeService.deleteProductType(deleteProductTypeRequestBaseDetail, request, responseSelvet);
+                    return productProviderService.deleteProductProvider(deleteProductTypeRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, deleteProductTypeRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
@@ -198,7 +198,7 @@ public class ProductTypeController {
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return productTypeService.getProductType(queryProductTypeRequestBaseDetail, request, responseSelvet);
+                    return productProviderService.getProductProvider(queryProductTypeRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryProductTypeRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
@@ -250,7 +250,7 @@ public class ProductTypeController {
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return productTypeService.getListProductType(queryAllProductTypeRequestBaseDetail, request, responseSelvet);
+                    return productProviderService.getListProductProvider(queryAllProductTypeRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllProductTypeRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }

@@ -3,10 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.dao.PasswordResetTokenRepository;
-import com.smartmarket.code.dao.UserProfileRepository;
-import com.smartmarket.code.dao.UserRepository;
-import com.smartmarket.code.dao.UserRoleRepository;
+import com.smartmarket.code.dao.*;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
@@ -81,10 +78,13 @@ public class UserServiceImpl implements UserService {
     UserProfileRepository userProfileRepository;
 
     @Autowired
-    ProductProviderService productProviderService;
+    UserProductProviderService userProductProviderService;
 
     @Autowired
-    UserProductProviderService userProductProviderService;
+    UserProductProviderRepository userProductProviderRepository;
+
+    @Autowired
+    ProductProviderRepository productProviderRepository;
 
 //    @Autowired
 //    KeycloakAdminClientService keycloakAdminClientService;
@@ -92,9 +92,13 @@ public class UserServiceImpl implements UserService {
 
     //admin
     public ResponseEntity<?> createProviderAdminUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-
         String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
-        UserProductProvider userProductProvider = userProductProviderService.findByProductProviderName(productProviderName).orElse(null);
+        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productProviderName).orElse(null);
+        if(productProvider == null){
+            throw new CustomException("productProvider doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        UserProductProvider userProductProvider = userProductProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(userProductProvider!=null){
             throw new CustomException("Admin of this productProvider existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
@@ -120,7 +124,6 @@ public class UserServiceImpl implements UserService {
 
         userProfileService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
         userRoleService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
-        productProviderService.create(createProviderAdminUserRequestBaseDetail);
         userProductProviderService.create(username,productProviderName);
 
 //            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
@@ -139,8 +142,6 @@ public class UserServiceImpl implements UserService {
 
     //provider_admin
     public ResponseEntity<?> createProviderUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        //check provider of provider_admin is equal with provider in request
-
         //get user token
         Map<String, Object> claims = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -150,16 +151,12 @@ public class UserServiceImpl implements UserService {
         }else {
             claims = JwtUtils.getClaimsMap(authentication);
         }
-        String userName = (String) claims.get("user_name");
-
-        UserProductProvider userProductProvider = userProductProviderService.findByUserName(userName).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
+        String userNameProviderAdmin = (String) claims.get("user_name");
         String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
-        if(!productProviderName.equals(userProductProvider.getProductProviderName())){
-            throw new CustomException("AdminProvider can not create user with this productProvider", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userNameProviderAdmin, productProviderName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String username = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName();

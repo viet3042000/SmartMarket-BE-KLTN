@@ -2,8 +2,8 @@ package com.smartmarket.code.model.entitylog;
 
 import org.json.JSONObject;
 
-public class KafkaExceptionObject {
-//    String consumerName;
+public class ListenerExceptionObject {
+    //    String consumerName;
     String topicName;
     String tableName;
     String serviceName ; //update ...
@@ -12,9 +12,9 @@ public class KafkaExceptionObject {
     String errorCode ;
     String errorDetail;
 
-    public KafkaExceptionObject( String topicName, String tableName,
-                                String serviceName, String messageTimestamp, String errorMsg,
-                                String errorCode, String errorDetail){
+    public ListenerExceptionObject(String topicName, String tableName,
+                                   String serviceName, String messageTimestamp, String errorMsg,
+                                   String errorCode, String errorDetail){
 //        this.consumerName = consumerName;
         this.topicName = topicName;
         this.tableName = tableName;

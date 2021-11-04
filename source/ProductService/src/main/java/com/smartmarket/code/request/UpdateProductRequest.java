@@ -19,7 +19,8 @@ public class UpdateProductRequest implements Serializable {
     @Size(max = 100, message = "productName should be less than or equal to 100 characters")
     private String productName;
 
-//    @NotBlank(message = "productProvider is require")
+    //updated productProvider
+    @NotBlank(message = "productProvider is require")
     @Size(max = 100, message = "productProvider should be less than or equal to 100 characters")
     private String productProvider;
 
