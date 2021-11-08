@@ -13,10 +13,10 @@ public class UserProductProviderServiceImpl implements UserProductProviderServic
     @Autowired
     UserProductProviderRepository userProductProviderRepository;
 
-    public UserProductProvider create(String userName, String productProviderName){
+    public UserProductProvider create(String userName, Long productProviderId){
         UserProductProvider userProductProvider=  new UserProductProvider();
         userProductProvider.setUserName(userName);
-        userProductProvider.setProductProviderName(productProviderName);
+        userProductProvider.setProductProviderId(productProviderId);
         return userProductProviderRepository.save(userProductProvider);
     }
 

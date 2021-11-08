@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM product where product_name =:product_name", nativeQuery = true)
-    public int deleteProductKafka(@Param("product_name") String productName) ;
+    @Query(value = "DELETE FROM product where id =:id", nativeQuery = true)
+    public int deleteProductKafka(@Param("id") Long id) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "TRUNCATE TABLE product",  nativeQuery = true)

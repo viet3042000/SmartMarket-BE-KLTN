@@ -1,7 +1,6 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.dao.UserProductProviderRepository;
-import com.smartmarket.code.model.ProductProvider;
 import com.smartmarket.code.model.UserProductProvider;
 import com.smartmarket.code.service.UserProductProviderKafkaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,8 @@ public class UserProductProviderKafkaServiceImpl implements UserProductProviderK
             if (k.equals("id")) {
                 userProductProvider.setId(((Number)keyPairs.get(k)).longValue());
             }
-            if (k.equals("product_provider_name")) {
-                userProductProvider.setProductProviderName((String) keyPairs.get(k));
+            if (k.equals("product_provider_id")) {
+                userProductProvider.setProductProviderId(((Number)keyPairs.get(k)).longValue());
             }
             if (k.equals("user_name")) {
                 userProductProvider.setUserName((String) keyPairs.get(k));
@@ -46,8 +45,8 @@ public class UserProductProviderKafkaServiceImpl implements UserProductProviderK
             if (k.equals("id")) {
                 userProductProvider.setId(((Number)keyPairs.get(k)).longValue());
             }
-            if (k.equals("product_provider_name")) {
-                userProductProvider.setProductProviderName((String) keyPairs.get(k));
+            if (k.equals("product_provider_id")) {
+                userProductProvider.setProductProviderId(((Number)keyPairs.get(k)).longValue());
             }
             if (k.equals("user_name")) {
                 userProductProvider.setUserName((String) keyPairs.get(k));

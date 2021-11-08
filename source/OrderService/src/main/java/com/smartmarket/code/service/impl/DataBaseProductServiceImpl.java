@@ -23,14 +23,12 @@ public class DataBaseProductServiceImpl implements DataBaseProductService {
     }
 
     public void deleteDatabaseProduct(Map<String, Object> keyPairs){
-        String productName = "";
-
         for (String k : keyPairs.keySet()) {
-            if (k.equals("product_name")) {
-                productName = (String) keyPairs.get(k);
+            if (k.equals("id")) {
+                Long id = ((Number)keyPairs.get(k)).longValue();
+                productKafkaService.deleteProductKafka(id);
             }
         }
-        productKafkaService.deleteProductKafka(productName);
     }
 
     public void truncateDatabaseProduct(){

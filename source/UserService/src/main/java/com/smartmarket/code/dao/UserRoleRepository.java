@@ -11,23 +11,27 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
 @Repository
 public interface UserRoleRepository extends JpaRepository<UserRole, Long> {
 
-	@Query(value = "from UserRole u where u.id =:id")
-	public Optional<UserRole> findByUserRoleId(@Param("id") Long id);
-
 	@Query(value = "from UserRole u where u.userName =:userName")
 	public Optional<UserRole> findByUserName(@Param("userName") String userName);
+
+//	@Query(value = "from UserRole u where u.userName =:userName and u.roleName=:roleName")
+//	public Optional<UserRole> findUserRole(@Param("userName") String userName, @Param("roleName") String roleName);
 
 	@Query(value = "select u.roleName from UserRole u where u.userName =:userName")
 	public String findRoleByUserName(@Param("userName") String userName);
 
+	@Query(value = "select * from user_role where role_name =:role_name", nativeQuery = true)
+	public List<UserRole> findByRoleName(@Param("role_name") String roleName);
+
 	@Modifying(clearAutomatically = true)
-	@Query(value = "DELETE FROM user_role where user_name =:userName", nativeQuery = true)
-	public int deleteUserRoleByUserName(@Param("userName") String userName) ;
+	@Query(value = "DELETE FROM user_role where user_name =:user_name", nativeQuery = true)
+	public int deleteByUserName(@Param("user_name") String username) ;
 
 }

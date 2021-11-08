@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.ProductProviderRepository;
+import com.smartmarket.code.dao.ProductRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
+import com.smartmarket.code.model.Product;
 import com.smartmarket.code.model.ProductProvider;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
@@ -14,6 +16,7 @@ import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductTypeResponse;
 import com.smartmarket.code.service.ProductProviderService;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.GetKeyPairUtil;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.Date;
+import java.util.*;
 
 @Service
 public class ProductProviderServiceImpl implements ProductProviderService {
@@ -39,22 +42,28 @@ public class ProductProviderServiceImpl implements ProductProviderService {
     ProductProviderRepository productProviderRepository;
 
     @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
     LogServiceImpl logService;
+
+    @Autowired
+    GetKeyPairUtil getKeyPairUtil;
 
     @Autowired
     ConfigurableEnvironment environment;
 
 
     //Admin
-    public ResponseEntity<?> createProductProvider(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException{
-        String productTypeName = createProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+    public ResponseEntity<?> createProductProvider(@Valid @RequestBody BaseDetail<CreateProductProviderRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException{
+        String productProviderName = createProductTypeRequestBaseDetail.getDetail().getProductProviderName();
+        ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider != null){
-            throw new CustomException("productTypeName has already existed", HttpStatus.BAD_REQUEST, createProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("productProviderName existed", HttpStatus.BAD_REQUEST, createProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         ProductProvider newProductProvider = new ProductProvider();
-        newProductProvider.setProductProviderName(productTypeName);
+        newProductProvider.setProductProviderName(productProviderName);
         newProductProvider.setDesc(createProductTypeRequestBaseDetail.getDetail().getDesc());
         newProductProvider.setCreatedLogtimestamp(new Date());
         productProviderRepository.save(newProductProvider);
@@ -70,13 +79,41 @@ public class ProductProviderServiceImpl implements ProductProviderService {
     }
 
     //Admin
-    public ResponseEntity<?> updateProductProvider(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        String productTypeName = updateProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+    public ResponseEntity<?> updateProductProvider(@Valid @RequestBody BaseDetail<UpdateProductProviderRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
+        String productProviderName = updateProductTypeRequestBaseDetail.getDetail().getProductProviderName();
+        ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
-            throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("productProviderName does not exist", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
-        productProvider.setDesc(updateProductTypeRequestBaseDetail.getDetail().getDesc());
+
+        //eliminate null value from request body
+        JSONObject detail = new JSONObject(updateProductTypeRequestBaseDetail.getDetail());
+        Map<String, Object> keyPairs = new HashMap<>();
+        getKeyPairUtil.getKeyPair(detail, keyPairs);
+
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("newProductProviderName")) {
+                String newProductProviderName = (String) keyPairs.get(k);
+                //check newProductProviderName existed
+                ProductProvider p = productProviderRepository.findByProductProviderName(newProductProviderName).orElse(null);
+                if(p!=null){
+                    throw new CustomException("newProductProviderName existed", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                }
+
+                productProvider.setProductProviderName(newProductProviderName);
+                //update newProductProvdierName in all product has equal productProviderName
+                List<Product> listProducts = productRepository.findByProductProvider(productProviderName);
+                if(!listProducts.isEmpty()) {
+                    for (Product product : listProducts) {
+                        product.setProductProvider(newProductProviderName);
+                        productRepository.save(product);
+                    }
+                }
+            }
+            if (k.equals("desc")) {
+                productProvider.setDesc((String) keyPairs.get(k));
+            }
+        }
         productProviderRepository.save(productProvider);
 
         BaseResponse response = new BaseResponse();
@@ -91,12 +128,21 @@ public class ProductProviderServiceImpl implements ProductProviderService {
 
     //Admin
     public ResponseEntity<?> deleteProductProvider(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        String productTypeName = deleteProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        String productProviderName = deleteProductTypeRequestBaseDetail.getDetail().getProductProviderName();
+        ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
-            throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, deleteProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("productProviderName does not exist", HttpStatus.BAD_REQUEST, deleteProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
+        Long id = productProvider.getId();
         productProviderRepository.delete(productProvider);
+
+        //delete product
+        List<Product> listProducts = productRepository.findByProductProvider(productProviderName);
+        if(!listProducts.isEmpty()) {
+            for (Product product : listProducts) {
+                productRepository.delete(product);
+            }
+        }
 
         BaseResponse response = new BaseResponse();
         response.setDetail(productProvider);
@@ -115,15 +161,15 @@ public class ProductProviderServiceImpl implements ProductProviderService {
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        String productTypeName = queryProductTypeRequestBaseDetail.getDetail().getProductTypeName();
-        ProductProvider productProvider = productProviderRepository.findByProductTypeName(productTypeName).orElse(null);
+        String productProviderName = queryProductTypeRequestBaseDetail.getDetail().getProductProviderName();
+        ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
-            throw new CustomException("productTypeName does not exist", HttpStatus.BAD_REQUEST, queryProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            throw new CustomException("productProviderName does not exist", HttpStatus.BAD_REQUEST, queryProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         DetailProductTypeResponse detailProductTypeResponse = new DetailProductTypeResponse() ;
         detailProductTypeResponse.setId(productProvider.getId());
-        detailProductTypeResponse.setProductTypeName(productTypeName);
+        detailProductTypeResponse.setProductTypeName(productProviderName);
         detailProductTypeResponse.setDesc(productProvider.getDesc());
 
         //set response data to client

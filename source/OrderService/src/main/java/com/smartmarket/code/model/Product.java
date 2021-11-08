@@ -13,12 +13,11 @@ import java.util.Date;
 @Setter
 public class Product implements Serializable {
 
-//    @Id
+    @Id
     @Column(name = "id")
     private Long id;
 
     //BICTRV
-    @Id
     @Column(name = "product_name")
     private String productName;
 

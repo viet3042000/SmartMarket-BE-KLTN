@@ -18,7 +18,7 @@ public class UserProductProvider {
     @Column(name = "user_name")
     private String userName;
 
-    @Column(name = "product_provider_name")
-    private String productProviderName;
+    @Column(name = "product_provider_id")
+    private Long productProviderId;
 
 }

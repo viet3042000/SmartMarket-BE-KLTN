@@ -90,12 +90,14 @@ public class ListenerServiceImp implements ListenerService {
                             if (op.equals("d")) {
                                 dataBaseProductProviderService.deleteDatabaseProductProvider(keyPairs);
                             }
-                        } else {
+                       } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
                             dataBaseProductProviderService.truncateDatabaseProductProvider();
+
+                            // delete user + user_productprovider + userrole + userprofile (sau)
                         }
 
                     } else {

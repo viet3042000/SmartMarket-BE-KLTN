@@ -16,16 +16,11 @@ import java.util.Optional;
 @Repository
 public interface ProductProviderRepository extends JpaRepository<ProductProvider, String> {
     @Query(value = "Select * FROM product_provider where product_provider_name =:product_provider_name", nativeQuery = true)
-    public Optional<ProductProvider> findByProductTypeName(@Param("product_provider_name") String productProviderName) ;
+    public Optional<ProductProvider> findByProductProviderName(@Param("product_provider_name") String productProviderName) ;
 
     @Query(value = "SELECT * FROM product_provider order by created_logtimestamp DESC",nativeQuery = true)
     public Page<ProductProvider> getAll(Pageable pageable);
 
-    @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM product_provider where product_provider_name =:product_provider_name", nativeQuery = true)
-    public int deleteProductProviderKafka(@Param("product_provider_name") String productProviderName) ;
-
-    @Modifying(clearAutomatically = true)
-    @Query(value = "TRUNCATE TABLE product_provider",  nativeQuery = true)
-    public int truncateProductProviderKafka() ;
+    @Query(value = "select id from product_provider where product_provider_name=:product_provider_name",nativeQuery = true)
+    public Long getId(@Param("product_provider_name") String productProviderName);
 }

@@ -91,8 +91,8 @@ public class ProductKafkaServiceImpl implements ProductKafkaService {
     }
 
 
-    public int deleteProductKafka(String productName) {
-        return productRepository.deleteProductKafka(productName);
+    public int deleteProductKafka(Long id) {
+        return productRepository.deleteProductKafka(id);
     }
 
     public int truncateProductKafka() {

@@ -14,15 +14,12 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface UserProductProviderRepository extends JpaRepository<UserProductProvider, String> {
-    @Query(value = "Select * FROM user_product_provider where product_provider_name =:product_provider_name", nativeQuery = true)
-    public Optional<UserProductProvider> findByProductProviderName(@Param("product_provider_name") String productProviderName) ;
-
     @Query(value = "Select * FROM user_product_provider where user_name =:user_name", nativeQuery = true)
     public Optional<UserProductProvider> findByUserName(@Param("user_name") String userName) ;
 
     @Query(value = "Select * FROM user_product_provider where user_name =:user_name " +
-            "and product_provider_name =:product_provider_name", nativeQuery = true)
-    public Optional<UserProductProvider> findUser(@Param("user_name") String userName, @Param("product_provider_name") String productProviderName) ;
+            "and product_provider_id =:product_provider_id", nativeQuery = true)
+    public Optional<UserProductProvider> findUser(@Param("user_name") String userName, @Param("product_provider_id") Long productProviderId) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "DELETE FROM user_product_provider where user_name =:user_name", nativeQuery = true)

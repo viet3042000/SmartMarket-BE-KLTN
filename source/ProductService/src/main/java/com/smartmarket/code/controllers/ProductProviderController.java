@@ -38,8 +38,8 @@ public class ProductProviderController {
 
 
     //Admin(kltn) (sau khi phe duyet thi tao)
-    @PostMapping(value = "/create-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createProductType(@Valid @RequestBody BaseDetail<CreateProductTypeRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
+    @PostMapping(value = "/create-product-provider", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> createProductProvider(@Valid @RequestBody BaseDetail<CreateProductProviderRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -88,8 +88,8 @@ public class ProductProviderController {
     }
 
     //Admin(kltn)
-    @PostMapping(value = "/update-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateProductType(@Valid @RequestBody BaseDetail<UpdateProductTypeRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    @PostMapping(value = "/update-product-provider", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> updateProductProvider(@Valid @RequestBody BaseDetail<UpdateProductProviderRequest> updateProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -141,8 +141,8 @@ public class ProductProviderController {
     }
 
     //Admin(kltn)
-    @PostMapping(value = "/delete-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> deleteProductType(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    @PostMapping(value = "/delete-product-provider", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> deleteProductProvider(@Valid @RequestBody BaseDetail<DeleteProductTypeRequest> deleteProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -192,8 +192,8 @@ public class ProductProviderController {
 
 
     //Admin(kltn)
-    @RequestMapping(value = "/get-product-type")
-    public ResponseEntity<?> getProductType(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    @RequestMapping(value = "/get-product-provider")
+    public ResponseEntity<?> getProductProvider(@Valid @RequestBody BaseDetail<QueryProductTypeRequest> queryProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -242,8 +242,8 @@ public class ProductProviderController {
 
 
     //Admin(kltn)
-    @PostMapping(value = "/get-list-product-type", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getListProductType(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
+    @PostMapping(value = "/get-list-product-provider", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> getListProductProvider(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
                                            HttpServletRequest request,
                                            HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         try{

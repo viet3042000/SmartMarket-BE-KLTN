@@ -1,20 +1,13 @@
 package com.smartmarket.code.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Throwables;
-import com.google.gson.Gson;
 import com.smartmarket.code.constants.AggregateType;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.constants.TravelInsuranceState;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
-import com.smartmarket.code.dao.TravelInsuranceRepository;
-import com.smartmarket.code.model.BICTransaction;
 import com.smartmarket.code.model.Outbox;
-import com.smartmarket.code.model.TravelInsurance;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
-import com.smartmarket.code.request.*;
 import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.GetKeyPairUtil;
 import org.apache.kafka.clients.consumer.CommitFailedException;
@@ -25,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -33,7 +25,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class ListenerServiceImp implements ListenerService {

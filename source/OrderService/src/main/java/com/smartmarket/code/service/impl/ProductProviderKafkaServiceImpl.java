@@ -66,8 +66,8 @@ public class ProductProviderKafkaServiceImpl implements ProductProviderKafkaServ
     }
 
 
-    public int deleteProductProviderKafka(String productProviderName) {
-        return productProviderRepository.deleteProductProviderKafka(productProviderName);
+    public int deleteProductProviderKafka(Long id) {
+        return productProviderRepository.deleteProductProviderKafka(id);
     }
 
     public int truncateProductProviderKafka() {

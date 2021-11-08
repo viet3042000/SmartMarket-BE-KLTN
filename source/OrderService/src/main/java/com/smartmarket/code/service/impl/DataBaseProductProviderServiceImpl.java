@@ -23,14 +23,12 @@ public class DataBaseProductProviderServiceImpl implements DataBaseProductProvid
     }
 
     public void deleteDatabaseProductProvider(Map<String, Object> keyPairs){
-        String productProviderName = "";
-
         for (String k : keyPairs.keySet()) {
-            if (k.equals("product_provider_name")) {
-                productProviderName = (String) keyPairs.get(k);
+            if (k.equals("id")) {
+                Long id = ((Number)keyPairs.get(k)).longValue();
+                productProviderKafkaService.deleteProductProviderKafka(id);
             }
         }
-        productProviderKafkaService.deleteProductProviderKafka(productProviderName);
     }
 
     public void truncateDatabaseProductProvider(){

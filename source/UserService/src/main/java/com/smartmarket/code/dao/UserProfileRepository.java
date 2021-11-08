@@ -21,4 +21,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, String
     @Query(value = "from UserProfile u where u.userName =:userName")
     public Optional<UserProfile> findByUsername(@Param("userName") String userName);
 
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM user_profile where user_name =:user_name", nativeQuery = true)
+    public int deleteByUserName(@Param("user_name") String username) ;
+
 }

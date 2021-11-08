@@ -2,19 +2,18 @@ package com.smartmarket.code.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
-import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.ResponseCode;
-import com.smartmarket.code.dao.RoleRepository;
+import com.smartmarket.code.dao.*;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.Role;
+import com.smartmarket.code.model.UserRole;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.service.RoleService;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.GetKeyPairUtil;
 import com.smartmarket.code.util.Utils;
-import org.hibernate.exception.JDBCConnectionException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -22,20 +21,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.net.ConnectException;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -44,20 +37,41 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
 
     @Autowired
+    UserRoleRepository userRoleRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    UserProfileRepository userProfileRepository;
+
+    @Autowired
+    UserProductProviderRepository userProductProviderRepository;
+
+    @Autowired
     ConfigurableEnvironment environment;
 
     @Autowired
     LogServiceImpl logService;
 
+    @Autowired
+    GetKeyPairUtil getKeyPairUtil;
+
 
     public ResponseEntity<?> createRole(@Valid @RequestBody BaseDetail<CreateRoleRequest> createRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         BaseResponse response = new BaseResponse();
+        //check roleName existed
+        String roleName = createRoleRequestBaseDetail.getDetail().getRoleName();
+        Role role = roleRepository.findByRoleName(createRoleRequestBaseDetail.getDetail().getRoleName()).orElse(null);
+        if(role != null){
+            throw new CustomException("roleName existed", HttpStatus.BAD_REQUEST, createRoleRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
         Role roleCreate =  new Role();
-        roleCreate.setRoleName(createRoleRequestBaseDetail.getDetail().getRole().getRoleName());
+        roleCreate.setRoleName(createRoleRequestBaseDetail.getDetail().getRoleName());
         roleCreate.setCreatedLogtimestamp(new Date());
-        roleCreate.setDesc(createRoleRequestBaseDetail.getDetail().getRole().getDesc());
-        roleCreate.setEnabled(createRoleRequestBaseDetail.getDetail().getRole().getEnabled());
-        roleCreate.setEnabled(createRoleRequestBaseDetail.getDetail().getRole().getEnabled());
+        roleCreate.setDesc(createRoleRequestBaseDetail.getDetail().getDesc());
+        roleCreate.setEnabled(createRoleRequestBaseDetail.getDetail().getEnabled());
         roleRepository.save(roleCreate);
 
         //set response data to client
@@ -74,7 +88,26 @@ public class RoleServiceImpl implements RoleService {
     public ResponseEntity<?> updateRole(@Valid @RequestBody BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        Role roleUpdate = this.update(updateRoleRequestBaseDetail) ;
+        //eliminate null value from request body
+        JSONObject detail = new JSONObject(updateRoleRequestBaseDetail.getDetail());
+        Map<String, Object> keyPairs = new HashMap<>();
+        getKeyPairUtil.getKeyPair(detail, keyPairs);
+
+        Role roleUpdate = roleRepository.findByRoleName(updateRoleRequestBaseDetail.getDetail().getRoleName()).orElse(null);
+        if (roleUpdate != null) {
+            for (String k : keyPairs.keySet()) {
+                if (k.equals("type")) {
+                    roleUpdate.setEnabled(((Number)keyPairs.get(k)).intValue());
+                }
+                if (k.equals("desc")) {
+                    roleUpdate.setDesc((String) keyPairs.get(k));
+                }
+            }
+            roleRepository.save(roleUpdate);
+        }else {
+            throw new CustomException("roleName doesn't exist", HttpStatus.BAD_REQUEST, updateRoleRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
         //set response data to client
         response.setDetail(roleUpdate);
         response.setResponseId(updateRoleRequestBaseDetail.getRequestId());
@@ -89,7 +122,26 @@ public class RoleServiceImpl implements RoleService {
     public ResponseEntity<?> deleteRole(@Valid @RequestBody BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         BaseResponse response = new BaseResponse();
 
-        Role roleDelete = this.deleteByRoleName(deleteRoleRequestBaseDetail) ;
+        Role roleDelete = roleRepository.findByRoleName(deleteRoleRequestBaseDetail.getDetail().getRoleName()).orElse(null);
+        if (roleDelete != null) {
+            roleRepository.delete(roleDelete);
+        }else {
+            throw new CustomException("roleName does not exist", HttpStatus.BAD_REQUEST, deleteRoleRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        //delete user+ user_role
+        String roleName = deleteRoleRequestBaseDetail.getDetail().getRoleName();
+        List<UserRole> listUserRoles = userRoleRepository.findByRoleName(roleName);
+        if(!listUserRoles.isEmpty()){
+            for (UserRole userRole : listUserRoles) {
+                String userName =userRole.getUserName();
+                userRepository.deleteByUserName(userName);
+                userProfileRepository.deleteByUserName(userName);
+                userRoleRepository.delete(userRole);
+                userProductProviderRepository.deleteByUserName(userName);
+            }
+        }
+
         //set response data to client
         response.setDetail(roleDelete);
         response.setResponseId(deleteRoleRequestBaseDetail.getRequestId());
@@ -125,7 +177,7 @@ public class RoleServiceImpl implements RoleService {
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
-        pageResult = this.getList(pageable);
+        pageResult = roleRepository.findAll(pageable);
 
         page =  getListRoleRequestBaseDetail.getDetail().getPage();
         totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
@@ -154,41 +206,4 @@ public class RoleServiceImpl implements RoleService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-//    @Override
-//    public Role create(Role object) {
-//        object.setEnabled(Constant.STATUS.ACTIVE);
-//        return roleRepository.save(object);
-//    }
-
-    @Override
-    public Role update(BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail) throws Exception {
-//        Role roleUpdate = roleRepository.findById(updateRoleRequestBaseDetail.getDetail().getRole().getId()).orElse(null);
-        Role roleUpdate = roleRepository.findByUserRoleName(updateRoleRequestBaseDetail.getDetail().getRole().getRoleName()).orElse(null);
-        if (roleUpdate != null) {
-//            roleUpdate.setRoleName(updateRoleRequestBaseDetail.getDetail().getRole().getRoleName());
-            roleUpdate.setDesc(updateRoleRequestBaseDetail.getDetail().getRole().getDesc());
-            roleUpdate.setEnabled(updateRoleRequestBaseDetail.getDetail().getRole().getEnabled());
-            roleRepository.save(roleUpdate);
-        }else {
-            throw new CustomException("Role_name does not exist", HttpStatus.BAD_REQUEST, updateRoleRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-        return roleUpdate;
-    }
-
-    @Override
-    public Role deleteByRoleName(BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail) throws Exception {
-        Role roleDelete = roleRepository.findByUserRoleName(deleteRoleRequestBaseDetail.getDetail().getRoleName()).orElse(null);
-        if (roleDelete != null) {
-            roleRepository.delete(roleDelete);
-        }else {
-            throw new CustomException("Role_name does not exist", HttpStatus.BAD_REQUEST, deleteRoleRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-        return roleDelete;
-    }
-
-
-    @Override
-    public Page<Role> getList(Pageable pageable) {
-        return roleRepository.findAll(pageable);
-    }
 }

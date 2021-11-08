@@ -17,10 +17,9 @@ public class GetKeyPairUtil {
         while(keys.hasNext()) {
             String key = keys.next();
             Object o = jsonObject.get(key);
-
-            // do something with jsonObject here
-            Object value = o; // Here's your value
-            keyPairs.put(key, o);
+            if(!JSONObject.NULL.equals(o)) {
+                keyPairs.put(key,o);
+            }
         }
     }
 }

@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface ProductProviderRepository extends JpaRepository<ProductProvider, String> {
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM product_provider where product_provider_name =:product_provider_name", nativeQuery = true)
-    public int deleteProductProviderKafka(@Param("product_provider_name") String productProviderName) ;
+    @Query(value = "DELETE FROM product_provider where id =:id", nativeQuery = true)
+    public int deleteProductProviderKafka(@Param("id") Long id) ;
 
     @Modifying(clearAutomatically = true)
     @Query(value = "TRUNCATE TABLE product_provider",  nativeQuery = true)

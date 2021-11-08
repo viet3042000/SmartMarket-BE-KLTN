@@ -31,19 +31,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 	@Query(value = "from User u where u.email =:email and u.oauthProvider IS NULL")
 	public Optional<User> findByEmailAndProvider(@Param("email") String email);
 
-
-	@Modifying(clearAutomatically = true)
-	// Đây là Native SQL --> dùng tên biến theo DB
-	@Query(value = "UPDATE users set user_password =:password, enabled =:enabled where user_name = :user_name",nativeQuery = true)
-	public int updateConsumerClientKafka(@Param("user_name") String username,@Param("password") String password,
-										 @Param("enabled") Long enabled) ;
-
 	@Modifying(clearAutomatically = true)
 	@Query(value = "DELETE FROM users where user_name =:user_name", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("user_name") String username) ;
-
-	@Modifying(clearAutomatically = true)
-	@Query(value = "TRUNCATE TABLE users",  nativeQuery = true)
-	public int truncateConsumerClientKafka() ;
+	public int deleteByUserName(@Param("user_name") String username) ;
 	
 }

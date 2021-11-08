@@ -99,9 +99,8 @@ public class OrderServiceImpl implements OrderService {
 
         //Create BIC
         CreateTravelInsuranceToBIC createTravelInsuranceToBIC = mapperUtils.mapCreateObjectToBIC(createTravelInsuranceBICRequest.getDetail());
-        String responseCreate = null;
         Gson gson = new Gson();
-        responseCreate = gson.toJson(createTravelInsuranceToBIC);
+        String responseCreate = gson.toJson(createTravelInsuranceToBIC);
         JSONObject transactionDetail = new JSONObject(responseCreate);
 
         //logRequest vs TravelInsuranceService
@@ -190,8 +189,7 @@ public class OrderServiceImpl implements OrderService {
         String messageTimestamp = logtimeStamp;
 
         UpdateTravelInsuranceToBIC updateTravelInsuranceToBIC = mapperUtils.mapUpdateObjectToBIC(updateTravelInsuranceBICRequest.getDetail());
-        String responseCreate = null;
-        responseCreate = gson.toJson(updateTravelInsuranceToBIC);
+        String responseCreate = gson.toJson(updateTravelInsuranceToBIC);
         JSONObject transactionDetail = new JSONObject(responseCreate);
 
         //logRequest vs TravelInsuranceService

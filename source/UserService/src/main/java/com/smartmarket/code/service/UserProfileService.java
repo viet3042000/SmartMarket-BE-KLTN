@@ -6,6 +6,7 @@ import com.smartmarket.code.request.CreateProviderUserRequest;
 import com.smartmarket.code.request.CreateUserRequest;
 import com.smartmarket.code.request.UpdateUserRequest;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserProfileService {
@@ -14,7 +15,7 @@ public interface UserProfileService {
 
     public UserProfile createProviderAdminUser(BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail) ;
 
-    public UserProfile update(UserProfile userProfile,BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail) ;
+    public UserProfile update(UserProfile userProfile, Map<String, Object> keyPairs) ;
 
 //    public UserProfile deleteByUserName(String userName) ;
 

@@ -10,7 +10,7 @@ public interface ProductProviderKafkaService {
 
     public ProductProvider updateProductProviderKafka(Map<String, Object> keyPairs) throws ParseException;
 
-    public int deleteProductProviderKafka(String productProviderName) ;
+    public int deleteProductProviderKafka(Long id) ;
 
     public int truncateProductProviderKafka() ;
 }

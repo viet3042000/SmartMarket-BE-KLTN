@@ -26,13 +26,4 @@ public interface RoleService {
     public ResponseEntity<?> getListRole(@Valid @RequestBody BaseDetail<QueryRoleRequest> getListRoleRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
-
-//    public Role create(Role object) ;
-
-    public Role update(BaseDetail<UpdateRoleRequest> updateRoleRequestBaseDetail) throws Exception;
-
-    public Role deleteByRoleName(BaseDetail<DeleteRoleRequest> deleteRoleRequestBaseDetail) throws Exception;
-
-    public Page<Role> getList(Pageable pageable);
-
 }

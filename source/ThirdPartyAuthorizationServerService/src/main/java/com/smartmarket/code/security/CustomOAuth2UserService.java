@@ -100,8 +100,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactoryCreateBIC);
 
             HttpEntity<BaseDetail> entity = new HttpEntity<BaseDetail>(createUserRequestBaseDetail);
-//            ResponseEntity<String> jsonResultCreateUser = restTemplate.exchange("http://localhost:8081/user/user-service/v1/register-user", HttpMethod.POST, entity, String.class);
-            ResponseEntity<String> jsonResultCreateUser = restTemplate.exchange("http://10.14.101.202:31441/dev/user/user-service/v1/register-user", HttpMethod.POST, entity, String.class);
+            ResponseEntity<String> jsonResultCreateUser = restTemplate.exchange("http://localhost:8081/user/user-service/v1/register-user", HttpMethod.POST, entity, String.class);
+//            ResponseEntity<String> jsonResultCreateUser = restTemplate.exchange("http://10.14.101.202:31441/dev/user/user-service/v1/register-user", HttpMethod.POST, entity, String.class);
 
             if (jsonResultCreateUser.getStatusCodeValue() == 200) {
 //                //send password to email

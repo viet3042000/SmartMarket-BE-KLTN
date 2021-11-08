@@ -2,13 +2,16 @@ package com.smartmarket.code.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.dao.ProductProviderRepository;
 import com.smartmarket.code.dao.ProductRepository;
 import com.smartmarket.code.dao.UserProductProviderRepository;
 import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.Product;
+import com.smartmarket.code.model.ProductProvider;
 import com.smartmarket.code.model.User;
 import com.smartmarket.code.model.UserProductProvider;
 import com.smartmarket.code.model.entitylog.ServiceObject;
@@ -18,6 +21,7 @@ import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductResponse;
 import com.smartmarket.code.service.ProductService;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.GetKeyPairUtil;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +39,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    ProductProviderRepository productProviderRepository;
 
     @Autowired
     UserRepository userRepository;
@@ -54,6 +64,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     UserProductProviderRepository userProductProviderRepository;
 
+    @Autowired
+    GetKeyPairUtil getKeyPairUtil;
+
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
@@ -64,7 +77,13 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
+        if(productProvider == null){
+            throw new CustomException("productProviderName doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        Long productProviderId = productProviderRepository.getId(productProviderName);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
@@ -75,15 +94,15 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException("productName existed", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
+
         Product newProduct = new Product();
         newProduct.setProductName(productName);
-        newProduct.setProductProvider(createProductRequestBaseDetail.getDetail().getProductProvider());
         newProduct.setType(createProductRequestBaseDetail.getDetail().getType());
         newProduct.setDesc(createProductRequestBaseDetail.getDetail().getDesc());
         newProduct.setPrice(createProductRequestBaseDetail.getDetail().getPrice());
         newProduct.setState("PendingApprove");
-
         newProduct.setCreatedLogtimestamp(new Date());
+        newProduct.setProductProvider(productProviderName);
         productRepository.save(newProduct);
 
         BaseResponse response = new BaseResponse();
@@ -111,15 +130,37 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        Long productProviderId = productProviderRepository.getId(productProviderName);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        product.setProductProvider(updateProductRequestBaseDetail.getDetail().getProductProvider());
-        product.setType(updateProductRequestBaseDetail.getDetail().getType());
-        product.setDesc(updateProductRequestBaseDetail.getDetail().getDesc());
-        product.setPrice(updateProductRequestBaseDetail.getDetail().getPrice());
+        //eliminate null value from request body
+        JSONObject detail = new JSONObject(updateProductRequestBaseDetail.getDetail());
+        Map<String, Object> keyPairs = new HashMap<>();
+        getKeyPairUtil.getKeyPair(detail, keyPairs);
+
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("newProductName")) {
+                //check newProductName existed
+                String newProductName =(String) keyPairs.get(k);
+                Product p = productRepository.findByProductName(newProductName).orElse(null);
+                if(p != null){
+                    throw new CustomException("newProductName existed", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                }
+                product.setProductName(newProductName);
+            }
+            if (k.equals("type")) {
+                product.setType((String) keyPairs.get(k));
+            }
+            if (k.equals("desc")) {
+                product.setDesc((String) keyPairs.get(k));
+            }
+            if (k.equals("price")) {
+                product.setPrice((String) keyPairs.get(k));
+            }
+        }
         productRepository.save(product);
 
         BaseResponse response = new BaseResponse();
@@ -147,7 +188,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        Long productProviderId = productProviderRepository.getId(productProviderName);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
@@ -184,7 +226,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderName).orElse(null);
+        Long productProviderId = productProviderRepository.getId(productProviderName);
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }

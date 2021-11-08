@@ -1,7 +1,5 @@
 package com.smartmarket.code.request;
 
-import com.smartmarket.code.model.Role;
-import com.smartmarket.code.request.entity.RoleUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +9,12 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class UpdateRoleRequest implements Serializable {
-    @NotNull(message = "role is required")
-    private RoleUpdate role;
+
+    @NotNull(message = "roleName is required")
+    private String roleName;
+
+    private Integer enabled;
+
+    private String desc;
 
 }

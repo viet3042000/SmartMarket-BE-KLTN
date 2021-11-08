@@ -13,12 +13,11 @@ import java.util.Date;
 @Setter
 public class ProductProvider implements Serializable {
 
-//    @Id
+    @Id
     @Column(name = "id")
     private Long id;
 
     //BIC(=productProvider(product) = username of provider)
-    @Id
     @Column(name = "product_provider_name")
     private String productProviderName;
 

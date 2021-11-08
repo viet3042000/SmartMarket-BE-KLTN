@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,16 +24,16 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfile create(BaseDetail<CreateUserRequest> createUserRequestBaseDetail) {
         UserProfile userProfileCreate = new UserProfile();
 
-        userProfileCreate.setFullName(createUserRequestBaseDetail.getDetail().getUser().getFullName());
-        userProfileCreate.setBirthDate(createUserRequestBaseDetail.getDetail().getUser().getBirthDate());
-        userProfileCreate.setIdentifyNumber(createUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
-        userProfileCreate.setGender(createUserRequestBaseDetail.getDetail().getUser().getGender());
-        userProfileCreate.setAddress(createUserRequestBaseDetail.getDetail().getUser().getAddress());
-        userProfileCreate.setPhoneNumber(createUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
-        userProfileCreate.setEmail(createUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userProfileCreate.setUserName(createUserRequestBaseDetail.getDetail().getUser().getUserName());
+        userProfileCreate.setFullName(createUserRequestBaseDetail.getDetail().getFullName());
+        userProfileCreate.setBirthDate(createUserRequestBaseDetail.getDetail().getBirthDate());
+        userProfileCreate.setIdentifyNumber(createUserRequestBaseDetail.getDetail().getIdentifyNumber());
+        userProfileCreate.setGender(createUserRequestBaseDetail.getDetail().getGender());
+        userProfileCreate.setAddress(createUserRequestBaseDetail.getDetail().getAddress());
+        userProfileCreate.setPhoneNumber(createUserRequestBaseDetail.getDetail().getPhoneNumber());
+        userProfileCreate.setEmail(createUserRequestBaseDetail.getDetail().getEmail());
+        userProfileCreate.setUserName(createUserRequestBaseDetail.getDetail().getUserName());
         userProfileCreate.setCreateDate(new Date());
-        userProfileCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userProfileCreate.setEnabled(createUserRequestBaseDetail.getDetail().getEnabled());
 
         return userProfileRepository.save(userProfileCreate);
     }
@@ -41,30 +42,48 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfile createProviderAdminUser(BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail) {
         UserProfile userProfileCreate = new UserProfile();
 
-        userProfileCreate.setFullName(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getFullName());
-        userProfileCreate.setBirthDate(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getBirthDate());
-        userProfileCreate.setIdentifyNumber(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
-        userProfileCreate.setGender(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getGender());
-        userProfileCreate.setAddress(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getAddress());
-        userProfileCreate.setPhoneNumber(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
-        userProfileCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userProfileCreate.setUserName(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName());
+        userProfileCreate.setFullName(createProviderAdminUserRequestBaseDetail.getDetail().getFullName());
+        userProfileCreate.setBirthDate(createProviderAdminUserRequestBaseDetail.getDetail().getBirthDate());
+        userProfileCreate.setIdentifyNumber(createProviderAdminUserRequestBaseDetail.getDetail().getIdentifyNumber());
+        userProfileCreate.setGender(createProviderAdminUserRequestBaseDetail.getDetail().getGender());
+        userProfileCreate.setAddress(createProviderAdminUserRequestBaseDetail.getDetail().getAddress());
+        userProfileCreate.setPhoneNumber(createProviderAdminUserRequestBaseDetail.getDetail().getPhoneNumber());
+        userProfileCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getEmail());
+        userProfileCreate.setUserName(createProviderAdminUserRequestBaseDetail.getDetail().getUserName());
         userProfileCreate.setCreateDate(new Date());
-        userProfileCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userProfileCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getEnabled());
 
         return userProfileRepository.save(userProfileCreate);
     }
 
     @Override
-    public UserProfile update(UserProfile userProfile,BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail) {
-        userProfile.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
-        userProfile.setEmail(updateUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userProfile.setPhoneNumber(updateUserRequestBaseDetail.getDetail().getUser().getPhoneNumber());
-        userProfile.setAddress(updateUserRequestBaseDetail.getDetail().getUser().getAddress());
-        userProfile.setGender(updateUserRequestBaseDetail.getDetail().getUser().getGender());
-        userProfile.setBirthDate(updateUserRequestBaseDetail.getDetail().getUser().getBirthDate());
-        userProfile.setFullName(updateUserRequestBaseDetail.getDetail().getUser().getFullName());
-        userProfile.setIdentifyNumber(updateUserRequestBaseDetail.getDetail().getUser().getIdentifyNumber());
+    public UserProfile update(UserProfile userProfile, Map<String, Object> keyPairs) {
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("email")) {
+                userProfile.setEmail((String) keyPairs.get(k));
+            }
+            if (k.equals("enabled")) {
+                userProfile.setEnabled(((Number)keyPairs.get(k)).intValue());
+            }
+            if (k.equals("phoneNumber")) {
+                userProfile.setPhoneNumber((String) keyPairs.get(k));
+            }
+            if (k.equals("address")) {
+                userProfile.setAddress((String) keyPairs.get(k));
+            }
+            if (k.equals("gender")) {
+                userProfile.setGender(((Number)keyPairs.get(k)).intValue());
+            }
+            if (k.equals("identifyNumber")) {
+                userProfile.setIdentifyNumber((String) keyPairs.get(k));
+            }
+            if (k.equals("birthDate")) {
+                userProfile.setBirthDate((String) keyPairs.get(k));
+            }
+            if (k.equals("fullName")) {
+                userProfile.setFullName((String) keyPairs.get(k));
+            }
+        }
         userProfileRepository.save(userProfile);
         return userProfile;
     }

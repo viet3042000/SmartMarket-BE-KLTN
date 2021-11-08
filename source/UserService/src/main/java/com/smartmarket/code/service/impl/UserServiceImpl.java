@@ -13,6 +13,7 @@ import com.smartmarket.code.response.UserCreateResponse;
 //import com.smartmarket.code.service.KeycloakAdminClientService;
 import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.GetKeyPairUtil;
 import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -86,45 +87,58 @@ public class UserServiceImpl implements UserService {
     @Autowired
     ProductProviderRepository productProviderRepository;
 
+    @Autowired
+    GetKeyPairUtil getKeyPairUtil;
+
+    @Autowired
+    RoleRepository roleRepository;
+
 //    @Autowired
 //    KeycloakAdminClientService keycloakAdminClientService;
 
 
     //admin
     public ResponseEntity<?> createProviderAdminUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
+        String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getProductProviderName();
         ProductProvider productProvider = productProviderRepository.findByProductTypeName(productProviderName).orElse(null);
         if(productProvider == null){
             throw new CustomException("productProvider doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        UserProductProvider userProductProvider = userProductProviderRepository.findByProductProviderName(productProviderName).orElse(null);
-        if(userProductProvider!=null){
+        Long productProviderId = productProviderRepository.getId(productProviderName);
+        List<UserProductProvider> userProductProviders = userProductProviderRepository.findByProductProviderId(productProviderId);
+        if(!userProductProviders.isEmpty()){
             throw new CustomException("Admin of this productProvider existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName();
+        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUserName();
         Optional<User> userExist = userRepository.findByUsername(username);
         if (userExist.isPresent()) {
             throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
 //            check email
-        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
         if(user != null) {
             throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
+        //check role
+        Role role = roleRepository.findByRoleName(createProviderAdminUserRequestBaseDetail.getDetail().getRole()).orElse(null);
+        if(role==null){
+            throw new CustomException("Role doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
         User userCreate = new User();
         userCreate.setUserName(username);
-        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPassword()));
-        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getPassword()));
+        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getEmail());
+        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getEnabled());
         userRepository.save(userCreate);
 
         userProfileService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
         userRoleService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
-        userProductProviderService.create(username,productProviderName);
+        userProductProviderService.create(username,productProviderId);
 
 //            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
 
@@ -152,35 +166,41 @@ public class UserServiceImpl implements UserService {
             claims = JwtUtils.getClaimsMap(authentication);
         }
         String userNameProviderAdmin = (String) claims.get("user_name");
-        String productProviderName = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getProductProviderName();
 
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userNameProviderAdmin, productProviderName).orElse(null);
+        Long productProviderId = productProviderRepository.getId(createProviderAdminUserRequestBaseDetail.getDetail().getProductProviderName());
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userNameProviderAdmin, productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
-        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUser().getUserName();
+        String username = createProviderAdminUserRequestBaseDetail.getDetail().getUserName();
         Optional<User> userExist = userRepository.findByUsername(username);
         if (userExist.isPresent()) {
             throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
 //            check email
-        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        User user = userRepository.findByEmailAndProvider(createProviderAdminUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
         if(user != null) {
             throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
+        //check role
+        Role role = roleRepository.findByRoleName(createProviderAdminUserRequestBaseDetail.getDetail().getRole()).orElse(null);
+        if(role==null){
+            throw new CustomException("Role doesn't exist", HttpStatus.BAD_REQUEST, createProviderAdminUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
         User userCreate = new User();
         userCreate.setUserName(username);
-        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getPassword()));
-        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createProviderAdminUserRequestBaseDetail.getDetail().getPassword()));
+        userCreate.setEmail(createProviderAdminUserRequestBaseDetail.getDetail().getEmail());
+        userCreate.setEnabled(createProviderAdminUserRequestBaseDetail.getDetail().getEnabled());
         userRepository.save(userCreate);
 
         userProfileService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
         userRoleService.createProviderAdminUser(createProviderAdminUserRequestBaseDetail);
-        userProductProviderService.create(username,productProviderName);
+        userProductProviderService.create(username,productProviderId);
 
 //            keycloakAdminClientService.addUser(userCreate, createUserRequestBaseDetail.getDetail().getUser().getPassword());
 
@@ -198,24 +218,30 @@ public class UserServiceImpl implements UserService {
 
     public ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
 
-        String username = createUserRequestBaseDetail.getDetail().getUser().getUserName();
+        String username = createUserRequestBaseDetail.getDetail().getUserName();
         Optional<User> userExist = userRepository.findByUsername(username);
         if (userExist.isPresent()) {
             throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
 //            check email
-        User user = userRepository.findByEmailAndProvider(createUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        User user = userRepository.findByEmailAndProvider(createUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
         if(user != null) {
             throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
+        //check role
+        Role role = roleRepository.findByRoleName(createUserRequestBaseDetail.getDetail().getRole()).orElse(null);
+        if(role==null){
+            throw new CustomException("Role doesn't exist", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+
         User userCreate = new User();
         userCreate.setUserName(username);
-        userCreate.setPassword(bCryptPasswordEncoder.encode(createUserRequestBaseDetail.getDetail().getUser().getPassword()));
-        userCreate.setOauthProvider(createUserRequestBaseDetail.getDetail().getUser().getProvider());
-        userCreate.setEmail(createUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userCreate.setEnabled(createUserRequestBaseDetail.getDetail().getUser().getEnabled());
+        userCreate.setPassword(bCryptPasswordEncoder.encode(createUserRequestBaseDetail.getDetail().getPassword()));
+        userCreate.setOauthProvider(createUserRequestBaseDetail.getDetail().getProvider());
+        userCreate.setEmail(createUserRequestBaseDetail.getDetail().getEmail());
+        userCreate.setEnabled(createUserRequestBaseDetail.getDetail().getEnabled());
         userRepository.save(userCreate);
 
         userProfileService.create(createUserRequestBaseDetail);
@@ -237,35 +263,55 @@ public class UserServiceImpl implements UserService {
 
     public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
 
-        String userName = updateUserRequestBaseDetail.getDetail().getUser().getUserName();
+        String userName = updateUserRequestBaseDetail.getDetail().getUserName();
         User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
         if(userUpdate == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
 //            check email
-        User userFoundByEmail = userRepository.findByEmailAndProvider(updateUserRequestBaseDetail.getDetail().getUser().getEmail()).orElse(null);
+        User userFoundByEmail = userRepository.findByEmailAndProvider(updateUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
         if(userFoundByEmail != null) {
             if(!userName.equals(userFoundByEmail.getUserName())) {
                 throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
             }
         }
 
-        userUpdate.setEmail(updateUserRequestBaseDetail.getDetail().getUser().getEmail());
-        userUpdate.setEnabled(updateUserRequestBaseDetail.getDetail().getUser().getEnabled());
-        userRepository.save(userUpdate);
-
         UserProfile userProfileUpdate = userProfileRepository.findByUsername(userName).orElse(null);
         if (userProfileUpdate == null) {
             throw new CustomException("userProfile does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
-        userProfileService.update(userProfileUpdate,updateUserRequestBaseDetail);
 
         UserRole userRoleUpdate = userRoleRepository.findByUserName(userName).orElse(null);
         if (userRoleUpdate == null) {
             throw new CustomException("UserRole does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
-        userRoleService.update(userRoleUpdate,updateUserRequestBaseDetail);
+
+        //eliminate null value from request body
+        JSONObject detail = new JSONObject(updateUserRequestBaseDetail.getDetail());
+        Map<String, Object> keyPairs = new HashMap<>();
+        getKeyPairUtil.getKeyPair(detail, keyPairs);
+
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("newRole")) {
+                //check role existed
+                Role role= roleRepository.findByRoleName((String) keyPairs.get(k)).orElse(null);
+                if(role ==null){
+                    throw new CustomException("newRole doesn't exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                }
+                userRoleUpdate.setRoleName((String) keyPairs.get(k));
+            }
+            if (k.equals("email")) {
+                userUpdate.setEmail((String) keyPairs.get(k));
+            }
+            if (k.equals("enabled")) {
+                userUpdate.setEnabled(((Number)keyPairs.get(k)).intValue());
+            }
+        }
+        userRepository.save(userUpdate);
+
+        userProfileService.update(userProfileUpdate,keyPairs);
+        userRoleService.update(userRoleUpdate,keyPairs,updateUserRequestBaseDetail.getRequestId());
 
         //set response data to client
         BaseResponse response = new BaseResponse();
