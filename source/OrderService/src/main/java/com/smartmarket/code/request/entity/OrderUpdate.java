@@ -15,18 +15,14 @@ import java.util.UUID;
 @Setter
 public class OrderUpdate {
 
-    //order id in orderService
-    @NotBlank(message = "orderEntityId is require")
-    @Size(max = 50, message = "orderEntityId should be less than or equal to 50 characters")
-    private String orderEntityId;
+    //order id of product
+    @NotBlank(message = "private orderId; is require")
+    @Size(max = 50, message = "orderId should be less than or equal to 50 characters")
+    private String orderId;
 
-    //map order id in order service
-//    @NotBlank(message = "orderReference is require")
-//    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
-//    private String orderReference;
-
-    //order id in travelinsuranceservice
-//    private String orderId;
+    @NotBlank(message = "orderReference is require")
+    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
+    private String orderReference;
 
     @NotBlank(message = "ordBillFirstName is require")
     @Size(max = 255, message = "ordBillFirstName should be less than or equal to 255 characters")

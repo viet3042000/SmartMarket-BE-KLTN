@@ -1,7 +1,7 @@
 package com.smartmarket.code.constants;
 
 public class OutboxType {
-    public static final String CREATE_TRAVEL_INSURANCE_BIC = "createTravelInsuranceBIC";
-    public static final String UPDATE_TRAVEL_INSURANCE_BIC = "updateTravelInsuranceBIC";
-    public static final String GET_TRAVEL_INSURANCE_BIC = "getTravelInsuranceBIC";
+    public static final String CREATE_ORDER = "createOrder";
+    public static final String CANCEL_ORDER = "cancelOrder";
+    public static final String ABORT_ORDER = "abortOrder";
 }

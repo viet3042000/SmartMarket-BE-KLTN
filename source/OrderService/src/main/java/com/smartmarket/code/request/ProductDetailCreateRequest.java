@@ -7,17 +7,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-
 @Getter
 @Setter
-public class CreateTravelInsuranceBICRequest implements Serializable {
-
+public class ProductDetailCreateRequest implements Serializable{
     @NotNull(message = "orders is required")
     private @Valid Orders orders;
 
@@ -26,5 +22,4 @@ public class CreateTravelInsuranceBICRequest implements Serializable {
 
     @NotNull(message = "trvDetails is required")
     private @Valid ArrayList<TRVDetail> trvDetails;
-
 }

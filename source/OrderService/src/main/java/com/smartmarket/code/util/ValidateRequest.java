@@ -1,15 +1,11 @@
 package com.smartmarket.code.util;
 
-import com.smartmarket.code.exception.InvalidInputException;
 import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
-import org.springframework.util.StringUtils;
+import com.smartmarket.code.request.CreateOrderRequest;
 
 public class ValidateRequest {
 
-    public static void checkValidCreate(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
+    public static void checkValidCreate(BaseDetail<CreateOrderRequest> updateTravelInsuranceBICRequest){
         //validate
 //        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
 //            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());

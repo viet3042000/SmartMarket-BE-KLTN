@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface ListenerService {
 
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException;

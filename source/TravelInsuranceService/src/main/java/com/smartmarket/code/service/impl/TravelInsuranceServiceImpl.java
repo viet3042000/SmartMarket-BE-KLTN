@@ -69,6 +69,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
     @Autowired
     BICTransactionExceptionService bicTransactionExceptionService;
 
+
     @Override
     public ResponseEntity<?> createTravelBIC(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
 
@@ -92,7 +93,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
 
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
 
         //check validate json request
         ValidateRequest.checkValidCreate(createTravelInsuranceBICRequest);
@@ -537,17 +537,11 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         //Read timeout
         clientHttpRequestFactoryCreateBIC.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.createTravelBIC")));
 
-
         BaseResponse response = new BaseResponse();
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
-
         String typeTransaction = Constant.TYPE_CREATE;
-
-//        String requestURL = request.getRequestURL().toString();
-//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
         try {
             //check validate json request
             ValidateRequest.checkValidCreate(createTravelInsuranceBICRequest);
@@ -579,8 +573,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             EJson jsonObjectReponseCreate = null;
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
-//            int status = responseSelvet.getStatus();
-//            String responseStatus = Integer.toString(status);
 
             if (jsonResultCreateBIC != null && jsonResultCreateBIC.getBody() != null) {
                 jsonObjectReponseCreate = new EJson(jsonResultCreateBIC.getBody());
@@ -735,12 +727,7 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         CreateTravelInsuranceBICResponse createTravelInsuranceBICResponse = new CreateTravelInsuranceBICResponse();
         BaseResponse response = new BaseResponse();
         ObjectMapper mapper = new ObjectMapper();
-
-//        String requestURL = request.getRequestURL().toString();
-//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
         String typeTransaction = Constant.TYPE_UPDATE;
-
         try {
             //check validate json request
             ValidateRequest.checkValidUpdate(updateTravelInsuranceBICRequest);
@@ -780,9 +767,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             String timeDurationBIC = DateTimeUtils.getElapsedTimeStr(startTime);
 
             //set response data to client
-//            int status = responseSelvet.getStatus();
-//            String responseStatus = Integer.toString(status);
-
             if (jsonResultPutBIC != null && jsonResultPutBIC.getBody() != null) {
                 EJson jsonObjectReponseUpdate = new EJson(jsonResultPutBIC.getBody());
                 JSONObject responseBodyFromBIC = new JSONObject(jsonResultPutBIC.getBody());
@@ -933,13 +917,9 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
         ObjectMapper mapper = new ObjectMapper();
         BaseResponse response = new BaseResponse();
 
-//        String requestURL = request.getRequestURL().toString();
-//        String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
-
-        //check validate json request
-
         try {
 
+            //check validate json request
             ValidateRequest.checkValidInquire(queryTravelInsuranceBICRequest);
             //delcare used value
             CreateTravelInsuranceBICRequest createTravelInsuranceBICResponse = null;
@@ -952,7 +932,6 @@ public class TravelInsuranceServiceImpl implements TravelInsuranceService {
             //properties log
             String orderID = queryTravelInsuranceBICRequest.getDetail().getOrderId();
             String orderReference = queryTravelInsuranceBICRequest.getDetail().getOrderReference();
-//            String responseStatus = Integer.toString(responseSelvet.getStatus());
             org.json.JSONObject transactionDetail = new org.json.JSONObject();
             transactionDetail.put("orderId", orderID);
             transactionDetail.put("orderRef", orderReference);

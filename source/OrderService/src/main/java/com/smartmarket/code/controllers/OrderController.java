@@ -36,38 +36,38 @@ public class OrderController {
 
     //user
     @PostMapping(value = "/create-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> createOrder(@Valid @RequestBody BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
+    public ResponseEntity<?> createOrder(@Valid @RequestBody BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("CUSTOMER")) {
-                    return orderService.createOrder(createTravelInsuranceBICRequestBaseDetail, request, responseSelvet);
+                    return orderService.createOrder(createOrderRequest, request, responseSelvet);
                 }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createTravelInsuranceBICRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
             }else {
-                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, createTravelInsuranceBICRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, createOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
              if (ex instanceof ResourceAccessException) {
                 ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                 if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(createOrderRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 } else {
-                    throw new APIAccessException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(createOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 }
             }
 
             //catch truong hop goi dc sang BIC nhưng loi
             else if (ex instanceof HttpClientErrorException) {
                 HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(createTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                throw new APIResponseException(createOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
             }
 
             //catch invalid input exception
             else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), createTravelInsuranceBICRequestBaseDetail.getRequestId());
+                throw new InvalidInputException(ex.getMessage(), createOrderRequest.getRequestId());
             }
 
             //catch truong hop loi kết nối database
@@ -75,7 +75,7 @@ public class OrderController {
                 throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } else if (ex instanceof CustomException) {
                 CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createTravelInsuranceBICRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), createOrderRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
             } else {
                 throw ex;
             }
@@ -83,39 +83,39 @@ public class OrderController {
     }
 
     //user
-    @PostMapping(value = "/update-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> updateOrder(@Valid @RequestBody BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
+    @PostMapping(value = "/cancel-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> cancelOrder(@Valid @RequestBody BaseDetail<CancelOrderRequest> cancelOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("CUSTOMER")) {
-                    return orderService.updateOrder(updateTravelInsuranceBICRequestBaseDetail, request, responseSelvet);
+                    return orderService.cancelOrder(cancelOrderRequest, request, responseSelvet);
                 }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateTravelInsuranceBICRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
             }else {
-                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, updateTravelInsuranceBICRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
             if (ex instanceof ResourceAccessException) {
                 ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                 if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(updateTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(cancelOrderRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 } else {
-                    throw new APIAccessException(updateTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(cancelOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 }
             }
 
             //catch truong hop goi dc sang BIC nhưng loi
             else if (ex instanceof HttpClientErrorException) {
                 HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(updateTravelInsuranceBICRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                throw new APIResponseException(cancelOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
             }
 
             //catch invalid input exception
             else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), updateTravelInsuranceBICRequestBaseDetail.getRequestId());
+                throw new InvalidInputException(ex.getMessage(), cancelOrderRequest.getRequestId());
             }
 
             //catch truong hop loi kết nối database
@@ -123,7 +123,7 @@ public class OrderController {
                 throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } else if (ex instanceof CustomException) {
                 CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), updateTravelInsuranceBICRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), cancelOrderRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
             } else {
                 throw ex;
             }
@@ -132,38 +132,38 @@ public class OrderController {
 
     //user + admin
     @PostMapping(value = "/get-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getOrder(@Valid @RequestBody BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
+    public ResponseEntity<?> getOrder(@Valid @RequestBody BaseDetail<QueryOrderRequest> queryOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("CUSTOMER")||roles.contains("ADMIN")) {
-                    return orderService.getOrder(queryTravelInsuranceBICRequest, request, responseSelvet);
+                    return orderService.getOrder(queryOrderRequest, request, responseSelvet);
                 }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryTravelInsuranceBICRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }
             }else {
-                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryTravelInsuranceBICRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
         }catch (Exception ex) {
             //catch truong hop chua goi dc sang BIC
             if (ex instanceof ResourceAccessException) {
                 ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
                 if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(queryOrderRequest.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 } else {
-                    throw new APIAccessException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+                    throw new APIAccessException(queryOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
                 }
             }
 
             //catch truong hop goi dc sang BIC nhưng loi
             else if (ex instanceof HttpClientErrorException) {
                 HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(queryTravelInsuranceBICRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+                throw new APIResponseException(queryOrderRequest.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
             }
 
             //catch invalid input exception
             else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), queryTravelInsuranceBICRequest.getRequestId());
+                throw new InvalidInputException(ex.getMessage(), queryOrderRequest.getRequestId());
             }
 
             //catch truong hop loi kết nối database
@@ -171,7 +171,7 @@ public class OrderController {
                 throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             } else if (ex instanceof CustomException) {
                 CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryTravelInsuranceBICRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryOrderRequest.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
             } else {
                 throw ex;
             }

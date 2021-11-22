@@ -13,6 +13,9 @@ import java.util.Optional;
 @Transactional
 @Repository
 public interface TravelInsuranceRepository extends JpaRepository<TravelInsurance, String> {
-    @Query(value = "SELECT * FROM travel_insurance WHERE id=:id", nativeQuery = true)
+    @Query(value = "SELECT * FROM travel_insurance WHERE id=:id and state ='Succeeded'", nativeQuery = true)
     public Optional<TravelInsurance> findById(@Param("id") String id);
+
+//    @Query(value = "SELECT * FROM travel_insurance WHERE id=:id", nativeQuery = true)
+//    public Optional<TravelInsurance> findById(@Param("id") String id);
 }

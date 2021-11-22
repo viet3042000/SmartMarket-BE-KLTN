@@ -18,6 +18,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -80,14 +81,11 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
-        //=order ref
-        String aggregateId = "";
+        String aggregateId = "";//=order ref
         String aggregateType = "";
         String type = "";
         String payload = "";
 
-        String requestId ="";
-        String status = "";
         try {
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println(record.offset());
@@ -123,12 +121,9 @@ public class ListenerServiceImp implements ListenerService {
 
                             if ("Order".equals(aggregateType)) {
                                 //order id, status = payload.get
-                                JSONObject j = new JSONObject(payload);
-                                requestId = j.getString("requestId");
-                                status = j.getString("status");
-
+                                JSONObject jsonPayload = new JSONObject(payload);
                                 if (op.equals("c")) {
-                                    travelInsuranceOutboxService.processMessageFromTravelOutbox(j,requestId,status,aggregateId,type);
+                                    travelInsuranceOutboxService.processMessageFromTravelOutbox(jsonPayload,aggregateId,type);
                                 }
                             }
 
@@ -178,7 +173,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -271,7 +266,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -364,7 +359,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
+//    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -457,7 +452,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.product}",topics = "${kafka.topic.product}")
+//    @KafkaListener(id = "${kafka.groupID.product}",topics = "${kafka.topic.product}")
     public void listenProduct(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -549,7 +544,7 @@ public class ListenerServiceImp implements ListenerService {
         }
     }
 
-    @KafkaListener(id = "${kafka.groupID.product_provider}",topics = "${kafka.topic.product_provider}")
+//    @KafkaListener(id = "${kafka.groupID.product_provider}",topics = "${kafka.topic.product_provider}")
     public void listenProductProvider(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {

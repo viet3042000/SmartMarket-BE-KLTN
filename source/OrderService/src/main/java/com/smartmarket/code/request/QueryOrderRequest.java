@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class QueryTravelInsuranceBICRequest implements Serializable {
+public class QueryOrderRequest implements Serializable {
 
     //order id in orderService
     @NotBlank(message = "orderReference is require")

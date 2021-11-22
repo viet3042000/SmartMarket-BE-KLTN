@@ -21,7 +21,6 @@ public class OrderUpdate {
 
     @NotBlank(message = "ordBillFirstName is require")
     @Size(max = 255, message = "ordBillFirstName should be less than or equal to 255 characters")
-//    @JsonDeserialize(using = StringOnlyDeserializer.class)
     private String ordBillFirstName;
 
     @NotBlank(message = "ordBillMobile is require")
@@ -41,6 +40,5 @@ public class OrderUpdate {
     @Range(min= 1, max= 2)
     @NotNull(message = "ordStatus is require")
     private Long ordStatus;
-
 
 }

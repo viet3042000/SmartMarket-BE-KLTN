@@ -348,6 +348,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         }else {
             claims = JwtUtils.getClaimsMap(authentication);
         }
+//        ArrayList<String> roles = (ArrayList<String>) claims.get("authorities");
         ArrayList<String> roles = (ArrayList<String>) claims.get("roles");
 
         return roles;

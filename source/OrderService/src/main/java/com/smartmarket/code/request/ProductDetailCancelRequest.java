@@ -1,17 +1,19 @@
 package com.smartmarket.code.request;
 
-import com.smartmarket.code.request.entity.*;
+import com.smartmarket.code.request.entity.OrderUpdate;
+import com.smartmarket.code.request.entity.TRVDetailUpdate;
+import com.smartmarket.code.request.entity.TRVUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 @Getter
 @Setter
-public class UpdateTravelInsuranceBICRequest implements Serializable {
+public class ProductDetailCancelRequest {
+
     @NotNull(message = "orders is required")
     private @Valid OrderUpdate orders;
 
@@ -20,4 +22,5 @@ public class UpdateTravelInsuranceBICRequest implements Serializable {
 
     @NotNull(message = "trvDetails is required")
     private @Valid ArrayList<TRVDetailUpdate> trvDetails;
+
 }

@@ -14,10 +14,9 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class Orders implements Serializable {
-
-//    @NotBlank(message = "orderReference is require")
-//    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
-//    private String orderReference ;
+    //set after create succeeded (for aborting can get from requestpayload)
+    @Size(max = 50, message = "orderReference should be less than or equal to 50 characters")
+    private String orderReference ;
 
     private String orderId ;
 
@@ -47,7 +46,6 @@ public class Orders implements Serializable {
     @NotBlank(message = "ordDate is require")
     @ValidDate(message = "ordDate is invalid date format (yyyy-MM-dd'T'HH:ss:mm)")
     private String ordDate;
-
 
     @Range(min= 1, max= 2)
     @NotNull(message = "ordStatus is require")

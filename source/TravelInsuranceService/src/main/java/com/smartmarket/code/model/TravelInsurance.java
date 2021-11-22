@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 public class TravelInsurance implements Serializable {
 
-    //=order_id(order_ref)
+    //=order_ref
     @Id
     @Column(name = "id")
     private String id;

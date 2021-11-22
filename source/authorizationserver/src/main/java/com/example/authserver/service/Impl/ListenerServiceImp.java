@@ -61,7 +61,6 @@ public class ListenerServiceImp implements ListenerService {
 //    String topicConsumers;
 
 
-//        @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
 //    @KafkaListener(id = "group_id_author_server_users",topics = "userservice.public.users")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";

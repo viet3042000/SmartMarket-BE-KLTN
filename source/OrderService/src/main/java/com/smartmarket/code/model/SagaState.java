@@ -18,21 +18,18 @@ public class SagaState {
     @Column(name = "id")
     private String id;
 
-//    @Column(name = "order_id")
-//    private UUID orderId;
-
     @Column(name = "current_step")
     private String currentStep;
 
-    //STARTED, SUCCEEDED, ABORTING, or ABORTED
+    //STARTED, SUCCEEDED, ABORTING, ABORTED, ERROR (status of the individual steps)
     @Column(name = "step_state")
     private String stepState;
 
-    //STARTED, SUCCEEDED, ABORTING, or ABORTED
+    //STARTED, SUCCEEDED, ABORTING, ABORTED, ERROR (The current status of the Saga)
     @Column(name = "status")
     private String status;
 
-    //order-placement/createTravelInsuranceBIC/...
+    //createOrder/cancelOrder
     @Column(name = "type")
     private String type;
 
@@ -48,6 +45,10 @@ public class SagaState {
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishedLogtimestamp;
 
+    //@Version = UPDATE MYENTITY SET ..., VERSION = VERSION + 1 WHERE ((ID = ?) AND (VERSION = ?))
+    //If the WHERE clause fails to match a record
+    //(because the same entity has already been updated by another thread),
+    // then the persistence provider will throw an OptimisticLockException
     @Version
     @Column(name = "version")
     private int version;

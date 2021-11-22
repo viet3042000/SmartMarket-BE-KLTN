@@ -33,5 +33,4 @@ public class TRVDetail implements Serializable {
     @Size(max =63, message = "passportCard should be less than or equal to 63 characters")
     private String passportCard;
 
-
 }

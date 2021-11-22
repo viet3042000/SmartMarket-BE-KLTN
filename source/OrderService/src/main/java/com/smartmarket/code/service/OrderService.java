@@ -12,18 +12,18 @@ import java.text.ParseException;
 public interface OrderService {
     //user
     //1 order = 1 type product
-    public ResponseEntity<?> createOrder(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet)
+    public ResponseEntity<?> createOrder(BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
     //user
-    //update order đã được BIC tạo thành công
-    public ResponseEntity<?> updateOrder(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest,
-                                             HttpServletRequest request,
-                                             HttpServletResponse responseSelvet)
+    //hủy order đã được BIC tạo thành công
+    public ResponseEntity<?> cancelOrder(BaseDetail<CancelOrderRequest> cancelOrderRequest,
+                                         HttpServletRequest request,
+                                         HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
     //user + admin
-    public ResponseEntity<?> getOrder(BaseDetail<QueryTravelInsuranceBICRequest> queryTravelInsuranceBICRequest,
+    public ResponseEntity<?> getOrder(BaseDetail<QueryOrderRequest> queryOrderRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;

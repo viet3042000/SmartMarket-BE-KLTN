@@ -14,17 +14,25 @@ import java.util.Date;
 public class OrderProduct implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_product_seq")
+    @SequenceGenerator(sequenceName = "order_product_sequence", allocationSize = 1, name = "order_product_seq")
+    @Column(name = "id")
+    private Long id;
+
     @Column(name = "order_id")
     private String orderId;
 
-    //request body
+    //orderReference
     @Column(name = "product_id")
     private String productId;
 
     @Column(name = "product_name")
     private String productName;
 
-    //Succeeded/Aborted
+    @Column(name = "index")
+    private Integer index;
+
+    //Succeeded/Canceling/Canceled/Aborted/Aborting/Error
     @Column(name = "state")
     private String state;
 

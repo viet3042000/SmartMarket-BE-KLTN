@@ -93,14 +93,14 @@ public class ListenerServiceImp implements ListenerService {
     @KafkaListener(id = "${kafka.groupID.orderoutbox}",topics = "${kafka.topic.orderoutbox}")
     public void listenOrderServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
+
         //order_id
         String aggregateId = "";
-        String aggregateType = "";
+//        String aggregateType = "";
         String type = "";
         String payload = "";
 
-        String requestId = "";
-        String orderReference ="";
+//        String orderReference ="";
 
         try {
             for (ConsumerRecord<String, String> record : records) {
@@ -124,9 +124,9 @@ public class ListenerServiceImp implements ListenerService {
                                 if (k.equals("aggregateid")) {
                                     aggregateId =(String) keyPairs.get(k);
                                 }
-                                if (k.equals("aggregatetype")) {
-                                    aggregateType =(String) keyPairs.get(k);
-                                }
+//                                if (k.equals("aggregatetype")) {
+//                                    aggregateType =(String) keyPairs.get(k);
+//                                }
                                 if (k.equals("type")) {
                                     type = (String) keyPairs.get(k);
                                 }
@@ -135,10 +135,8 @@ public class ListenerServiceImp implements ListenerService {
                                 }
                             }
                             JSONObject jsonPayload = new JSONObject(payload);
-                            requestId = jsonPayload.getString("requestId");
-
-                            orderOutboxService.processMessageFromOrderOutbox(op,aggregateId,type,orderReference,
-                                                                             requestId,jsonPayload);
+                            orderOutboxService.processMessageFromOrderOutbox(op,aggregateId,type,
+                                                                     jsonPayload);
 
                         } else {
                             System.out.println("afterObj is null");
@@ -180,22 +178,6 @@ public class ListenerServiceImp implements ListenerService {
                     "outbox", op , dateTimeFormatter.format(currentTime),
                     ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
             logService.createListenerLogExceptionException(listenerExceptionObject);
-
-//            insert into travelinsurance_outbox table
-            Outbox outBox = new Outbox();
-            outBox.setAggregateId(aggregateId);
-            outBox.setAggregateType(AggregateType.Order);
-            outBox.setType(type);
-
-            //payload = responsebody + status+ request_id + orderRef
-            JSONObject jsonBody = new JSONObject();
-            if(type.equals("createTravelInsuranceBIC")){
-                jsonBody.put("OrderReference",orderReference);
-            }
-            jsonBody.put("requestId",requestId);
-            jsonBody.put("status","failure");
-            outBox.setPayload(jsonBody.toString());
-            outboxRepository.save(outBox);
         }
         finally {
 //          In the case of an error, we want to make sure that we commit before we leave.
@@ -442,7 +424,7 @@ public class ListenerServiceImp implements ListenerService {
 //    }
 
 
-    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -538,7 +520,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -634,7 +616,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
+//    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {

@@ -3,16 +3,8 @@ package com.smartmarket.code.util;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.*;
-import com.smartmarket.code.request.BaseDetail;
-import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
-import com.smartmarket.code.request.QueryTravelInsuranceBICRequest;
-import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
-import com.smartmarket.code.response.BaseResponseGetAll;
-import com.smartmarket.code.response.CreateTravelInsuranceBICResponse;
-import com.smartmarket.code.response.DataCreateBIC;
 import com.smartmarket.code.response.ResponseError;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 

@@ -19,9 +19,6 @@ public class Orders implements Serializable {
 //    @Column(name = "id")
 //    private Long id;
 
-//    @Column(name = "order_id")
-//    private UUID orderId;
-
     @Id
     @Column(name = "order_id")
     private String orderId;
@@ -30,13 +27,7 @@ public class Orders implements Serializable {
     @Column(name = "payload")
     private String payload;
 
-    @Column(name = "payload_update")
-    private String payloadUpdate;
-
-    @Column(name = "type")
-    private String type;
-
-    //Pending/Succeeded/Aborted
+    //Pending/Succeeded/Aborted/Paid
     @Column(name = "state")
     private String state;
 
@@ -50,5 +41,11 @@ public class Orders implements Serializable {
 
     @Column(name = "user_name")
     private String userName;
+
+    //number_of_items
+    @Column(name = "quantity_items")
+    private Integer quantityItems;
+
+    //price
 
 }
