@@ -71,11 +71,6 @@ public class ProductServiceImpl implements ProductService {
     //Admin(kltn)+ Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         String userName = createProductRequestBaseDetail.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
         ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
@@ -83,6 +78,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Long productProviderId = productProviderRepository.getId(productProviderName);
+        //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -118,11 +114,6 @@ public class ProductServiceImpl implements ProductService {
     //Admin(kltn)+ Provider
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String userName = updateProductRequestBaseDetail.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -131,6 +122,7 @@ public class ProductServiceImpl implements ProductService {
 
         String productProviderName = product.getProductProvider();
         Long productProviderId = productProviderRepository.getId(productProviderName);
+        //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -176,11 +168,6 @@ public class ProductServiceImpl implements ProductService {
     //Admin(kltn)+ Provider
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String userName =deleteProductRequestBaseDetail.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = deleteProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -189,6 +176,7 @@ public class ProductServiceImpl implements ProductService {
 
         String productProviderName = product.getProductProvider();
         Long productProviderId = productProviderRepository.getId(productProviderName);
+        //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -214,11 +202,6 @@ public class ProductServiceImpl implements ProductService {
         ObjectMapper mapper = new ObjectMapper();
 
         String userName =queryProductRequestBaseDetail.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
-
         String productName = queryProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -227,6 +210,7 @@ public class ProductServiceImpl implements ProductService {
 
         String productProviderName = product.getProductProvider();
         Long productProviderId = productProviderRepository.getId(productProviderName);
+        //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -274,11 +258,8 @@ public class ProductServiceImpl implements ProductService {
                                                       HttpServletRequest request,
                                                       HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
         String userName = queryAllProductOfProviderRequestBaseDetail.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName does not exist in productService", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
 
+        //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
         if(userProductProvider == null){
             throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
@@ -430,7 +411,6 @@ public class ProductServiceImpl implements ProductService {
 
     //Admin
     public ResponseEntity<?> approvePendingProduct(@Valid @RequestBody BaseDetail<ApprovePendingProductRequest> approvePendingProductRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
-
         String productName = approvePendingProductRequest.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -458,7 +438,6 @@ public class ProductServiceImpl implements ProductService {
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
-
     }
 
 

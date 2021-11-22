@@ -268,20 +268,19 @@ public class ListenerServiceImp implements ListenerService {
                                 Date date = new Date();
                                 String finishedAt = formatter.format(date);
 
-                                Optional<JobHistory> jobHistory =jobHistoryRepository.findByIntervalId(intervalId);
-                                if(jobHistory.isPresent()) {
+                                JobHistory jobHistory =jobHistoryRepository.findByIntervalId(intervalId).orElse(null);
+                                if(jobHistory != null) {
                                     //insert to outbox
                                     if (status.equals("success")) {
-                                        JobHistory j = jobHistory.get();
-                                        j.setFinishedAt(finishedAt);
+                                        jobHistory.setFinishedAt(finishedAt);
 
-                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
-                                        j.setCurrentStep(currentStep);
+                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
+                                        jobHistory.setCurrentStep(currentStep);
 
-                                        if (step == j.getAmountStep() && !j.getState().equals("error")) {
-                                            j.setState("succeeded");
+                                        if (step == jobHistory.getAmountStep() && !jobHistory.getState().equals("error")) {
+                                            jobHistory.setState("succeeded");
                                         }
-                                        jobHistoryRepository.save(j);
+                                        jobHistoryRepository.save(jobHistory);
 
                                         IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
                                         if (intervalHistory != null) {
@@ -290,18 +289,17 @@ public class ListenerServiceImp implements ListenerService {
                                             intervalHistoryRepository.save(intervalHistory);
                                         }
                                     }else {
-                                        JobHistory j = jobHistory.get();
-                                        j.setFinishedAt(finishedAt);
+                                        jobHistory.setFinishedAt(finishedAt);
 
-                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(j.getAmountStep());
-                                        j.setCurrentStep(currentStep);
+                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
+                                        jobHistory.setCurrentStep(currentStep);
 
-                                        if (step < j.getAmountStep()) {
-                                            j.setState("error");
+                                        if (step < jobHistory.getAmountStep()) {
+                                            jobHistory.setState("error");
                                         } else {
-                                            j.setState("failed");
+                                            jobHistory.setState("failed");
                                         }
-                                        jobHistoryRepository.save(j);
+                                        jobHistoryRepository.save(jobHistory);
 
                                         IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
                                         if (intervalHistory != null) {

@@ -10,14 +10,15 @@ import java.util.Date;
 @Table(name = "job_history")
 @Getter
 @Setter
+// save state + information of a list of pendingBIC implemented in jobservice
 public class JobHistory {
-
-    @Column(name = "name")
-    private String name;
 
     @Id
     @Column(name = "interval_id")
     private String intervalId;
+
+    @Column(name = "name")
+    private String name;
 
     //running/succeeded/error/failed
     @Column(name = "state")

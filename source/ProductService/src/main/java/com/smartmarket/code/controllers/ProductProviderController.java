@@ -37,7 +37,7 @@ public class ProductProviderController {
     ProductProviderService productProviderService;
 
 
-    //Admin(kltn) (sau khi phe duyet thi tao)
+    //Admin(kltn)
     @PostMapping(value = "/create-product-provider", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProductProvider(@Valid @RequestBody BaseDetail<CreateProductProviderRequest> createProductTypeRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{

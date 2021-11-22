@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    //provider_admin
+    //provider_admin (create role provider1 -5 , 1 provider i = 1 user)
     public ResponseEntity<?> createProviderUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //get user token
         Map<String, Object> claims = null;

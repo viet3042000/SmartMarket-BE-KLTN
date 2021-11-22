@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "interval_history")
 @Getter
 @Setter
+// save state + information of each pendingBIC implemented in jobservice
 public class IntervalHistory {
 
     @Id
@@ -28,13 +28,13 @@ public class IntervalHistory {
     @Column(name = "step_detail")
     private String stepDetail;
 
+    //running/succeeded/failed
+    @Column(name = "state")
+    private String state;
+
     @Column(name = "created_at")
     private String createAt;
 
     @Column(name = "finished_at")
     private String finishedAt;
-
-    //running/succeeded/failed
-    @Column(name = "state")
-    private String state;
 }
