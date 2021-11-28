@@ -4,7 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -47,5 +50,7 @@ public class Orders implements Serializable {
     private Integer quantityItems;
 
     //price
+    @Column(name = "order_price")
+    private String orderPrice;
 
 }

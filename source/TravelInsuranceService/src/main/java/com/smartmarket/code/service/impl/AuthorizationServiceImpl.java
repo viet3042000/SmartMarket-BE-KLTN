@@ -4,6 +4,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartmarket.code.constants.HostConstants;
+import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.*;
@@ -41,7 +42,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     AccesUserService accesUserService;
 
     @Autowired
-    UserService userService;
+    UserRepository userRepository ;
 
     @Autowired
     UrlService urlService;
@@ -84,7 +85,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
         try {
             //find user by name
             User userToken =
-                    userService.findByUsername(userName).orElseThrow(() -> new CustomException("Vui lòng kiểm tra lại Token",HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST));
+                    userRepository.findByUsername(userName).orElseThrow(() -> new CustomException("Vui lòng kiểm tra lại Token",HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST));
 
             //get url request
             AntPathMatcher matcher = new AntPathMatcher();

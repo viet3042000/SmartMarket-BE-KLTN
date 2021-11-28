@@ -20,6 +20,7 @@ public class CustomTokenEnhancer implements TokenEnhancer {
 		roles.add("CUSTOMER");
 		roles.add("ADMIN");
 		roles.add("PROVIDER");
+//		roles.add("PROVIDER2");
 		roles.add("PROVIDER_ADMIN");
 
 		Map<String, Object> info = Map.of("iss", "http://smartmarket.com","roles", roles);

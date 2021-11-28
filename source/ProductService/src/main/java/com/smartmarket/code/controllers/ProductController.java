@@ -7,6 +7,7 @@ import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.ProductService;
+import org.apache.kafka.common.protocol.types.Field;
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ import javax.validation.Valid;
 import java.net.ConnectException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @RestController
@@ -353,12 +356,19 @@ public class ProductController {
                                             HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
+            ArrayList<String> listRoles = new ArrayList<>(Arrays.asList("PROVIDER","PROVIDER1", "PROVIDER2", "PROVIDER3", "PROVIDER4","PROVIDER5"));
             if(roles != null) {
-                if (roles.contains("ADMIN")) {
-                    return productService.approvePendingProduct(approvePendingProductRequest, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                for(int i =0; i<listRoles.size();i++) {
+                    String role = listRoles.get(i);
+                    if (!roles.contains(role)) {
+                        if(i == listRoles.size()-1) {
+                            throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                        }
+                    }else{
+                        break;
+                    }
                 }
+                return productService.approvePendingProduct(approvePendingProductRequest, request, responseSelvet);
             }else {
                 throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
@@ -394,7 +404,6 @@ public class ProductController {
                 throw ex;
             }
         }
-
     }
 
 

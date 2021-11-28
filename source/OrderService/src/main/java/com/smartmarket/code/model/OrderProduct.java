@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -39,4 +40,8 @@ public class OrderProduct implements Serializable {
     @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishedLogtimestamp;
+
+    //price
+    @Column(name = "item_price")
+    private String itemPrice;
 }

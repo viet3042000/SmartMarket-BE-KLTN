@@ -14,7 +14,6 @@ import com.smartmarket.code.model.SagaState;
 import com.smartmarket.code.request.entity.ItemDetailCancelRequest;
 import com.smartmarket.code.request.entity.ItemDetailCreateRequest;
 import com.smartmarket.code.service.TravelInsuranceOutboxService;
-import com.smartmarket.code.util.JwtUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,9 +71,9 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                     String currentStep = "Index-"+Integer.toString(createItemIndex)+"-"+AggregateType.TRAVEL_INSURANCE;
                     sagaState.setCurrentStep(currentStep);
 
+                    ItemDetailCreateRequest itemDetailCreateSuccess = items.get(createItemIndex);
                     //insert to outbox
                     if (status.equals("success")) {
-                        ItemDetailCreateRequest itemDetailCreateSuccess = items.get(createItemIndex);
                         itemDetailCreateSuccess.getProductDetailCreateRequest().getOrders().setOrderReference(orderReference);
                         items.set(createItemIndex,itemDetailCreateSuccess);
 
@@ -97,6 +96,7 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                         orderProduct.setOrderId(aggregateId);
                         orderProduct.setIndex(createItemIndex);
                         orderProduct.setState(OrderProductState.SUCCEEDED);
+                        orderProduct.setItemPrice(itemDetailCreateSuccess.getItemPrice().toString());
                         orderProduct.setProductId(orderReference);
                         orderProduct.setProductName(productName);
                         orderProduct.setFinishedLogtimestamp(finishedAt);
@@ -133,6 +133,7 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                         orderProduct.setOrderId(aggregateId);
                         orderProduct.setIndex(createItemIndex);
                         orderProduct.setState(OrderProductState.ABORTED);
+                        orderProduct.setItemPrice(itemDetailCreateSuccess.getItemPrice().toString());
                         orderProduct.setProductId(orderReference);
                         orderProduct.setProductName(productName);
                         orderProduct.setFinishedLogtimestamp(finishedAt);

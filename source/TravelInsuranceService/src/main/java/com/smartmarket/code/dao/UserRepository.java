@@ -29,10 +29,10 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "DELETE FROM users where user_name =:user_name", nativeQuery = true)
-	public int deleteConsumerClientKafka(@Param("user_name") String username) ;
+	public int deleteUserKafka(@Param("user_name") String username) ;
 
 	@Modifying(clearAutomatically = true)
 	@Query(value = "TRUNCATE TABLE users",  nativeQuery = true)
-	public int truncateConsumerClientKafka() ;
+	public int truncateUserKafka() ;
 	
 }

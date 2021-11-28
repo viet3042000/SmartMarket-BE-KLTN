@@ -60,7 +60,7 @@ public class ListenerServiceImp implements ListenerService {
     IntervalHistoryRepository intervalHistoryRepository;
 
 
-    @KafkaListener(id = "${kafka.groupID.travelinsurance.pendingBictransaction}",topics = "${kafka.topic.travelinsurance.pendingBictransaction}")
+//    @KafkaListener(id = "${kafka.groupID.travelinsurance.pendingBictransaction}",topics = "${kafka.topic.travelinsurance.pendingBictransaction}")
     public void listenPendingBicTransaction(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
 
@@ -70,7 +70,6 @@ public class ListenerServiceImp implements ListenerService {
         String requestId = "";
         Long count =0L;
 
-        Gson g = new Gson();
         try {
             for (ConsumerRecord<String, String> record : records) {
                 System.out.println(record.offset());
@@ -200,7 +199,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
+//    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenTravelServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
 //        UUID orderId = UUID.randomUUID();

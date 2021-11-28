@@ -3,7 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.google.common.base.Throwables;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
-import com.smartmarket.code.service.DataBaseProductProviderService;
+import com.smartmarket.code.service.ProductProviderService;
 import com.smartmarket.code.service.ListenerService;
 import com.smartmarket.code.util.GetKeyPairUtil;
 import org.apache.kafka.clients.consumer.*;
@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ public class ListenerServiceImp implements ListenerService {
     LogServiceImpl logService;
 
     @Autowired
-    DataBaseProductProviderService dataBaseProductProviderService;
+    ProductProviderService productProviderService;
 
     @Value("${kafka.topic.product_provider}")
     String topicProductProvider;
@@ -72,10 +71,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseProductProviderService.createDatabaseProductProvider(keyPairs);
+                                productProviderService.createProductProvider(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseProductProviderService.updateDatabaseProductProvider(keyPairs);
+                                productProviderService.updateProductProvider(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -88,14 +87,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseProductProviderService.deleteDatabaseProductProvider(keyPairs);
+                                productProviderService.deleteProductProvider(keyPairs);
                             }
                        } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseProductProviderService.truncateDatabaseProductProvider();
+                            productProviderService.truncateProductProvider();
 
                             // delete user + user_productprovider + userrole + userprofile (sau)
                         }

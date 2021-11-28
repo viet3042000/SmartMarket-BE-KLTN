@@ -1,12 +1,10 @@
 package com.smartmarket.code.service.impl;
 
 import com.google.common.base.Throwables;
-import com.smartmarket.code.constants.AggregateType;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.PendingBICTransactionRepository;
-import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.entitylog.ListenerExceptionObject;
 import com.smartmarket.code.service.*;
 import com.smartmarket.code.util.GetKeyPairUtil;
@@ -41,13 +39,13 @@ public class ListenerServiceImp implements ListenerService {
     OrderOutboxService orderOutboxService;
 
     @Autowired
-    DataBaseUserService dataBaseUserService;
+    UserService userService;
 
     @Autowired
-    DataBaseUserRoleService dataBaseUserRoleService;
+    UserRoleService userRoleService;
 
     @Autowired
-    DataBaseRoleService dataBaseRoleService;
+    RoleService roleService;
 
     @Autowired
     BICTransactionRepository bicTransactionRepository;
@@ -446,10 +444,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserService.createDatabaseUser(keyPairs);
+                                userService.createUser(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserService.updateDatabaseUser(keyPairs);
+                                userService.updateUser(keyPairs);
                             }
 //                            if (op.equals("r")) {
 //                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
@@ -465,14 +463,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserService.deleteDatabaseUser(keyPairs);
+                                userService.deleteUser(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserService.truncateDatabaseUser();
+                            userService.truncateUser();
                         }
 
                     } else {
@@ -542,10 +540,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserRoleService.createDatabaseUserRole(keyPairs);
+                                userRoleService.createUserRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserRoleService.updateDatabaseUserRole(keyPairs);
+                                userRoleService.updateUserRole(keyPairs);
                             }
 //                            if (op.equals("r")) {
 //                                dataBaseUserServiceImp.readAndUpdateDatabaseUser(keyPairs,countReadUser);
@@ -561,14 +559,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserRoleService.deleteDatabaseUserRole(keyPairs);
+                                userRoleService.deleteUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserRoleService.truncateDatabaseUserRole();
+                            userRoleService.truncateUserRole();
                         }
 
                     } else {
@@ -638,10 +636,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseRoleService.createDatabaseRole(keyPairs);
+                                roleService.createRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseRoleService.updateDatabaseRole(keyPairs);
+                                roleService.updateRole(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -654,14 +652,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseRoleService.deleteDatabaseRole(keyPairs);
+                                roleService.deleteRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseRoleService.truncateDatabaseRole();
+                            roleService.truncateRole();
                         }
 
                     } else {

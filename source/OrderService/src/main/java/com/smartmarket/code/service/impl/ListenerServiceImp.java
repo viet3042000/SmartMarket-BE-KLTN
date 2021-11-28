@@ -18,11 +18,9 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-
 import java.util.Map;
 
 
@@ -39,19 +37,19 @@ public class ListenerServiceImp implements ListenerService {
     LogServiceImpl logService;
 
     @Autowired
-    DataBaseUserService dataBaseUserService;
+    UserService userService;
 
     @Autowired
-    DataBaseUserRoleService dataBaseUserRoleService;
+    UserRoleService userRoleService;
 
     @Autowired
-    DataBaseRoleService dataBaseRoleService;
+    RoleService roleService;
 
     @Autowired
-    DataBaseProductService dataBaseProductService;
+    ProductService productService;
 
     @Autowired
-    DataBaseProductProviderService dataBaseProductProviderService;
+    ProductProviderService productProviderService;
 
     @Value("${kafka.topic.travelinsuranceoutbox}")
     String topicTravelInsuranceOutbox;
@@ -195,10 +193,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserService.createDatabaseUser(keyPairs);
+                                userService.createUser(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserService.updateDatabaseUser(keyPairs);
+                                userService.updateUser(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -211,14 +209,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserService.deleteDatabaseUser(keyPairs);
+                                userService.deleteUser(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserService.truncateDatabaseUser();
+                            userService.truncateUser();
                         }
 
                     } else {
@@ -288,10 +286,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserRoleService.createDatabaseUserRole(keyPairs);
+                                userRoleService.createUserRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserRoleService.updateDatabaseUserRole(keyPairs);
+                                userRoleService.updateUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -304,14 +302,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserRoleService.deleteDatabaseUserRole(keyPairs);
+                                userRoleService.deleteUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserRoleService.truncateDatabaseUserRole();
+                            userRoleService.truncateUserRole();
                         }
 
                     } else {
@@ -381,10 +379,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseRoleService.createDatabaseRole(keyPairs);
+                                roleService.createRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseRoleService.updateDatabaseRole(keyPairs);
+                                roleService.updateRole(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -397,14 +395,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseRoleService.deleteDatabaseRole(keyPairs);
+                                roleService.deleteRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseRoleService.truncateDatabaseRole();
+                            roleService.truncateRole();
                         }
 
                     } else {
@@ -474,10 +472,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseProductService.createDatabaseProduct(keyPairs);
+                                productService.createProduct(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseProductService.updateDatabaseProduct(keyPairs);
+                                productService.updateProduct(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -490,14 +488,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseProductService.deleteDatabaseProduct(keyPairs);
+                                productService.deleteProduct(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseProductService.truncateDatabaseProduct();
+                            productService.truncateProduct();
                         }
 
                     } else {
@@ -566,10 +564,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseProductProviderService.createDatabaseProductProvider(keyPairs);
+                                productProviderService.createProductProvider(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseProductProviderService.updateDatabaseProductProvider(keyPairs);
+                                productProviderService.updateProductProvider(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -582,14 +580,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseProductProviderService.deleteDatabaseProductProvider(keyPairs);
+                                productProviderService.deleteProductProvider(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseProductProviderService.truncateDatabaseProductProvider();
+                            productProviderService.truncateProductProvider();
                         }
 
                     } else {

@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 @Getter
@@ -16,7 +17,7 @@ public class CreateOrderRequest implements Serializable {
 
     @NotNull(message = "orderPrice is require")
     @Min(value = 0)
-    private Integer orderPrice;
+    private BigDecimal orderPrice;
 
     @NotNull(message = "orderItems is required")
     private @Valid ArrayList<ItemDetailCreateRequest> orderItems;

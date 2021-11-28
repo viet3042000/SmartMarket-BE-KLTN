@@ -6,15 +6,15 @@ import org.springframework.util.StringUtils;
 
 public class ValidateRequest {
 
-    public static void checkValidCreate(BaseDetail<CreateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest){
+    public static void checkValidCreate(BaseDetail<CreateTravelInsuranceBICRequest> createTravelInsuranceBICRequestBaseDetail){
         //validate
-//        if (updateTravelInsuranceBICRequest.getDetail() != null && updateTravelInsuranceBICRequest.getDetail().getOrders() == null) {
-//            throw new InvalidInputException("order is require", updateTravelInsuranceBICRequest.getRequestId());
+//        if (createTravelInsuranceBICRequestBaseDetail.getDetail() != null && createTravelInsuranceBICRequestBaseDetail.getDetail().getOrders() == null) {
+//            throw new InvalidInputException("order is require", createTravelInsuranceBICRequestBaseDetail.getRequestId());
 //        }
-//        if (updateTravelInsuranceBICRequest.getDetail() != null &&
-//                updateTravelInsuranceBICRequest.getDetail().getOrders() != null) {
-//            if (updateTravelInsuranceBICRequest.getDetail().getOrders().getOrderReference() == null) {
-//                throw new InvalidInputException("orderReference is require", updateTravelInsuranceBICRequest.getRequestId());
+//        if (createTravelInsuranceBICRequestBaseDetail.getDetail() != null &&
+//                createTravelInsuranceBICRequestBaseDetail.getDetail().getOrders() != null) {
+//            if (createTravelInsuranceBICRequestBaseDetail.getDetail().getOrders().getOrderReference() == null) {
+//                throw new InvalidInputException("orderReference is require", createTravelInsuranceBICRequestBaseDetail.getRequestId());
 //            }
 //        }
     }

@@ -19,8 +19,14 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query(value = "Select * FROM product where product_name =:product_name", nativeQuery = true)
     public Optional<Product> findByProductName(@Param("product_name") String productName) ;
 
+    @Query(value = "Select * FROM product where id =:id", nativeQuery = true)
+    public Optional<Product> findByProductId(@Param("id") Long id) ;
+
     @Query(value = "Select * FROM product where product_provider =:product_provider", nativeQuery = true)
     public List<Product> findByProductProvider(@Param("product_provider") String productProvider) ;
+
+    @Query(value = "DELETE FROM product where product_provider =:product_provider", nativeQuery = true)
+    public int deleteByProductProvider(@Param("product_provider") String productProvider) ;
 
     @Query(value = "SELECT * FROM product WHERE product_provider=:user_name order by created_logtimestamp DESC",nativeQuery = true)
     public Page<Product> findByUserName(@Param("user_name") String userName, Pageable pageable);

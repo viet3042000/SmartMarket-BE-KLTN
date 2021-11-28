@@ -1,11 +1,9 @@
 package com.smartmarket.code.request;
 
-import com.smartmarket.code.request.entity.UserUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 

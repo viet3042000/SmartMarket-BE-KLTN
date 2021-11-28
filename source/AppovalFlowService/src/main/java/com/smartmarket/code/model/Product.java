@@ -1,0 +1,49 @@
+package com.smartmarket.code.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+@Entity
+@Table(name = "product")
+@Getter
+@Setter
+public class Product implements Serializable {
+
+    @Id
+    @Column(name = "id")
+    private Long id;
+
+    //BICTRV
+    @Column(name = "product_name")
+    private String productName;
+
+    //bao hiem du lich
+    @Column(name = "type")
+    private String type;
+
+    //BIC (=username of provider)
+    @Column(name = "product_provider")
+    private String productProvider;
+
+    @Column(name = "description")
+    private String desc;
+
+    //ct tinh
+    @Column(name = "price")
+    private String price;
+
+    @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdLogtimestamp;
+
+    @Column(name = "state")
+    private String state;
+
+//    @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date finishedLogtimestamp;
+}

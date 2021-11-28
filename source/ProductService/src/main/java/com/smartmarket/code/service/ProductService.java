@@ -45,7 +45,7 @@ public interface ProductService {
                                      HttpServletResponse responseSelvet)
                                      throws JsonProcessingException, APIAccessException;
 
-    //Admin
+    //Provider-i
     ResponseEntity<?> approvePendingProduct(@Valid @RequestBody BaseDetail<ApprovePendingProductRequest> approvePendingProductRequest,
                                             HttpServletRequest request, HttpServletResponse responseSelvet)
                                             throws JsonProcessingException, APIAccessException;

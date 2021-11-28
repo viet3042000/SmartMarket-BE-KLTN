@@ -1,10 +1,12 @@
 package com.smartmarket.code.service;
 
-import com.smartmarket.code.model.User;
-import java.util.Optional;
+import java.text.ParseException;
+import java.util.Map;
 
 public interface UserService {
-    Optional<User> findByUsername(String username);
+    public void createUser(Map<String, Object> keyPairs) throws ParseException;
+    public void updateUser(Map<String, Object> keyPairs) throws ParseException;
+    public void deleteUser(Map<String, Object> keyPairs);
+    public void truncateUser();
 
-    Long findUserIdByUsername(String username);
 }

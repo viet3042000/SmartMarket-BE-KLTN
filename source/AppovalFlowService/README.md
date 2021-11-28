@@ -1,0 +1,2 @@
+# smartmarket_resourceserver
+demo

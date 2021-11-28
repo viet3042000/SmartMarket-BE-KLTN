@@ -94,6 +94,10 @@ public class ProductProviderServiceImpl implements ProductProviderService {
         for (String k : keyPairs.keySet()) {
             if (k.equals("newProductProviderName")) {
                 String newProductProviderName = (String) keyPairs.get(k);
+                if(newProductProviderName.equals(productProviderName)){
+                    throw new CustomException("newProductProviderName is equal with oldProductProviderName", HttpStatus.BAD_REQUEST, updateProductTypeRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                }
+
                 //check newProductProviderName existed
                 ProductProvider p = productProviderRepository.findByProductProviderName(newProductProviderName).orElse(null);
                 if(p!=null){
@@ -137,12 +141,7 @@ public class ProductProviderServiceImpl implements ProductProviderService {
         productProviderRepository.delete(productProvider);
 
         //delete product
-        List<Product> listProducts = productRepository.findByProductProvider(productProviderName);
-        if(!listProducts.isEmpty()) {
-            for (Product product : listProducts) {
-                productRepository.delete(product);
-            }
-        }
+        productRepository.deleteByProductProvider(productProviderName);
 
         BaseResponse response = new BaseResponse();
         response.setDetail(productProvider);

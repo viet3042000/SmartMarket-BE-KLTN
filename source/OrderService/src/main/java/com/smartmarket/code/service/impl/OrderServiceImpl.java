@@ -106,13 +106,16 @@ public class OrderServiceImpl implements OrderService {
         for(ItemDetailCreateRequest itemDetailCreateRequest : orderItems) {
             //find product by productName and set AggregateType = productType
             String productName = itemDetailCreateRequest.getProductName();
-            Product p = productRepository.findByProductName(productName).orElse(null);
-            if (p == null) {
+            Product product = productRepository.findByProductName(productName).orElse(null);
+            if (product == null) {
                 throw new CustomException("Product doesn't exist in orderService", HttpStatus.BAD_REQUEST, createOrderRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
             }
-            itemDetailCreateRequest.setProductProvider(p.getProductProvider());
-            itemDetailCreateRequest.setProductType(p.getType());
-            listProducts.add(p);//to get product without find again in DB
+            if(!"Completed".equals(product.getState())){
+                throw new CustomException("Uncompleted product", HttpStatus.BAD_REQUEST, createOrderRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            }
+            itemDetailCreateRequest.setProductProvider(product.getProductProvider());
+            itemDetailCreateRequest.setProductType(product.getType());
+            listProducts.add(product);//to get product without find again in DB
         }
         createOrderRequest.getDetail().setOrderItems(orderItems);
 
@@ -126,6 +129,7 @@ public class OrderServiceImpl implements OrderService {
         Date createAt = formatter.parse(stringCreateAt);
         orders.setCreatedLogtimestamp(createAt);
         orders.setQuantityItems(orderItems.size());
+        orders.setOrderPrice(createOrderRequest.getDetail().getOrderPrice().toString());
         orderRepository.save(orders);
 
         SagaState sagaState = new SagaState();
@@ -217,16 +221,17 @@ public class OrderServiceImpl implements OrderService {
         for(int i =0 ; i < orderProductList.size(); i++) {
             ItemDetailCancelRequest itemDetailCancelRequest = new ItemDetailCancelRequest();
             OrderProduct orderProduct = orderProductList.get(i);
-            Product p = productRepository.findByProductName(orderProduct.getProductName()).orElse(null);
-            if(p == null){
+            //in case product deleted after order had created
+            Product product = productRepository.findByProductName(orderProduct.getProductName()).orElse(null);
+            if(product == null){
                 throw new CustomException("Product doesn't exist", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
             orderProduct.setState("Canceling");
 
             itemDetailCancelRequest.setProductName(orderProduct.getProductName());
             itemDetailCancelRequest.setOrderReference(orderProduct.getProductId());
-            itemDetailCancelRequest.setProductProvider(p.getProductProvider());
-            itemDetailCancelRequest.setProductType(p.getType());
+            itemDetailCancelRequest.setProductProvider(product.getProductProvider());
+            itemDetailCancelRequest.setProductType(product.getType());
 
             orderItems.add(itemDetailCancelRequest);
         }

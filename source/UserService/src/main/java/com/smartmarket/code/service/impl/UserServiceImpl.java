@@ -351,6 +351,8 @@ public class UserServiceImpl implements UserService {
         }
         userRoleRepository.delete(userRoleDelete);
 
+        userProductProviderRepository.deleteByUserName(userName);
+
 //            keycloakAdminClientService.deleteUser(userDelete.getUserName());
 
         //set response data to client
