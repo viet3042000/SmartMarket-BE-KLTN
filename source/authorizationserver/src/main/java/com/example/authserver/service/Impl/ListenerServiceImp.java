@@ -2,9 +2,9 @@ package com.example.authserver.service.Impl;
 
 import com.example.authserver.constants.ResponseCode;
 import com.example.authserver.exception.ListenerExceptionObject;
-import com.example.authserver.service.DataBaseRoleService;
-import com.example.authserver.service.DataBaseUserRoleService;
-import com.example.authserver.service.DataBaseUserService;
+import com.example.authserver.service.RoleService;
+import com.example.authserver.service.UserRoleService;
+import com.example.authserver.service.UserService;
 import com.example.authserver.service.ListenerService;
 import com.example.authserver.utils.GetKeyPairUtil;
 import com.google.common.base.Throwables;
@@ -36,32 +36,29 @@ public class ListenerServiceImp implements ListenerService {
     LogServiceImpl logService;
 
     @Autowired
-    DataBaseUserService dataBaseUserService;
+    UserService userService;
 
     @Autowired
-    DataBaseUserRoleService dataBaseUserRoleService;
+    UserRoleService userRoleService;
 
     @Autowired
-    DataBaseRoleService dataBaseRoleService;
+    RoleService roleService;
 
 //    @Value("${kafka.topic.users}")
-//    String topicUsers ;
+//    String topicUsers;
     String topicUsers ="userservice.public.users";
 
 //    @Value("${kafka.topic.user_role}")
+//    String topicUserRole;
     String topicUserRole ="userservice.public.user_role";
 
 //    @Value("${kafka.topic.roles}")
+//    String topicRole;
     String topicRole = "userservice.public.roles";
 
-//    @Value("${kafka.topic.clients}")
-//    String topicClients;
-//
-//    @Value("${kafka.topic.consumers}")
-//    String topicConsumers;
 
-
-//    @KafkaListener(id = "group_id_author_server_users",topics = "userservice.public.users")
+//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+    @KafkaListener(id = "group_id_author_server_users",topics = "userservice.public.users")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
@@ -83,10 +80,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserService.createDatabaseUser(keyPairs);
+                                userService.createUser(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserService.updateDatabaseUser(keyPairs);
+                                userService.updateUser(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -99,14 +96,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserService.deleteDatabaseUser(keyPairs);
+                                userService.deleteUser(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserService.truncateDatabaseUser();
+                            userService.truncateUser();
                         }
 
                     } else {
@@ -153,8 +150,8 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-    //    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
-//    @KafkaListener(id = "group_id_author_server_user_role",topics = "userservice.public.user_role")
+//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+    @KafkaListener(id = "group_id_author_server_user_role",topics = "userservice.public.user_role")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
@@ -176,10 +173,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseUserRoleService.createDatabaseUserRole(keyPairs);
+                                userRoleService.createUserRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseUserRoleService.updateDatabaseUserRole(keyPairs);
+                                userRoleService.updateUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -192,14 +189,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseUserRoleService.deleteDatabaseUserRole(keyPairs);
+                                userRoleService.deleteUserRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseUserRoleService.truncateDatabaseUserRole();
+                            userRoleService.truncateUserRole();
                         }
 
                     } else {
@@ -246,8 +243,8 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-//    @KafkaListener(id = "${kafka.groupID.roles}", topics = "${kafka.topic.roles}")
-//    @KafkaListener(id = "group_id_author_server_roles", topics = "userservice.public.roles")
+//    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
+    @KafkaListener(id = "group_id_author_server_roles", topics = "userservice.public.roles")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
@@ -269,10 +266,10 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             if (op.equals("c")) {
-                                dataBaseRoleService.createDatabaseRole(keyPairs);
+                                roleService.createRole(keyPairs);
                             }
                             if (op.equals("u")) {
-                                dataBaseRoleService.updateDatabaseRole(keyPairs);
+                                roleService.updateRole(keyPairs);
                             }
                         } else {
                             System.out.println("afterObj is null");
@@ -285,14 +282,14 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(beforeObj, keyPairs);
 
                             if (op.equals("d")) {
-                                dataBaseRoleService.deleteDatabaseRole(keyPairs);
+                                roleService.deleteRole(keyPairs);
                             }
                         } else {
                             System.out.println("beforeObj is null");
                         }
 
                         if (op.equals("t")) {
-                            dataBaseRoleService.truncateDatabaseRole();
+                            roleService.truncateRole();
                         }
 
                     } else {

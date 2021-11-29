@@ -2,18 +2,20 @@ package com.example.authserver.service.Impl;
 
 import com.example.authserver.entities.User;
 import com.example.authserver.repository.UserRepository;
-import com.example.authserver.service.UserKafkaService;
+import com.example.authserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.Map;
 
 @Service
-public class UserKafkaServiceImp implements UserKafkaService {
+public class UserServiceImp implements UserService {
+
     @Autowired
     private UserRepository userRepository;
 
-    public User createUserKafka(Map<String, Object> keyPairs) {
+    public void createUser(Map<String, Object> keyPairs) throws ParseException {
         User user = new User();
 
         for (String k : keyPairs.keySet()) {
@@ -36,10 +38,10 @@ public class UserKafkaServiceImp implements UserKafkaService {
                 user.setOauthProvider((String) keyPairs.get(k));
             }
         }
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
-    public User updateUserKafka(Map<String, Object> keyPairs) {
+    public void updateUser(Map<String, Object> keyPairs) throws ParseException{
         User user = new User();
 
         for (String k : keyPairs.keySet()) {
@@ -62,15 +64,21 @@ public class UserKafkaServiceImp implements UserKafkaService {
                 user.setOauthProvider((String) keyPairs.get(k));
             }
         }
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
-    public int deleteUserKafka(String username) {
-        return userRepository.deleteUserKafka(username);
+    public void deleteUser(Map<String, Object> keyPairs){
+        String username = "";
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("user_name")) {
+                username = (String) keyPairs.get(k);
+            }
+        }
+        userRepository.deleteUserKafka(username);
     }
 
-    public int truncateUserKafka() {
-        return userRepository.truncateUserKafka();
+    public void truncateUser(){
+        userRepository.truncateUserKafka();
     }
 
 }

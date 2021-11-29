@@ -2,7 +2,7 @@ package com.example.authserver.service.Impl;
 
 import com.example.authserver.entities.Role;
 import com.example.authserver.repository.RoleRepository;
-import com.example.authserver.service.RoleKafkaService;
+import com.example.authserver.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +11,13 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @Service
-public class RoleKafkaServiceImp implements RoleKafkaService {
+public class RoleServiceImp implements RoleService {
+
     @Autowired
     private RoleRepository roleRepository;
 
-    public Role createRoleKafka(Map<String, Object> keyPairs) throws ParseException {
+
+    public void createRole(Map<String, Object> keyPairs) throws ParseException {
         Role role = new Role();
 
         //convert string --> date with formart tương ứng
@@ -39,10 +41,10 @@ public class RoleKafkaServiceImp implements RoleKafkaService {
                 role.setCreatedLogtimestamp(formatter.parse(createAt));
             }
         }
-        return roleRepository.save(role);
+        roleRepository.save(role);
     }
 
-    public Role updateRoleKafka(Map<String, Object> keyPairs) throws ParseException{
+    public void updateRole(Map<String, Object> keyPairs) throws ParseException{
         Role role = new Role();
 
         //convert string --> date with formart tương ứng
@@ -66,15 +68,21 @@ public class RoleKafkaServiceImp implements RoleKafkaService {
                 role.setCreatedLogtimestamp(formatter.parse(createAt));
             }
         }
-        return roleRepository.save(role);
+        roleRepository.save(role);
     }
 
+    public void deleteRole(Map<String, Object> keyPairs){
+        String roleName = "";
 
-    public int deleteRoleKafka(String roleName) {
-        return roleRepository.deleteRoleKafka(roleName);
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("role_name")) {
+                roleName = (String) keyPairs.get(k);
+            }
+        }
+        roleRepository.deleteRoleKafka(roleName);
     }
 
-    public int truncateRoleKafka() {
-        return roleRepository.truncateRoleKafka();
+    public void truncateRole(){
+        roleRepository.truncateRoleKafka();
     }
 }

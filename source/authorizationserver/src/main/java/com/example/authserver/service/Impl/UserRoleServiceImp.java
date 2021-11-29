@@ -2,7 +2,7 @@ package com.example.authserver.service.Impl;
 
 import com.example.authserver.entities.UserRole;
 import com.example.authserver.repository.UserRoleRepository;
-import com.example.authserver.service.UserRoleKafkaService;
+import com.example.authserver.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +11,12 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 
 @Service
-public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
+public class UserRoleServiceImp implements UserRoleService {
+
     @Autowired
     private UserRoleRepository userRoleRepository;
 
-    public UserRole createUserRoleKafka(Map<String, Object> keyPairs) throws ParseException {
+    public void createUserRole(Map<String, Object> keyPairs) throws ParseException {
         UserRole userRole = new UserRole();
 
         //convert string --> date with formart tương ứng
@@ -39,11 +40,10 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
                 userRole.setCreateDate(formatter.parse(createAt));
             }
         }
-        return userRoleRepository.save(userRole);
+        userRoleRepository.save(userRole);
     }
 
-
-    public UserRole updateUserRoleKafka(Map<String, Object> keyPairs)throws ParseException {
+    public void updateUserRole(Map<String, Object> keyPairs) throws ParseException{
         UserRole userRole = new UserRole();
 
         //convert string --> date with formart tương ứng
@@ -67,14 +67,20 @@ public class UserRoleKafkaServiceImp implements UserRoleKafkaService {
                 userRole.setCreateDate(formatter.parse(createAt));
             }
         }
-        return userRoleRepository.save(userRole);
+        userRoleRepository.save(userRole);
     }
 
-    public int deleteUserRoleKafka(String username) {
-        return userRoleRepository.deleteUserRoleByUserName(username);
+    public void deleteUserRole(Map<String, Object> keyPairs){
+        String username = "";
+        for (String k : keyPairs.keySet()) {
+            if (k.equals("user_name")) {
+                username = (String) keyPairs.get(k);
+            }
+        }
+        userRoleRepository.deleteUserRoleByUserName(username);
     }
 
-    public int truncateUserRoleKafka() {
-        return userRoleRepository.truncateUserRoleKafka();
+    public void truncateUserRole(){
+        userRoleRepository.truncateUserRoleKafka();
     }
 }
