@@ -8,10 +8,10 @@ import java.io.Serializable;
 
 //Used to ignore null fields in an object.
 //If you try to return object,you will find that null fields aren't included in response
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class StateApproval implements Serializable {
-    private String stateName;
+    private String stateName;//Completed, PendingApprove
     private String roleName;
 }

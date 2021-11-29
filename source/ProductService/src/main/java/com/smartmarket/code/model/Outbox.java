@@ -6,7 +6,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Table(name = "outbox")
@@ -23,7 +22,7 @@ public class Outbox implements Serializable {
     @Column(name = "aggregatetype")
     private String aggregateType;
 
-    //order_id
+    //product_id
     @Column(name = "aggregateid")
     private String aggregateId;
 

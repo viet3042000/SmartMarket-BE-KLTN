@@ -42,6 +42,7 @@ public class Product implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdLogtimestamp;
 
+    //state of approvalCreatedProduct
     @Column(name = "state")
     private String state;
 

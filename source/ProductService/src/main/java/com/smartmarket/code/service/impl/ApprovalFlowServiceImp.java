@@ -34,8 +34,14 @@ public class ApprovalFlowServiceImp implements ApprovalFlowService {
             if (k.equals("product_name")) {
                 approvalFlow.setProductName((String) keyPairs.get(k));
             }
+            if (k.equals("step_detail")) {
+                approvalFlow.setStepDetail((String) keyPairs.get(k));
+            }
             if (k.equals("product_provider_id")) {
                 approvalFlow.setProductProviderId(((Number)keyPairs.get(k)).longValue());
+            }
+            if (k.equals("number_of_steps")) {
+                approvalFlow.setNumberOfSteps(((Number)keyPairs.get(k)).intValue());
             }
             if (k.equals("created_logtimestamp")) {
                 String createAt = (String)keyPairs.get(k);
@@ -62,8 +68,14 @@ public class ApprovalFlowServiceImp implements ApprovalFlowService {
             if (k.equals("product_name")) {
                 approvalFlow.setProductName((String) keyPairs.get(k));
             }
+            if (k.equals("step_detail")) {
+                approvalFlow.setStepDetail((String) keyPairs.get(k));
+            }
             if (k.equals("product_provider_id")) {
                 approvalFlow.setProductProviderId(((Number)keyPairs.get(k)).longValue());
+            }
+            if (k.equals("number_of_steps")) {
+                approvalFlow.setNumberOfSteps(((Number)keyPairs.get(k)).intValue());
             }
             if (k.equals("created_logtimestamp")) {
                 String createAt = (String)keyPairs.get(k);

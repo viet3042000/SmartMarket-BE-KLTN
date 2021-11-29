@@ -3,7 +3,7 @@ package com.smartmarket.code.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.smartmarket.code.constants.ResponseCode;
+import com.smartmarket.code.constants.*;
 import com.smartmarket.code.dao.*;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
@@ -11,6 +11,7 @@ import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entity.StateApproval;
+import com.smartmarket.code.request.entity.StepDecision;
 import com.smartmarket.code.request.entity.StepFlow;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
@@ -70,6 +71,12 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductApprovalFlowRepository productApprovalFlowRepository;
 
+    @Autowired
+    OutboxRepository outboxRepository;
+
+    @Autowired
+    SagaStateRepository sagaStateRepository;
+
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
@@ -117,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
         }else{
             StateApproval stateApproval = new StateApproval();
             stateApproval.setStateName("Completed");
-            newProduct.setState("Completed");
+            newProduct.setState(new JSONObject(stateApproval).toString());
         }
         newProduct.setCreatedLogtimestamp(new Date());
         newProduct.setProductProvider(productProviderName);
@@ -128,6 +135,7 @@ public class ProductServiceImpl implements ProductService {
         productApprovalFlow.setCreatedLogtimestamp(new Date());
         productApprovalFlow.setFlowName("createProduct");
         productApprovalFlow.setStepDetail(approvalFlow.getStepDetail());
+        productApprovalFlow.setNumberOfSteps(approvalFlow.getNumberOfSteps());
         productApprovalFlowRepository.save(productApprovalFlow);
 
         BaseResponse response = new BaseResponse();
@@ -467,28 +475,84 @@ public class ProductServiceImpl implements ProductService {
 //            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
 //        }
 
-        String decision = approvePendingProductRequest.getDetail().getDecision();//DisApprove or Approve
-
         String currentState = product.getState();
         Gson g = new Gson();
         StateApproval stateApproval = g.fromJson(currentState, StateApproval.class);
-
         if("Completed".equals(stateApproval.getStateName())){
             throw new CustomException("Product was completed", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
+//        ArrayList<String> roles = authorizationService.getRoles();
+//        if(!roles.contains(stateApproval.getRoleName())){
+//            throw new CustomException("Role isn't accepted with current approval step ", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//        }
+
         String flowName = approvePendingProductRequest.getDetail().getFlowName();
+
+//        int currentStep = 0;
+//        SagaState sagaState = sagaStateRepository.findById(approvePendingProductRequest.getRequestId()).orElse(null);
+//        if(sagaState != null){
+//            ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(flowName,productId).orElse(null);
+//            ObjectMapper mapper = new ObjectMapper();
+//            List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
+//            for(StepFlow stepFlow : stepFlows){
+//                if(stateApproval.getRoleName().equals(stepFlow.getRoleName())){
+//                    currentStep = stepFlow.getStepNumber();
+//                }
+//            }
+//            sagaState.setCurrentStep(Integer.toString(currentStep));
+////            newSagaState.setPayload();
+//            sagaStateRepository.save(sagaState);
+//        }else {
+//            //create sage
+//            SagaState newSagaState = new SagaState();
+//            newSagaState.setId(approvePendingProductRequest.getRequestId());
+//            newSagaState.setCurrentStep("");
+//            newSagaState.setStepState("");
+//            newSagaState.setAggregateId(productId.toString());
+//            newSagaState.setType(SagaStateType.APPROVE_CREATED_PRODUCT);
+//            newSagaState.setStatus(SagaStateStatus.STARTED);
+//            newSagaState.setCreatedLogtimestamp(new Date());
+////            newSagaState.setPayload();
+//            sagaStateRepository.save(newSagaState);
+//        }
+
+
+        SagaState newSagaState = new SagaState();
+        newSagaState.setId(approvePendingProductRequest.getRequestId());
+        newSagaState.setCurrentStep("");
+        newSagaState.setStepState("");
+        newSagaState.setAggregateId(productId.toString());
+        newSagaState.setType(SagaStateType.APPROVE_CREATED_PRODUCT);
+        newSagaState.setStatus(SagaStateStatus.STARTED);
+        newSagaState.setCreatedLogtimestamp(new Date());
+//            newSagaState.setPayload();
+        sagaStateRepository.save(newSagaState);
+
+        //create outbox
+        Outbox outBox = new Outbox();
+        outBox.setAggregateId(productId.toString());
+        outBox.setCreatedLogtimestamp(new Date());
+        outBox.setAggregateType("Product");
+        outBox.setType(OutboxType.APPROVE_CREATED_PRODUCT);
+
+        StepDecision stepDecision = new StepDecision();
+        stepDecision.setRequestId(approvePendingProductRequest.getRequestId());
+        stepDecision.setProductId(productId);
+        stepDecision.setRoleName(stateApproval.getRoleName());
+        stepDecision.setDecision(approvePendingProductRequest.getDetail().getDecision());
+        stepDecision.setFlowName(flowName);
+
         ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(flowName,productId).orElse(null);
         ObjectMapper mapper = new ObjectMapper();
         List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
-
-        ArrayList<String> roles = authorizationService.getRoles();
-        if(!roles.contains(stateApproval.getRoleName())){
-            throw new CustomException("Role isn't accepted with current approval step ", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        for(StepFlow stepFlow : stepFlows){
+            if(stateApproval.getRoleName().equals(stepFlow.getRoleName())){
+                stepDecision.setCurrentStepNumber(stepFlow.getStepNumber());
+            }
         }
-
-//        product.setState(newState);
-        productRepository.save(product);
+        outBox.setPayload(new JSONObject(stepDecision).toString());
+        outboxRepository.save(outBox);
 
         BaseResponse response = new BaseResponse();
         response.setDetail(product);

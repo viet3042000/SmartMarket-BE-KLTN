@@ -10,6 +10,7 @@ import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.ApprovalFlow;
+import com.smartmarket.code.model.User;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateApprovalFlowRequest;
 import com.smartmarket.code.request.UpdateApprovalFlowRequest;
@@ -17,9 +18,12 @@ import com.smartmarket.code.request.entity.StepFlow;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.service.ApprovalFlowService;
 import com.smartmarket.code.util.DateTimeUtils;
+import com.smartmarket.code.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class ApprovalFlowServiceImpl implements ApprovalFlowService {
@@ -67,6 +72,7 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
         newApprovalFlow.setProductProviderId(productProviderId);
         newApprovalFlow.setProductName(productName);
         newApprovalFlow.setCreatedLogtimestamp(new Date());
+        newApprovalFlow.setNumberOfSteps(0);
         approvalFlowRepository.save(newApprovalFlow);
 
         BaseResponse response = new BaseResponse();
@@ -85,14 +91,14 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
                                                 HttpServletRequest request,
                                                 HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         //get user token
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed CustomAuthorizeRequestFilter
-//
-//        String userName = (String) claims.get("user_name");
-//        User user = userRepository.findByUsername(userName).orElse(null);
-//        if(user == null){
-//            throw new CustomException("UserName doesn't exist in ApprovalFlowService", HttpStatus.BAD_REQUEST, updateApprovalFlowRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-//        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed CustomAuthorizeRequestFilter
+
+        String userName = (String) claims.get("user_name");
+        User user = userRepository.findByUsername(userName).orElse(null);
+        if(user == null){
+            throw new CustomException("UserName doesn't exist in ApprovalFlowService", HttpStatus.BAD_REQUEST, updateApprovalFlowRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
 
         Long productProviderId = updateApprovalFlowRequestBaseDetail.getDetail().getProductProviderId();
         String flowName = updateApprovalFlowRequestBaseDetail.getDetail().getFlowName();
@@ -104,6 +110,7 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
         }
         ArrayList<StepFlow> flowStepDetail =  updateApprovalFlowRequestBaseDetail.getDetail().getFlowStepDetail();
         approvalFlow.setStepDetail(new Gson().toJson(flowStepDetail));
+        approvalFlow.setNumberOfSteps(flowStepDetail.size());
         approvalFlowRepository.save(approvalFlow);
 
         BaseResponse response = new BaseResponse();

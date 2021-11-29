@@ -3,11 +3,9 @@ package com.smartmarket.code.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Table(name = "saga_state")
@@ -54,7 +52,7 @@ public class SagaState implements Serializable {
     @Column(name = "version")
     private int version;
 
-    //order_id
+    //product_id
     @Column(name = "aggregateid")
     private String aggregateId;
 }

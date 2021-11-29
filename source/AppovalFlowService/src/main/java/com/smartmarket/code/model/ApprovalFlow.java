@@ -33,6 +33,9 @@ public class ApprovalFlow implements Serializable {
     @Column(name = "step_detail")
     private String stepDetail;
 
+    @Column(name = "number_of_steps")
+    private int numberOfSteps;
+
     @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdLogtimestamp;

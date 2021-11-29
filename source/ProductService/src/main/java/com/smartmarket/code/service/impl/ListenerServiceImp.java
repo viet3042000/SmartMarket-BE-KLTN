@@ -44,6 +44,12 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     ApprovalFlowService approvalFlowService;
 
+    @Autowired
+    ProductOutboxService productOutboxService;
+
+    @Value("${kafka.topic.productoutbox}")
+    String topicProductOutbox;
+
     @Value("${kafka.topic.users}")
     String topicUsers;
 
@@ -58,6 +64,101 @@ public class ListenerServiceImp implements ListenerService {
 
     @Value("${kafka.topic.approval_flow}")
     String topicApprovalFlow;
+
+
+    //outbox table only insert --> only crete/read
+    @KafkaListener(id = "${kafka.groupID.productoutbox}",topics = "${kafka.topic.productoutbox}")
+    public void listenProductServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
+        String op ="";
+
+        //product_id
+        String aggregateId = "";
+//        String aggregateType = "";
+        String type = "";
+        String payload = "";
+
+        try {
+            for (ConsumerRecord<String, String> record : records) {
+                System.out.println(record.offset());
+                if(record.value() != null) {
+                    String valueRecord = record.value();
+                    JSONObject valueObj = new JSONObject(valueRecord);
+                    if (!valueObj.isNull("payload")) {
+                        JSONObject payloadObj = valueObj.getJSONObject("payload");
+                        JSONObject sourceObj = payloadObj.getJSONObject("source");
+                        op = payloadObj.getString("op");
+
+                        if (!payloadObj.isNull("after")) {
+                            JSONObject afterObj = payloadObj.getJSONObject("after");
+
+                            //Get key-pair in afterObj
+                            Map<String, Object> keyPairs = new HashMap<>();
+                            getKeyPairUtil.getKeyPair(afterObj, keyPairs);
+
+                            for (String k : keyPairs.keySet()) {
+                                if (k.equals("aggregateid")) {
+                                    aggregateId =(String) keyPairs.get(k);
+                                }
+//                                if (k.equals("aggregatetype")) {
+//                                    aggregateType =(String) keyPairs.get(k);
+//                                }
+                                if (k.equals("type")) {
+                                    type = (String) keyPairs.get(k);
+                                }
+                                if (k.equals("payload")) {
+                                    payload =(String) keyPairs.get(k);
+                                }
+                            }
+
+                            productOutboxService.processMessageFromOrderOutbox(op,aggregateId,type,payload);
+
+                        } else {
+                            System.out.println("afterObj is null");
+                        }
+
+                    } else {
+                        System.out.println("payload is null");
+                    }
+                }else{
+                    System.out.println("record.value is null");
+                }
+            }
+
+            //Commit after processed record in batch (records)
+            acknowledgment.acknowledge();
+
+        } catch (CommitFailedException ex) {
+            // Do giữa các lần poll, thời gian xử lý của consumer lâu quá,
+            // nên coordinator tưởng là consumer chết rồi-->Không commit được
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime currentTime = LocalDateTime.now();
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicProductOutbox,
+                    "outbox", op ,dateTimeFormatter.format(currentTime),
+                    "Can not commit offset", ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+            logService.createListenerLogExceptionException(listenerExceptionObject);
+
+        }catch (KafkaException ex){
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime currentTime = LocalDateTime.now();
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicProductOutbox,
+                    "outbox", op , dateTimeFormatter.format(currentTime),
+                    ResponseCode.MSG.INVALID_TRANSACTION_MSG, ResponseCode.CODE.INVALID_TRANSACTION, Throwables.getStackTraceAsString(ex));
+            logService.createListenerLogExceptionException(listenerExceptionObject);
+
+        }catch (Exception ex) {
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime currentTime = LocalDateTime.now();
+            ListenerExceptionObject listenerExceptionObject = new ListenerExceptionObject(topicProductOutbox,
+                    "outbox", op , dateTimeFormatter.format(currentTime),
+                    ResponseCode.MSG.GENERAL_ERROR_MSG, ResponseCode.CODE.GENERAL_ERROR, Throwables.getStackTraceAsString(ex));
+            logService.createListenerLogExceptionException(listenerExceptionObject);
+        }
+        finally {
+//          In the case of an error, we want to make sure that we commit before we leave.
+            acknowledgment.acknowledge();
+//            System.out.println("Closed consumer and we are done");
+        }
+    }
 
 
 //    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
