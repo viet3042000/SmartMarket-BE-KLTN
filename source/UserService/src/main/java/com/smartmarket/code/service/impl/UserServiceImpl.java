@@ -224,10 +224,13 @@ public class UserServiceImpl implements UserService {
             throw new CustomException("UserName has already existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
+        String provider = createUserRequestBaseDetail.getDetail().getProvider();
 //            check email
-        User user = userRepository.findByEmailAndProvider(createUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
-        if(user != null) {
-            throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        if(provider == null) {
+            User user = userRepository.findByEmailAndProvider(createUserRequestBaseDetail.getDetail().getEmail()).orElse(null);
+            if (user != null) {
+                throw new CustomException("Email existed", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+            }
         }
 
         //check role

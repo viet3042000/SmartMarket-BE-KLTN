@@ -2,7 +2,6 @@ package com.smartmarket.code.security;
 
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateUserRequest;
-import com.smartmarket.code.request.entity.UserCreate;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 import org.passay.CharacterData;
@@ -67,24 +66,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user =  super.loadUser(userRequest);
             OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(userRequest.getClientRegistration().getRegistrationId(), user.getAttributes());
 
-            UserCreate userCreate = new UserCreate();
-            userCreate.setEnabled(1);
-            userCreate.setEmail(oAuth2UserInfo.getEmail());
-
-            if(userRequest.getClientRegistration().getRegistrationId().equals("google")) {
-                userCreate.setUserName(oAuth2UserInfo.getEmail());
-            }
-            userCreate.setFullName(oAuth2UserInfo.getName());
-            userCreate.setPassword(this.generatePassayPassword());
-            userCreate.setProvider(userRequest.getClientRegistration().getRegistrationId());
-
             CreateUserRequest createUserRequest = new CreateUserRequest();
             createUserRequest.setRole("CUSTOMER");
-            createUserRequest.setUser(userCreate);
+            createUserRequest.setUserName(oAuth2UserInfo.getEmail());
+            createUserRequest.setPassword(this.generatePassayPassword());
+            createUserRequest.setEmail(oAuth2UserInfo.getEmail());
+            createUserRequest.setEnabled(1);
+            createUserRequest.setFullName(oAuth2UserInfo.getName());
+            createUserRequest.setProvider(userRequest.getClientRegistration().getRegistrationId());
 
             BaseDetail<CreateUserRequest> createUserRequestBaseDetail = new BaseDetail<>();
             createUserRequestBaseDetail.setRequestId(UUID.randomUUID().toString());
-            createUserRequestBaseDetail.setRequestTime("dsdfs");
+            createUserRequestBaseDetail.setRequestTime("test");
             createUserRequestBaseDetail.setTargetId("userservice");
             createUserRequestBaseDetail.setDetail(createUserRequest);
 

@@ -31,7 +31,7 @@ public class CreateUserRequest implements Serializable {
     @Size(max = 255, message = "address should be less than or equal to 255 characters")
     private String address;
 
-    @NotNull(message = "gender is require")
+//    @NotNull(message = "gender is require")
     private Integer gender;
 
     private String identifyNumber;
