@@ -17,6 +17,22 @@ public class Outbox {
     @SequenceGenerator(sequenceName = "jobmanagement_outbox_sequence", allocationSize = 1, name = "jobmanagement_outbox_seq")
     private Long id;
 
+    //đích (travelinsurance)
+//    @Column(name = "aggregatetype")
+//    private String aggregateType;
+//
+//    //order_id
+//    @Column(name = "aggregateid")
+//    private String aggregateId;
+////   createOrder , cancelOrder ,...
+//    @Column(name = "type")
+//    private String type;
+//
+//    @Column(name = "payload")
+//    private String payload;
+
+
+//    pending_bic_transaction id
     @Column(name = "pending_id")
     private Long pendingId;
 
