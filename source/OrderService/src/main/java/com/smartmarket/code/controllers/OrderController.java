@@ -227,13 +227,13 @@ public class OrderController {
     }
 
     //admin
-    @PostMapping(value = "/get-list", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getListOrder(@Valid @RequestBody BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    @PostMapping(value = "/get-all-orders", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    public ResponseEntity<?> getAllOrder(@Valid @RequestBody BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
                 if (roles.contains("ADMIN")) {
-                    return orderService.getListOrder(queryAllOrderRequestBaseDetail, request, responseSelvet);
+                    return orderService.getAllOrders(queryAllOrderRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
                 }

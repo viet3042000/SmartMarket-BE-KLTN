@@ -97,7 +97,6 @@ public class ProductServiceImpl implements ProductService {
             if (k.equals("id")) {
                 Long id = ((Number)keyPairs.get(k)).longValue();
                 productRepository.deleteProductKafka(id);
-                approvalFlowRepository.deleteByProductId(id);
             }
         }
     }

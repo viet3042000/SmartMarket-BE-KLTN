@@ -11,18 +11,17 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class StepDecision implements Serializable {
+public class StepDetail implements Serializable {
 
     private String requestId;
 
     private String flowName;
 
-    private Long productId;
+    private String stepName;//Approve,...
 
-//    private String currentStepName;//step1,2,3,4,5
-    private int currentStepNumber;//1,2,3,4,5
+    private int stepNumber;//1,2,3,4,5
 
     private String roleName;
 
-    private String decision;//Approve or DisApprove
+    private String decision;//Approve, DisApprove
 }

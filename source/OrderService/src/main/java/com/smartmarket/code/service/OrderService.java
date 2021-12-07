@@ -35,7 +35,7 @@ public interface OrderService {
                                                 HttpServletResponse responseSelvet) throws JsonProcessingException;
 
     //admin
-    public ResponseEntity<?> getListOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
+    public ResponseEntity<?> getAllOrders(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet) throws JsonProcessingException;
 }

@@ -162,7 +162,6 @@ public class RoleServiceImpl implements RoleService {
         Page<Role> pageResult = null;
         int page =  getListRoleRequestBaseDetail.getDetail().getPage()  ;
         int size =  getListRoleRequestBaseDetail.getDetail().getSize()   ;
-        int totalPage = 0 ;
 
         Pageable pageable = PageRequest.of(page - 1 , size);
 
@@ -180,7 +179,7 @@ public class RoleServiceImpl implements RoleService {
         pageResult = roleRepository.findAll(pageable);
 
         page =  getListRoleRequestBaseDetail.getDetail().getPage();
-        totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
+        int totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
         //set response data to client
         response.setDetail(pageResult.getContent());
         response.setPage(page);

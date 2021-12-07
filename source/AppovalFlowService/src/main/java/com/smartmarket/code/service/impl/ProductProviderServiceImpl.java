@@ -70,9 +70,10 @@ public class ProductProviderServiceImpl implements ProductProviderService {
     public void deleteProductProvider(Map<String, Object> keyPairs){
         for (String k : keyPairs.keySet()) {
             if (k.equals("id")) {
-                Long id = ((Number)keyPairs.get(k)).longValue();
-                productProviderRepository.deleteProductProviderKafka(id);
-                approvalFlowRepository.deleteByProductProviderId(id);
+                productProviderRepository.deleteProductProviderKafka(((Number)keyPairs.get(k)).longValue());
+            }
+            if (k.equals("product_provider_name")) {
+                approvalFlowRepository.deleteByProductProviderName((String) keyPairs.get(k));
             }
         }
     }

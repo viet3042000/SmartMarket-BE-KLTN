@@ -15,19 +15,9 @@ import java.util.Optional;
 @Repository
 public interface ApprovalFlowRepository extends JpaRepository<ApprovalFlow, Long> {
 
-//    @Query(value = "Select * FROM approval_flow where product_provider_id =:product_provider_id and flow_name=:flow_name", nativeQuery = true)
-//    public List<ApprovalFlow> findApprovalFlow(@Param("product_provider_id") Long productProviderId,
-//                                               @Param("flow_name") String flowName) ;
-
-    @Query(value = "Select * FROM approval_flow where product_name =:product_name and " +
-            "product_provider_id=:product_provider_id and flow_name=:flow_name", nativeQuery = true)
-    public Optional<ApprovalFlow> findApprovalFlowOfProduct(@Param("product_name") String productName,
-                                                            @Param("product_provider_id") Long productProviderId,
-                                                            @Param("flow_name") String flowName) ;
-//
-//    @Modifying(clearAutomatically = true)
-//    @Query(value = "DELETE FROM approval_flow where product_provider_id =:product_provider_id", nativeQuery = true)
-//    public int deleteByProductProviderId(@Param("product_provider_id") Long productProviderId) ;
+    @Query(value = "Select * FROM approval_flow where product_provider_name =:product_provider_name and flow_name=:flow_name", nativeQuery = true)
+    public Optional<ApprovalFlow> findApprovalFlow(@Param("product_provider_name") String productProviderName,
+                                               @Param("flow_name") String flowName) ;
 
 
     @Modifying(clearAutomatically = true)

@@ -10,17 +10,15 @@ import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
-import com.smartmarket.code.request.entity.StateApproval;
-import com.smartmarket.code.request.entity.StepDecision;
+import com.smartmarket.code.request.entity.CurrentStepSaga;
+import com.smartmarket.code.request.entity.StepDetail;
 import com.smartmarket.code.request.entity.StepFlow;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.response.DetailProductResponse;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.ProductService;
-import com.smartmarket.code.util.DateTimeUtils;
-import com.smartmarket.code.util.GetKeyPairUtil;
-import com.smartmarket.code.util.Utils;
+import com.smartmarket.code.util.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,11 +27,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.persistence.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.util.*;
@@ -77,6 +79,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     SagaStateRepository sagaStateRepository;
 
+    @PersistenceContext
+    EntityManager entityManager;
+
 
     //Admin(kltn)+ Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
@@ -102,10 +107,12 @@ public class ProductServiceImpl implements ProductService {
 
         //check flow of provider
         //if flow of product doesn't exist --> exception
-        ApprovalFlow approvalFlow =  approvalFlowRepository.findApprovalFlowOfProduct(productName, productProviderId,"createProduct").orElse(null);
+        ApprovalFlow approvalFlow =  approvalFlowRepository.findApprovalFlow(productProviderName,"createProduct").orElse(null);
         if(approvalFlow ==null){
             throw new CustomException("approvalFlow doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
+        ObjectMapper mapper = new ObjectMapper();
+        List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(approvalFlow.getStepDetail(), StepFlow[].class));
 
         Product newProduct = new Product();
         newProduct.setProductName(productName);
@@ -114,20 +121,13 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setPrice(createProductRequestBaseDetail.getDetail().getPrice());
 
         if(approvalFlow.getStepDetail() != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(approvalFlow.getStepDetail(), StepFlow[].class));
-            StepFlow step1 = stepFlows.get(0);
-            StateApproval stateApproval = new StateApproval();
-            stateApproval.setStateName("PendingApprove");
-            stateApproval.setRoleName(step1.getRoleName());
-            newProduct.setState(new JSONObject(stateApproval).toString());
+            newProduct.setState(ProductState.PENDING);
         }else{
-            StateApproval stateApproval = new StateApproval();
-            stateApproval.setStateName("Completed");
-            newProduct.setState(new JSONObject(stateApproval).toString());
+            newProduct.setState(ProductState.APPROVED);
         }
         newProduct.setCreatedLogtimestamp(new Date());
         newProduct.setProductProvider(productProviderName);
+        newProduct.setCurrentSagaId(createProductRequestBaseDetail.getRequestId());
         productRepository.save(newProduct);
 
         ProductApprovalFlow productApprovalFlow = new ProductApprovalFlow();
@@ -135,8 +135,34 @@ public class ProductServiceImpl implements ProductService {
         productApprovalFlow.setCreatedLogtimestamp(new Date());
         productApprovalFlow.setFlowName("createProduct");
         productApprovalFlow.setStepDetail(approvalFlow.getStepDetail());
-        productApprovalFlow.setNumberOfSteps(approvalFlow.getNumberOfSteps());
         productApprovalFlowRepository.save(productApprovalFlow);
+
+        SagaState newSagaState = new SagaState();
+        newSagaState.setId(createProductRequestBaseDetail.getRequestId());
+        newSagaState.setCurrentStep("");
+        newSagaState.setStepState("");
+        newSagaState.setAggregateId(newProduct.getId().toString());
+        newSagaState.setType(SagaType.APPROVE_CREATED_PRODUCT);
+        newSagaState.setStatus(SagaStatus.STARTED);
+        newSagaState.setCreatedLogtimestamp(new Date());
+//            newSagaState.setPayload();
+        sagaStateRepository.save(newSagaState);
+
+        //create outbox
+        Outbox outBox = new Outbox();
+        outBox.setAggregateId(newProduct.getId().toString());
+        outBox.setCreatedLogtimestamp(new Date());
+        outBox.setAggregateType("Product");
+        outBox.setType(OutboxType.WAITING_APPROVE);
+
+        StepDetail stepDetail = new StepDetail();
+        stepDetail.setRequestId(createProductRequestBaseDetail.getRequestId());
+        stepDetail.setFlowName("createProduct");
+        stepDetail.setStepName(stepFlows.get(0).getStepName());
+        stepDetail.setRoleName(stepFlows.get(0).getRoleName());
+        stepDetail.setStepNumber(stepFlows.get(0).getStepNumber());//index i --> stepNumber = i+1
+        outBox.setPayload(new JSONObject(stepDetail).toString());
+        outboxRepository.save(outBox);
 
         BaseResponse response = new BaseResponse();
         response.setDetail(newProduct);
@@ -149,13 +175,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     //Admin(kltn)+ Provider
+    @Transactional//begin transaction from begin of function and commit at the end of function by default
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String userName = updateProductRequestBaseDetail.getDetail().getUserName();
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
-        Product product = productRepository.findByProductName(productName).orElse(null);
+
+//        productRepository.beginTransaction();//begin transaction from here
+
+//        Product product = productRepository.findByProductName(productName).orElse(null);
+        Product product = productRepository.findAndLock(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
+        if( ProductState.PENDING.equals(product.getState()) || ProductState.DISAPPROVED.equals(product.getState()) ){
+            throw new CustomException("Can't update this product", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+//       PESSIMISTIC_WRITE prevent other transactions from reading, updating or deleting the data.
+//        entityManager.lock(product , LockModeType.PESSIMISTIC_WRITE);//= for update in sql
+//        productRepository.commit();//commit transaction from here
 
         String productProviderName = product.getProductProvider();
         Long productProviderId = productProviderRepository.getId(productProviderName);
@@ -214,6 +252,9 @@ public class ProductServiceImpl implements ProductService {
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
+        if( ProductState.PENDING.equals(product.getState()) ){
+            throw new CustomException("Can't delete this product", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
 
         String productProviderName = product.getProductProvider();
         Long productProviderId = productProviderRepository.getId(productProviderName);
@@ -224,6 +265,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
+        sagaStateRepository.deleteByProductId(Long.toString(product.getId()));
+        productApprovalFlowRepository.deleteByProductId(product.getId());
 
         BaseResponse response = new BaseResponse();
         response.setDetail(product);
@@ -247,6 +290,9 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+        if(ProductState.PENDING.equals(product.getState())){
+            throw new CustomException("Can't get this product", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productProviderName = product.getProductProvider();
@@ -299,7 +345,6 @@ public class ProductServiceImpl implements ProductService {
                                                       HttpServletRequest request,
                                                       HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
         String userName = queryAllProductOfProviderRequestBaseDetail.getDetail().getUserName();
-
         //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
         if(userProductProvider == null){
@@ -380,7 +425,6 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<?> getListProduct(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail,
                                             HttpServletRequest request,
                                             HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
-        int totalPage = 0 ;
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
         String hostName = request.getRemoteHost();
@@ -401,7 +445,7 @@ public class ProductServiceImpl implements ProductService {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
         if(!allProducts.isEmpty()) {
-            totalPage = (int) Math.ceil((double) allProducts.getTotalElements()/size);
+            int totalPage = (int) Math.ceil((double) allProducts.getTotalElements()/size);
 
             //set response data to client
             response.setResponseId(queryAllProductRequestBaseDetail.getRequestId());
@@ -476,58 +520,24 @@ public class ProductServiceImpl implements ProductService {
 //        }
 
         String currentState = product.getState();
-        Gson g = new Gson();
-        StateApproval stateApproval = g.fromJson(currentState, StateApproval.class);
-        if("Completed".equals(stateApproval.getStateName())){
+        if(ProductState.APPROVED.equals(currentState)){
             throw new CustomException("Product was completed", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
+        SagaState sagaState = sagaStateRepository.findById(product.getCurrentSagaId()).orElse(null);
+        Gson gson = new Gson();
+        CurrentStepSaga currentStepSaga = gson.fromJson(sagaState.getCurrentStep(), CurrentStepSaga.class);
+        int currentStep = currentStepSaga.getCurrentStep();//=index of stepFlows +1
+
+        ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(approvePendingProductRequest.getDetail().getFlowName(),productId).orElse(null);
+        ObjectMapper mapper = new ObjectMapper();
+        List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
+        StepFlow stepFlow = stepFlows.get(currentStep-1);
+
 //        ArrayList<String> roles = authorizationService.getRoles();
-//        if(!roles.contains(stateApproval.getRoleName())){
+//        if(!roles.contains(stepFlow.getRoleName())){
 //            throw new CustomException("Role isn't accepted with current approval step ", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
 //        }
-
-        String flowName = approvePendingProductRequest.getDetail().getFlowName();
-
-//        int currentStep = 0;
-//        SagaState sagaState = sagaStateRepository.findById(approvePendingProductRequest.getRequestId()).orElse(null);
-//        if(sagaState != null){
-//            ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(flowName,productId).orElse(null);
-//            ObjectMapper mapper = new ObjectMapper();
-//            List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
-//            for(StepFlow stepFlow : stepFlows){
-//                if(stateApproval.getRoleName().equals(stepFlow.getRoleName())){
-//                    currentStep = stepFlow.getStepNumber();
-//                }
-//            }
-//            sagaState.setCurrentStep(Integer.toString(currentStep));
-////            newSagaState.setPayload();
-//            sagaStateRepository.save(sagaState);
-//        }else {
-//            //create sage
-//            SagaState newSagaState = new SagaState();
-//            newSagaState.setId(approvePendingProductRequest.getRequestId());
-//            newSagaState.setCurrentStep("");
-//            newSagaState.setStepState("");
-//            newSagaState.setAggregateId(productId.toString());
-//            newSagaState.setType(SagaStateType.APPROVE_CREATED_PRODUCT);
-//            newSagaState.setStatus(SagaStateStatus.STARTED);
-//            newSagaState.setCreatedLogtimestamp(new Date());
-////            newSagaState.setPayload();
-//            sagaStateRepository.save(newSagaState);
-//        }
-
-
-        SagaState newSagaState = new SagaState();
-        newSagaState.setId(approvePendingProductRequest.getRequestId());
-        newSagaState.setCurrentStep("");
-        newSagaState.setStepState("");
-        newSagaState.setAggregateId(productId.toString());
-        newSagaState.setType(SagaStateType.APPROVE_CREATED_PRODUCT);
-        newSagaState.setStatus(SagaStateStatus.STARTED);
-        newSagaState.setCreatedLogtimestamp(new Date());
-//            newSagaState.setPayload();
-        sagaStateRepository.save(newSagaState);
 
         //create outbox
         Outbox outBox = new Outbox();
@@ -536,22 +546,13 @@ public class ProductServiceImpl implements ProductService {
         outBox.setAggregateType("Product");
         outBox.setType(OutboxType.APPROVE_CREATED_PRODUCT);
 
-        StepDecision stepDecision = new StepDecision();
-        stepDecision.setRequestId(approvePendingProductRequest.getRequestId());
-        stepDecision.setProductId(productId);
-        stepDecision.setRoleName(stateApproval.getRoleName());
-        stepDecision.setDecision(approvePendingProductRequest.getDetail().getDecision());
-        stepDecision.setFlowName(flowName);
-
-        ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(flowName,productId).orElse(null);
-        ObjectMapper mapper = new ObjectMapper();
-        List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
-        for(StepFlow stepFlow : stepFlows){
-            if(stateApproval.getRoleName().equals(stepFlow.getRoleName())){
-                stepDecision.setCurrentStepNumber(stepFlow.getStepNumber());
-            }
-        }
-        outBox.setPayload(new JSONObject(stepDecision).toString());
+        StepDetail stepDetail = new StepDetail();
+        stepDetail.setRequestId(product.getCurrentSagaId());
+        stepDetail.setRoleName(stepFlow.getRoleName());
+        stepDetail.setDecision(approvePendingProductRequest.getDetail().getDecision());
+        stepDetail.setFlowName(approvePendingProductRequest.getDetail().getFlowName());
+        stepDetail.setStepNumber(stepFlow.getStepNumber());
+        outBox.setPayload(new JSONObject(stepDetail).toString());
         outboxRepository.save(outBox);
 
         BaseResponse response = new BaseResponse();
@@ -560,6 +561,70 @@ public class ProductServiceImpl implements ProductService {
         response.setResponseTime(DateTimeUtils.getCurrentDate());
         response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
         response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    //Provider-i
+    public ResponseEntity<?> getListPendingProduct(@Valid @RequestBody BaseDetail <QueryPendingProductRequest> queryPendingProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+//        User user = userRepository.findByUsername(userName).orElse(null);
+//        if(user == null){
+//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryPendingProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//        }
+
+        //check for user Provider
+        UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, queryPendingProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
+
+        ProductProvider productProvider = productProviderRepository.findByProductProviderId(userProductProvider.getProductProviderId()).orElse(null);
+        List<Product> productList = productRepository.findPendingProduct(productProvider.getProductProviderName());
+
+        ArrayList<String> roles = authorizationService.getRoles();
+        ObjectMapper mapper = new ObjectMapper();
+        Gson gson = new Gson();
+        for(Product product:productList){
+            //product pending --> only 1 saga current
+            SagaState sagaState = sagaStateRepository.findByAggregateId(Long.toString(product.getId())).orElse(null);
+            CurrentStepSaga currentStepSaga = gson.fromJson(sagaState.getCurrentStep(), CurrentStepSaga.class);
+            int currentStep = currentStepSaga.getCurrentStep();
+
+            ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findByProductId(product.getId()).orElse(null);
+            List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
+            StepFlow stepFlow = stepFlows.get(currentStep-1);
+            if(!roles.contains(stepFlow.getRoleName())){
+                productList.remove(product);
+            }
+        }
+
+        int page =  queryPendingProductRequestBaseDetail.getDetail().getPage()  ;
+        int size =  queryPendingProductRequestBaseDetail.getDetail().getSize()   ;
+        BaseResponseGetAll response = new BaseResponseGetAll();
+        if(!productList.isEmpty()) {
+            int totalPage = (int) Math.ceil((double) productList.size() / size);
+
+            List allPendingProduct = PagingUtil.getPageLimit(productList, page, size);
+
+            response.setPage(page);
+            response.setTotal(allPendingProduct.stream().count());
+            response.setTotalPage(totalPage);
+            response.setDetail(allPendingProduct);
+            response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+        }else {
+            response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("No pending approval product with this username");
+        }
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

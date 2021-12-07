@@ -42,9 +42,12 @@ public class Product implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdLogtimestamp;
 
-    //state of approvalCreatedProduct
+    ////Succeeded, Pending, .., (almost similar order state)
     @Column(name = "state")
     private String state;
+
+    @Column(name = "current_saga_id")
+    private String currentSagaId;
 
 //    @Column(name = "fisnished_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
 //    @Temporal(TemporalType.TIMESTAMP)

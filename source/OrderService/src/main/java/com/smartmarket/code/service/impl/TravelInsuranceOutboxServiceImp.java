@@ -68,7 +68,7 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
             if (order !=null && sagaState !=null) {
                 if(order.getState().equals("Pending")) {
                     String productName = items.get(createItemIndex).getProductName();
-                    String currentStep = "Index-"+Integer.toString(createItemIndex)+"-"+AggregateType.TRAVEL_INSURANCE;
+                    String currentStep = "CreateOrder-Index-"+Integer.toString(createItemIndex);
                     sagaState.setCurrentStep(currentStep);
 
                     ItemDetailCreateRequest itemDetailCreateSuccess = items.get(createItemIndex);
@@ -84,11 +84,11 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
 
                         if (createItemIndex==0) {
                             JSONObject stepState = new JSONObject();
-                            stepState.put(currentStep, SagaStateStepState.SUCCEEDED);
+                            stepState.put(currentStep, SagaStepState.SUCCEEDED);
                             sagaState.setStepState(stepState.toString());
                         }else {
                             JSONObject stepState = new JSONObject(sagaState.getStepState());
-                            stepState.put(currentStep, SagaStateStepState.SUCCEEDED);
+                            stepState.put(currentStep, SagaStepState.SUCCEEDED);
                             sagaState.setStepState(stepState.toString());
                         }
 
@@ -122,10 +122,10 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                             outBox.setPayload(itemDetailJsonObject.toString());
                             outboxRepository.save(outBox);
                         } else if(createItemIndex == items.size()-1){
-                            order.setState(OrderEntityState.SUCCEEDED);
+                            order.setState(OrderState.SUCCEEDED);
                             order.setFinishedLogtimestamp(finishedAt);
-                            sagaState.setCurrentStep("");
-                            sagaState.setStatus(SagaStateStatus.SUCCEEDED);
+                            sagaState.setCurrentStep(null);
+                            sagaState.setStatus(SagaStatus.SUCCEEDED);
                             sagaState.setFinishedLogtimestamp(finishedAt);
                         }
                     } else {
@@ -140,23 +140,23 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                         orderProductRepository.save(orderProduct);
 
                         if(createItemIndex==0){
-                            order.setState(OrderEntityState.ABORTED);
+                            order.setState(OrderState.ABORTED);
                             order.setFinishedLogtimestamp(finishedAt);
 
                             JSONObject stepState = new JSONObject();
-                            stepState.put(currentStep, SagaStateStepState.ABORTED);
+                            stepState.put(currentStep, SagaStepState.ABORTED);
                             sagaState.setStepState(stepState.toString());
-                            sagaState.setStatus(SagaStateStatus.ABORTED);
-                            sagaState.setCurrentStep("");
+                            sagaState.setStatus(SagaStatus.ABORTED);
+                            sagaState.setCurrentStep(null);
                             sagaState.setFinishedLogtimestamp(finishedAt);
 
                         }else { //createItemIndex>=1
-                            order.setState(OrderEntityState.ABORTING);
+                            order.setState(OrderState.ABORTING);
 
                             JSONObject stepState = new JSONObject(sagaState.getStepState());
-                            stepState.put(currentStep, SagaStateStepState.ABORTING);
+                            stepState.put(currentStep, SagaStepState.ABORTING);
                             sagaState.setStepState(stepState.toString());
-                            sagaState.setStatus(SagaStateStatus.ABORTING);
+                            sagaState.setStatus(SagaStatus.ABORTING);
 
                             ItemDetailCreateRequest itemDetailCreateRequest = items.get(createItemIndex-1);
                             orderProductRepository.updateOrderProduct(aggregateId,OrderProductState.ABORTING,createItemIndex-1);
@@ -204,7 +204,7 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
             if (order !=null && sagaState != null) {
                 if(order.getState().equals("Canceling")) {
 
-                    String currentStep = "Index-"+Integer.toString(cancelItemIndex)+"-"+AggregateType.TRAVEL_INSURANCE;
+                    String currentStep = "cancelOrder-Index-"+Integer.toString(cancelItemIndex);
                     sagaState.setCurrentStep(currentStep);
 
                     if (status.equals("success")) {
@@ -212,11 +212,11 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
 
                         if(cancelItemIndex ==0) {
                             JSONObject stepState = new JSONObject();
-                            stepState.put(currentStep, SagaStateStepState.SUCCEEDED);
+                            stepState.put(currentStep, SagaStepState.SUCCEEDED);
                             sagaState.setStepState(stepState.toString());
                         }else {
                             JSONObject stepState = new JSONObject(sagaState.getStepState());
-                            stepState.put(currentStep, SagaStateStepState.SUCCEEDED);
+                            stepState.put(currentStep, SagaStepState.SUCCEEDED);
                             sagaState.setStepState(stepState.toString());
                         }
                     } else {
@@ -224,11 +224,11 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                         orderProductRepository.updateOrderProduct(aggregateId,OrderProductState.ERROR,cancelItemIndex);
                         if(cancelItemIndex ==0) {
                             JSONObject stepState = new JSONObject();
-                            stepState.put(currentStep, SagaStateStepState.ERROR);
+                            stepState.put(currentStep, SagaStepState.ERROR);
                             sagaState.setStepState(stepState.toString());
                         }else{
                             JSONObject stepState = new JSONObject(sagaState.getStepState());
-                            stepState.put(currentStep, SagaStateStepState.ERROR);
+                            stepState.put(currentStep, SagaStepState.ERROR);
                             sagaState.setStepState(stepState.toString());
                         }
                     }
@@ -256,13 +256,13 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
 
                         int countSucceeded = orderProductRepository.countByState(aggregateId,"Canceled");
                         if(countSucceeded ==items.size()){
-                            order.setState(OrderEntityState.CANCELED);
-                            sagaState.setStatus(SagaStateStatus.SUCCEEDED);
+                            order.setState(OrderState.CANCELED);
+                            sagaState.setStatus(SagaStatus.SUCCEEDED);
                         }else{
-                            order.setState(OrderEntityState.ERROR);
-                            sagaState.setStatus(SagaStateStatus.ERROR);
+                            order.setState(OrderState.ERROR);
+                            sagaState.setStatus(SagaStatus.ERROR);
                         }
-                        sagaState.setCurrentStep("");
+                        sagaState.setCurrentStep(null);
                         sagaState.setFinishedLogtimestamp(finishedAt);
                     }
                     orderRepository.save(order);
@@ -290,12 +290,12 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
             SagaState sagaState = sagaStateRepository.findById(requestId).orElse(null);
             if (order!=null && sagaState != null) {
                 if(order.getState().equals("Aborting")) {
-                    String currentStep = "Index-"+Integer.toString(abortItemIndex)+"-"+AggregateType.TRAVEL_INSURANCE;
+                    String currentStep = "abortOrder-Index-"+Integer.toString(abortItemIndex);
                     sagaState.setCurrentStep(currentStep);
 
                     if (status.equals("success")) {
                         JSONObject stepState = new JSONObject(sagaState.getStepState());
-                        stepState.put(currentStep, SagaStateStepState.ABORTED);
+                        stepState.put(currentStep, SagaStepState.ABORTED);
                         sagaState.setStepState(stepState.toString());
 
                         orderProductRepository.updateOrderProduct(aggregateId,OrderProductState.ABORTED,abortItemIndex);
@@ -323,20 +323,20 @@ public class TravelInsuranceOutboxServiceImp implements TravelInsuranceOutboxSer
                             outBox.setPayload(itemDetailJsonObject.toString());
                             outboxRepository.save(outBox);
                         }else{//abortItemIndex ==0
-                            order.setState(OrderEntityState.ABORTED);
-                            sagaState.setCurrentStep("");
+                            order.setState(OrderState.ABORTED);
+                            sagaState.setCurrentStep(null);
                             sagaState.setFinishedLogtimestamp(finishedAt);
-                            sagaState.setStatus(SagaStateStatus.ABORTED);
+                            sagaState.setStatus(SagaStatus.ABORTED);
                         }
                     } else {
-                        order.setState(OrderEntityState.ERROR);
+                        order.setState(OrderState.ERROR);
 
                         JSONObject stepState = new JSONObject(sagaState.getStepState());
-                        stepState.put(currentStep, SagaStateStepState.ERROR);
+                        stepState.put(currentStep, SagaStepState.ERROR);
                         sagaState.setStepState(stepState.toString());
                         sagaState.setFinishedLogtimestamp(finishedAt);
-                        sagaState.setCurrentStep("");
-                        sagaState.setStatus(SagaStateStatus.ERROR);
+                        sagaState.setCurrentStep(null);
+                        sagaState.setStatus(SagaStatus.ERROR);
 
                         orderProductRepository.updateOrderProduct(aggregateId,OrderProductState.ERROR,abortItemIndex);
                     }

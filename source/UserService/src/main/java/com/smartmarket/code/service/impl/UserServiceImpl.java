@@ -398,7 +398,6 @@ public class UserServiceImpl implements UserService {
 
         int page =  getListUserRequestBaseDetail.getDetail().getPage()  ;
         int size =  getListUserRequestBaseDetail.getDetail().getSize()   ;
-        int totalPage = 0 ;
 
         Pageable pageable = PageRequest.of(page - 1 , size);
 
@@ -438,7 +437,7 @@ public class UserServiceImpl implements UserService {
 
 
         page =  getListUserRequestBaseDetail.getDetail().getPage();
-        totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
+        int totalPage =(int) Math.ceil((double) pageResult.getTotalElements()/size) ;
         //set response data to client
         BaseResponse response = new BaseResponse();
         response.setDetail(userCreateResponsePage.getContent());

@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -121,7 +122,7 @@ public class OrderServiceImpl implements OrderService {
 
         Orders orders = new Orders();
         orders.setOrderId(orderId.toString());
-        orders.setState(OrderEntityState.PENDING);
+        orders.setState(OrderState.PENDING);
         orders.setPayload(j.toString());
         orders.setUserName(userName);
         Date date = new Date();
@@ -137,8 +138,8 @@ public class OrderServiceImpl implements OrderService {
         sagaState.setId(createOrderRequest.getRequestId());
         sagaState.setCurrentStep("");
         sagaState.setStepState("");
-        sagaState.setStatus(SagaStateStatus.STARTED);
-        sagaState.setType(SagaStateType.CREATE_ORDER);
+        sagaState.setStatus(SagaStatus.STARTED);
+        sagaState.setType(SagaType.CREATE_ORDER);
         sagaState.setPayload(j.toString());
         sagaState.setAggregateId(orderId.toString());
         sagaStateRepository.save(sagaState);
@@ -173,6 +174,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     //user
+    @Transactional
     public ResponseEntity<?> cancelOrder(BaseDetail<CancelOrderRequest> cancelOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         //get user token
@@ -203,14 +205,15 @@ public class OrderServiceImpl implements OrderService {
         String payload = gson.toJson(cancelOrderRequest);
         String orderIdString = cancelOrderRequest.getDetail().getOrderId();
 
-        Orders order = orderRepository.findByOrderId(orderIdString).orElse(null);
+//        Orders order = orderRepository.findByOrderId(orderIdString).orElse(null);
+        Orders order = orderRepository.findAndLock(orderIdString).orElse(null);
         if(order == null){
             throw new CustomException("Order doesn't exist in OrderService", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
         if (!order.getUserName().equals(userName)){
             throw new CustomException("Order doesn't exist with user", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
-        if(!order.getState().equals("Succeeded")){
+        if(!order.getState().equals(OrderState.SUCCEEDED)){
             throw new CustomException("Order's state is not Succeeded", HttpStatus.BAD_REQUEST, cancelOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
@@ -237,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
         }
         cancelOrderRequest.getDetail().setOrderItems(orderItems);
 
-        order.setState(OrderEntityState.CANCELING);
+        order.setState(OrderState.CANCELING);
         orderRepository.save(order);
 
         Date date = new Date();
@@ -249,9 +252,9 @@ public class OrderServiceImpl implements OrderService {
         sagaState.setId(cancelOrderRequest.getRequestId());
         sagaState.setCurrentStep("");
         sagaState.setStepState("");
-        sagaState.setType(SagaStateType.CANCEL_ORDER);
+        sagaState.setType(SagaType.CANCEL_ORDER);
         sagaState.setPayload(payload);
-        sagaState.setStatus(SagaStateStatus.STARTED);
+        sagaState.setStatus(SagaStatus.STARTED);
         sagaState.setAggregateId(orderIdString);
         sagaStateRepository.save(sagaState);
 
@@ -311,6 +314,9 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             throw new CustomException("Order doesn't exist with user", HttpStatus.BAD_REQUEST, queryOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
+        if(!order.getState().equals(OrderState.SUCCEEDED)){
+            throw new CustomException("Order's state is not Succeeded", HttpStatus.BAD_REQUEST, queryOrderRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
 
         BaseResponse response = new BaseResponse();
         response.setDetail(order);
@@ -332,7 +338,6 @@ public class OrderServiceImpl implements OrderService {
             throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrdersOfUserRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        int totalPage = 0 ;
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
@@ -353,7 +358,7 @@ public class OrderServiceImpl implements OrderService {
                 orderRepository.findByUserNameAndType(userName,"comment",pageable);
 
         if(!allOrders.isEmpty()) {
-            totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
+            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
 
             //set response data to client
             response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
@@ -417,8 +422,7 @@ public class OrderServiceImpl implements OrderService {
 
     //admin
     @Override
-    public ResponseEntity<?> getListOrder(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
-        int totalPage = 0 ;
+    public ResponseEntity<?> getAllOrders(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
 
@@ -443,7 +447,7 @@ public class OrderServiceImpl implements OrderService {
         String responseStatus = Integer.toString(status);
 
         if(!allOrders.isEmpty()) {
-            totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
+            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
 
             //set response data to client
             response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());

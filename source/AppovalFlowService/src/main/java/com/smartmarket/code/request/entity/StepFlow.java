@@ -14,5 +14,6 @@ import java.io.Serializable;
 public class StepFlow implements Serializable {
 //    private String stepName;//step1,2,3,4,5
     private int stepNumber;//1,2,3,4,5
+    private String stepName;
     private String roleName;
 }

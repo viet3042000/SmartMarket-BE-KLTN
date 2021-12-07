@@ -2,17 +2,17 @@ package com.smartmarket.code.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.smartmarket.code.constants.OutboxType;
-import com.smartmarket.code.constants.SagaStateStatus;
-import com.smartmarket.code.constants.SagaStateStepState;
+import com.smartmarket.code.constants.*;
+import com.smartmarket.code.dao.OutboxRepository;
 import com.smartmarket.code.dao.ProductApprovalFlowRepository;
 import com.smartmarket.code.dao.ProductRepository;
 import com.smartmarket.code.dao.SagaStateRepository;
+import com.smartmarket.code.model.Outbox;
 import com.smartmarket.code.model.Product;
 import com.smartmarket.code.model.ProductApprovalFlow;
 import com.smartmarket.code.model.SagaState;
-import com.smartmarket.code.request.entity.StateApproval;
-import com.smartmarket.code.request.entity.StepDecision;
+import com.smartmarket.code.request.entity.CurrentStepSaga;
+import com.smartmarket.code.request.entity.StepDetail;
 import com.smartmarket.code.request.entity.StepFlow;
 import com.smartmarket.code.service.ProductOutboxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +36,9 @@ public class ProductOutboxServiceImp implements ProductOutboxService {
     @Autowired
     ProductApprovalFlowRepository productApprovalFlowRepository;
 
+    @Autowired
+    OutboxRepository outboxRepository;
+
 
     public void processMessageFromOrderOutbox(String op,String aggregateId,String type,
                                               String payload) throws Exception{
@@ -45,89 +48,131 @@ public class ProductOutboxServiceImp implements ProductOutboxService {
         Date createAt = formatter.parse(stringCreateAt);
 
         Gson gson = new Gson();
-        StepDecision stepDecision = gson.fromJson(payload, StepDecision.class);
+        StepDetail stepDetail = gson.fromJson(payload, StepDetail.class);
         if (type.equals(OutboxType.APPROVE_CREATED_PRODUCT)) {
             try {
-                Product product = productRepository.findByProductId(stepDecision.getProductId()).orElse(null);
-                SagaState sagaState = sagaStateRepository.findById(stepDecision.getRequestId()).orElse(null);
-                ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(stepDecision.getFlowName(),stepDecision.getProductId()).orElse(null);
+                Product product = productRepository.findByProductId(Long.parseLong(aggregateId)).orElse(null);
+                SagaState sagaState = sagaStateRepository.findById(stepDetail.getRequestId()).orElse(null);
+                CurrentStepSaga currentStepSaga = new CurrentStepSaga();
+                currentStepSaga.setCurrentStep(stepDetail.getStepNumber());
+                currentStepSaga.setSagaType(SagaType.APPROVE_CREATED_PRODUCT);
+//                String currentStep = SagaType.APPROVE_CREATED_PRODUCT+"-CurrentStep-"+Integer.toString(stepDetail.getStepNumber());
+                sagaState.setCurrentStep(gson.toJson(currentStepSaga));
 
-                StateApproval stateApproval = new StateApproval();
-                if ("Approve".equals(stepDecision.getDecision())) {
-                    if(stepDecision.getCurrentStepNumber() == productApprovalFlow.getNumberOfSteps()){
-                        stateApproval.setStateName("Completed");
-                    }else {
-                        ObjectMapper mapper = new ObjectMapper();
-                        List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
+                ProductApprovalFlow productApprovalFlow = productApprovalFlowRepository.findProductApprovalFlow(stepDetail.getFlowName(), Long.parseLong(aggregateId)).orElse(null);
+                ObjectMapper mapper = new ObjectMapper();
+                List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
 
-                        for(int i = 0 ; i< stepFlows.size()-1; i++){
-                            StepFlow stepFlow = stepFlows.get(i);
-                            if(stepDecision.getRoleName().equals(stepFlow.getRoleName())){
-                                stateApproval.setStateName("PendingApprove");
-                                stateApproval.setRoleName(stepFlows.get(i+1).getRoleName());
-                            }
-                        }
-                    }
-                    product.setState(new JSONObject(stateApproval).toString());
-
-                } else {//DisApprove
-                    stateApproval.setStateName("DisApproved");
-                    stateApproval.setRoleName(stepDecision.getRoleName());
-                    product.setState(new JSONObject(stateApproval).toString());
+                if ("DisApprove".equals(stepDetail.getDecision())) {
+                    product.setState(ProductState.DISAPPROVED);
+                    product.setCurrentSagaId(null);
+                    sagaState.setStatus(SagaStatus.SUCCEEDED);
+                    sagaState.setFinishedLogtimestamp(createAt);
                 }
-                product.setState(new JSONObject(stateApproval).toString());
+
+                if(stepDetail.getStepNumber() == stepFlows.size()){
+                    if ("Approve".equals(stepDetail.getDecision())) {
+                        product.setState(ProductState.APPROVED);
+                        product.setCurrentSagaId(null);
+                    }
+                }
                 productRepository.save(product);
 
-                //temporary 1 saga save 1 step
-//                if(stepDecision.getCurrentStepNumber() == 1){
-//                    JSONObject stepState = new JSONObject();
-//                    stepState.put(sagaState.getCurrentStep(), SagaStateStepState.SUCCEEDED);
-//                    sagaState.setStepState(stepState.toString());
-//                }else {
-//                    JSONObject stepState = new JSONObject(sagaState.getStepState());
-//                    stepState.put(sagaState.getCurrentStep(), SagaStateStepState.SUCCEEDED);
-//                    sagaState.setStepState(stepState.toString());
-//                }
-                JSONObject stepState = new JSONObject();
-//                String currentStep = "Index-"+Integer.toString(abortItemIndex)+"-"+AggregateType.TRAVEL_INSURANCE;//orderService
-                String currentStep = "CurrentStep-"+Integer.toString(stepDecision.getCurrentStepNumber())+"-"+"Product";
-                stepState.put(currentStep, SagaStateStepState.SUCCEEDED);
-                sagaState.setStepState(stepState.toString());
+                if(stepDetail.getStepNumber() == 1){
+                    JSONObject stepState = new JSONObject();
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.SUCCEEDED);
+                    sagaState.setStepState(stepState.toString());
+                }else {
+                    JSONObject stepState = new JSONObject(sagaState.getStepState());
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.SUCCEEDED);
+                    sagaState.setStepState(stepState.toString());
+                }
 
-                //temporary 1 saga save 1 step
-//                if(stepDecision.getCurrentStepNumber() == productApprovalFlow.getNumberOfSteps()){
-//                    sagaState.setCurrentStep("");
-//                    sagaState.setStatus(SagaStateStatus.SUCCEEDED);
-//                    sagaState.setFinishedLogtimestamp(createAt);
-//                }else {
-//                    //temporary 1 saga save 1 step
-//                    sagaState.setCurrentStep(Integer.toString(stepDecision.getCurrentStepNumber()));
-//                }
+                if(stepDetail.getStepNumber() == stepFlows.size()){
+                    sagaState.setCurrentStep(null);
+                    sagaState.setStatus(SagaStatus.SUCCEEDED);
+                    sagaState.setFinishedLogtimestamp(createAt);
+                }
+                sagaStateRepository.save(sagaState);
 
-                sagaState.setCurrentStep("");
-                sagaState.setStatus(SagaStateStatus.SUCCEEDED);
+                if ("Approve".equals(stepDetail.getDecision()) && stepDetail.getStepNumber() < stepFlows.size()) {
+                    //create outbox
+                    Outbox outBox = new Outbox();
+                    outBox.setAggregateId(aggregateId);
+                    outBox.setCreatedLogtimestamp(new Date());
+                    outBox.setAggregateType("Product");
+                    outBox.setType(OutboxType.WAITING_APPROVE);
+
+                    // index i --> stepNumber = i+1
+                    stepDetail.setStepName(stepFlows.get(stepDetail.getStepNumber()).getStepName());
+                    stepDetail.setRoleName(stepFlows.get(stepDetail.getStepNumber()).getRoleName());
+                    stepDetail.setStepNumber(stepDetail.getStepNumber()+1);
+                    outBox.setPayload(new JSONObject(stepDetail).toString());
+                    outboxRepository.save(outBox);
+                }
+
+            }catch (Exception ex) {
+                Product product = productRepository.findByProductId(Long.parseLong(aggregateId)).orElse(null);
+                product.setCurrentSagaId(null);
+                productRepository.save(product);
+
+                SagaState sagaState = sagaStateRepository.findById(stepDetail.getRequestId()).orElse(null);
+                sagaState.setCurrentStep(null);
+
+                if(stepDetail.getStepNumber() == 1){
+                    JSONObject stepState = new JSONObject();
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.ERROR);
+                    sagaState.setStepState(stepState.toString());
+                }else {
+                    JSONObject stepState = new JSONObject(sagaState.getStepState());
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.ERROR);
+                    sagaState.setStepState(stepState.toString());
+                }
+                sagaState.setStatus(SagaStatus.ERROR);
                 sagaState.setFinishedLogtimestamp(createAt);
                 sagaStateRepository.save(sagaState);
-            }catch (Exception ex) {
-                SagaState sagaState = sagaStateRepository.findById(stepDecision.getRequestId()).orElse(null);
 
-                //temporary 1 saga save 1 step
-//                if(stepDecision.getCurrentStepNumber() == 1){
-//                    JSONObject stepState = new JSONObject();
-//                    stepState.put(sagaState.getCurrentStep(), SagaStateStepState.ERROR);
-//                    sagaState.setStepState(stepState.toString());
-//                }else {
-//                    JSONObject stepState = new JSONObject(sagaState.getStepState());
-//                    stepState.put(sagaState.getCurrentStep(), SagaStateStepState.ERROR);
-//                    sagaState.setStepState(stepState.toString());
-//                }
-                JSONObject stepState = new JSONObject();
-                stepState.put(sagaState.getCurrentStep(), SagaStateStepState.SUCCEEDED);
-                sagaState.setStepState(stepState.toString());
+                throw ex;
+            }
+        }
 
-                sagaState.setCurrentStep("");
-                sagaState.setStatus(SagaStateStatus.ERROR);
-                sagaState.setFinishedLogtimestamp(createAt);
+        if (type.equals(OutboxType.WAITING_APPROVE)) {
+            try {
+                SagaState sagaState = sagaStateRepository.findById(stepDetail.getRequestId()).orElse(null);
+                CurrentStepSaga currentStepSaga = new CurrentStepSaga();
+                currentStepSaga.setCurrentStep(stepDetail.getStepNumber());
+                currentStepSaga.setSagaType(SagaType.APPROVE_CREATED_PRODUCT);
+//                String currentStep = SagaType.APPROVE_CREATED_PRODUCT+"-CurrentStep-"+Integer.toString(stepDetail.getStepNumber());
+                sagaState.setCurrentStep(gson.toJson(currentStepSaga));
+
+                if(stepDetail.getStepNumber() == 1){
+                    JSONObject stepState = new JSONObject();
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.STARTED);
+                    sagaState.setStepState(stepState.toString());
+                }else {
+                    JSONObject stepState = new JSONObject(sagaState.getStepState());
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.STARTED);
+                    sagaState.setStepState(stepState.toString());
+                }
+                sagaStateRepository.save(sagaState);
+
+            } catch (Exception ex) {
+                Product product = productRepository.findByProductId(Long.parseLong(aggregateId)).orElse(null);
+                product.setCurrentSagaId(null);
+                productRepository.save(product);
+
+                SagaState sagaState = sagaStateRepository.findById(stepDetail.getRequestId()).orElse(null);
+                sagaState.setCurrentStep(null);
+
+                if(stepDetail.getStepNumber() == 1){
+                    JSONObject stepState = new JSONObject();
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.ERROR);
+                    sagaState.setStepState(stepState.toString());
+                }else {
+                    JSONObject stepState = new JSONObject(sagaState.getStepState());
+                    stepState.put(sagaState.getCurrentStep(), SagaStepState.ERROR);
+                    sagaState.setStepState(stepState.toString());
+                }
                 sagaStateRepository.save(sagaState);
 
                 throw ex;

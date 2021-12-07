@@ -203,7 +203,6 @@ public class ProductProviderServiceImpl implements ProductProviderService {
     public ResponseEntity<?> getListProductProvider(@Valid @RequestBody BaseDetail<QueryAllProductTypeRequest> queryAllProductTypeRequestBaseDetail ,
                                                     HttpServletRequest request,
                                                     HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
-        int totalPage = 0 ;
         BaseResponseGetAll response = new BaseResponseGetAll();
         ObjectMapper mapper = new ObjectMapper();
         String hostName = request.getRemoteHost();
@@ -224,7 +223,7 @@ public class ProductProviderServiceImpl implements ProductProviderService {
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
 
         if(!allProductTypes.isEmpty()) {
-            totalPage = (int) Math.ceil((double) allProductTypes.getTotalElements()/size);
+            int totalPage = (int) Math.ceil((double) allProductTypes.getTotalElements()/size);
 
             //set response data to client
             response.setResponseId(queryAllProductTypeRequestBaseDetail.getRequestId());

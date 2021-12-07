@@ -15,8 +15,8 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Orders, String> {
 
-//    @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
-//    public OrdersServiceEntity findByOrderId(@Param("order_id") UUID orderId);
+    @Query(value = "SELECT * FROM orders WHERE order_id=:order_id for update", nativeQuery = true)
+    public Optional<Orders> findAndLock(@Param("order_id") String orderId);
 
     @Query(value = "SELECT * FROM orders WHERE order_id=:order_id", nativeQuery = true)
     public Optional<Orders> findByOrderId(@Param("order_id") String orderId);

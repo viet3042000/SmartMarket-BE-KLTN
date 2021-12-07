@@ -1,6 +1,6 @@
 package com.smartmarket.code.constants;
 
-public class OrderEntityState {
+public class OrderState {
     public static final String PENDING = "Pending";//create
     public static final String SUCCEEDED = "Succeeded";//create Succeeded
     public static final String CANCELING = "Canceling";//cancel

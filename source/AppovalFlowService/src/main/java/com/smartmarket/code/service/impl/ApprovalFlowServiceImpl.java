@@ -54,25 +54,22 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
     public ResponseEntity<?> createApprovalFlow(@Valid @RequestBody BaseDetail<CreateApprovalFlowRequest> createApprovalFlowRequestBaseDetail ,
                                                 HttpServletRequest request,
                                                 HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        Long productProviderId = createApprovalFlowRequestBaseDetail.getDetail().getProductProviderId();
+        String productProviderName = createApprovalFlowRequestBaseDetail.getDetail().getProductProviderName();
         String flowName = createApprovalFlowRequestBaseDetail.getDetail().getFlowName();
-        String productName = createApprovalFlowRequestBaseDetail.getDetail().getProductName();
 
-        ApprovalFlow approvalFlow = approvalFlowRepository.findApprovalFlowOfProduct(productName,productProviderId,flowName).orElse(null);
+        ApprovalFlow approvalFlow = approvalFlowRepository.findApprovalFlow(productProviderName,flowName).orElse(null);
         if(approvalFlow !=null) {
             throw new CustomException("approvalFlow existed", HttpStatus.BAD_REQUEST, createApprovalFlowRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
-        String providerName = productProviderRepository.getProductProviderName(productProviderId);
+        String providerName = productProviderRepository.getByProductProviderName(productProviderName);
         if(providerName == null){
             throw new CustomException("productProvider does not exist", HttpStatus.BAD_REQUEST, createApprovalFlowRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         ApprovalFlow newApprovalFlow = new ApprovalFlow();
         newApprovalFlow.setFlowName(flowName);
-        newApprovalFlow.setProductProviderId(productProviderId);
-        newApprovalFlow.setProductName(productName);
+        newApprovalFlow.setProductProviderName(productProviderName);
         newApprovalFlow.setCreatedLogtimestamp(new Date());
-        newApprovalFlow.setNumberOfSteps(0);
         approvalFlowRepository.save(newApprovalFlow);
 
         BaseResponse response = new BaseResponse();
@@ -100,17 +97,15 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
             throw new CustomException("UserName doesn't exist in ApprovalFlowService", HttpStatus.BAD_REQUEST, updateApprovalFlowRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
 
-        Long productProviderId = updateApprovalFlowRequestBaseDetail.getDetail().getProductProviderId();
+        String productProviderName = updateApprovalFlowRequestBaseDetail.getDetail().getProductProviderName();
         String flowName = updateApprovalFlowRequestBaseDetail.getDetail().getFlowName();
-        String productName = updateApprovalFlowRequestBaseDetail.getDetail().getProductName();
 
-        ApprovalFlow approvalFlow = approvalFlowRepository.findApprovalFlowOfProduct(productName,productProviderId,flowName).orElse(null);
+        ApprovalFlow approvalFlow = approvalFlowRepository.findApprovalFlow(productProviderName,flowName).orElse(null);
         if(approvalFlow ==null){
             throw new CustomException("approvalFlow does not exist", HttpStatus.BAD_REQUEST, updateApprovalFlowRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
         ArrayList<StepFlow> flowStepDetail =  updateApprovalFlowRequestBaseDetail.getDetail().getFlowStepDetail();
         approvalFlow.setStepDetail(new Gson().toJson(flowStepDetail));
-        approvalFlow.setNumberOfSteps(flowStepDetail.size());
         approvalFlowRepository.save(approvalFlow);
 
         BaseResponse response = new BaseResponse();

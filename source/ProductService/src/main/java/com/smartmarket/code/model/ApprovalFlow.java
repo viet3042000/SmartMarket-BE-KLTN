@@ -21,19 +21,12 @@ public class ApprovalFlow implements Serializable {
     @Column(name = "flow_name")
     private String flowName;
 
-    //BICTRV
-    @Column(name = "product_name")
-    private String productName;
-
-    @Column(name = "product_provider_id")
-    private Long productProviderId;
+    @Column(name = "product_provider_name")
+    private String productProviderName;
 
     //null(default)
     @Column(name = "step_detail")
     private String stepDetail;
-
-    @Column(name = "number_of_steps")
-    private int numberOfSteps;
 
     @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)

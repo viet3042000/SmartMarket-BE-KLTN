@@ -13,13 +13,9 @@ import java.io.Serializable;
 @Setter
 public class CreateApprovalFlowRequest implements Serializable {
 
-    @NotBlank(message = "productName is require")
-    @Size(max = 100, message = "productName should be less than or equal to 100 characters")
-    private String productName;
-
-    @NotNull(message = "productProviderId is require")
-    @Min(value = 0)
-    private Long productProviderId;
+    @NotBlank(message = "productProviderName is require")
+    @Size(max = 100, message = "productProviderName should be less than or equal to 100 characters")
+    private String productProviderName;
 
     //createProduct/updateProduct/deleteProduct/...
     @NotBlank(message = "flowName is require")
