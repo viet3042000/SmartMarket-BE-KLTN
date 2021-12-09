@@ -175,15 +175,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     //Admin(kltn)+ Provider
-    @Transactional//begin transaction from begin of function and commit at the end of function by default
+//    @Transactional//begin transaction from begin of function and commit at the end of function by default
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         String userName = updateProductRequestBaseDetail.getDetail().getUserName();
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
 
 //        productRepository.beginTransaction();//begin transaction from here
 
-//        Product product = productRepository.findByProductName(productName).orElse(null);
-        Product product = productRepository.findAndLock(productName).orElse(null);
+        Product product = productRepository.findByProductName(productName).orElse(null);
+//        Product product = productRepository.findAndLock(productName).orElse(null);
         if(product == null){
             throw new CustomException("productName does not exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
@@ -265,7 +265,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
-        sagaStateRepository.deleteByProductId(Long.toString(product.getId()));
+//        sagaStateRepository.deleteByProductId(Long.toString(product.getId()));
         productApprovalFlowRepository.deleteByProductId(product.getId());
 
         BaseResponse response = new BaseResponse();
@@ -520,8 +520,8 @@ public class ProductServiceImpl implements ProductService {
 //        }
 
         String currentState = product.getState();
-        if(ProductState.APPROVED.equals(currentState)){
-            throw new CustomException("Product was completed", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        if(!ProductState.PENDING.equals(currentState)){
+            throw new CustomException("Product's state isn't pending", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         SagaState sagaState = sagaStateRepository.findById(product.getCurrentSagaId()).orElse(null);
