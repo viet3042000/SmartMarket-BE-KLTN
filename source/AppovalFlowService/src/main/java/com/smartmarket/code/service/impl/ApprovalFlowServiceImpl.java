@@ -41,9 +41,6 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
     ApprovalFlowRepository approvalFlowRepository;
 
     @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
     ProductProviderRepository productProviderRepository;
 
     @Autowired
