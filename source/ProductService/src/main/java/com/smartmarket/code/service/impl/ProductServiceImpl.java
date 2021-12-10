@@ -608,17 +608,24 @@ public class ProductServiceImpl implements ProductService {
         BaseResponseGetAll response = new BaseResponseGetAll();
         if(!productList.isEmpty()) {
             int totalPage = (int) Math.ceil((double) productList.size() / size);
+            response.setPage(page);
+            response.setTotalPage(totalPage);
 
             List allPendingProduct = PagingUtil.getPageLimit(productList, page, size);
-
-            response.setPage(page);
-            response.setTotal(allPendingProduct.stream().count());
-            response.setTotalPage(totalPage);
-            response.setDetail(allPendingProduct);
-            response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+            if(allPendingProduct!=null) {
+                response.setTotal(allPendingProduct.stream().count());
+                response.setDetail(allPendingProduct);
+                response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
+                response.setResponseTime(DateTimeUtils.getCurrentDate());
+                response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+                response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+            }else {
+                response.setTotal(0L);
+                response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
+                response.setResponseTime(DateTimeUtils.getCurrentDate());
+                response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+                response.setResultMessage("No pending approval product");
+            }
         }else {
             response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
