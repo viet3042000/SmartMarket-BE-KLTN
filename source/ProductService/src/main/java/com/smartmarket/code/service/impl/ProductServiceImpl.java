@@ -497,13 +497,13 @@ public class ProductServiceImpl implements ProductService {
     //Provider-i
     public ResponseEntity<?> approvePendingProduct(@Valid @RequestBody BaseDetail<ApprovePendingProductRequest> approvePendingProductRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
         //get user token
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-//        String userName = (String) claims.get("user_name");
-//        User user = userRepository.findByUsername(userName).orElse(null);
-//        if(user == null){
-//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-//        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+        User user = userRepository.findByUsername(userName).orElse(null);
+        if(user == null){
+            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
 
         Long productId = approvePendingProductRequest.getDetail().getProductId();
         Product product = productRepository.findByProductId(productId).orElse(null);
@@ -514,10 +514,10 @@ public class ProductServiceImpl implements ProductService {
 
         Long productProviderId = productProviderRepository.getId(productProviderName);
         //check for user Provider
-//        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
-//        if(userProductProvider == null){
-//            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-//        }
+        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
+        if(userProductProvider == null){
+            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
 
         String currentState = product.getState();
         if(!ProductState.PENDING.equals(currentState)){
@@ -534,10 +534,10 @@ public class ProductServiceImpl implements ProductService {
         List<StepFlow> stepFlows = Arrays.asList(mapper.readValue(productApprovalFlow.getStepDetail(), StepFlow[].class));
         StepFlow stepFlow = stepFlows.get(currentStep-1);
 
-//        ArrayList<String> roles = authorizationService.getRoles();
-//        if(!roles.contains(stepFlow.getRoleName())){
-//            throw new CustomException("Role isn't accepted with current approval step ", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-//        }
+        ArrayList<String> roles = authorizationService.getRoles();
+        if(!roles.contains(stepFlow.getRoleName())){
+            throw new CustomException("Role isn't accepted with current approval step ", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+        }
 
         //create outbox
         Outbox outBox = new Outbox();
