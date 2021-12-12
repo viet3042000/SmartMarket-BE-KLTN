@@ -41,17 +41,24 @@ public class ProductController {
     AuthorizationService authorizationService;
 
 
-    //Provider
+    //Provider-i
     @PostMapping(value = "/create-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
+            ArrayList<String> listRoles = new ArrayList<>(Arrays.asList("PROVIDER","PROVIDER1", "PROVIDER2", "PROVIDER3", "PROVIDER4","PROVIDER5"));
             if(roles != null) {
-                if (roles.contains("PROVIDER")) {
-                    return productService.createProduct(createProductRequestBaseDetail, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                for(int i =0; i<listRoles.size();i++) {
+                    String role = listRoles.get(i);
+                    if (!roles.contains(role)) {
+                        if(i == listRoles.size()-1) {
+                            throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                        }
+                    }else{
+                        break;
+                    }
                 }
+                return productService.createProduct(createProductRequestBaseDetail, request, responseSelvet);
             }else {
                 throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
@@ -91,17 +98,24 @@ public class ProductController {
 
     }
 
-    //Provider
+    //Provider-i
     @PostMapping(value = "/update-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
+            ArrayList<String> listRoles = new ArrayList<>(Arrays.asList("PROVIDER","PROVIDER1", "PROVIDER2", "PROVIDER3", "PROVIDER4","PROVIDER5"));
             if(roles != null) {
-                if (roles.contains("PROVIDER")) {
-                    return productService.updateProduct(updateProductRequestBaseDetail, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                for(int i =0; i<listRoles.size();i++) {
+                    String role = listRoles.get(i);
+                    if (!roles.contains(role)) {
+                        if(i == listRoles.size()-1) {
+                            throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                        }
+                    }else{
+                        break;
+                    }
                 }
+                return productService.updateProduct(updateProductRequestBaseDetail, request, responseSelvet);
             }else {
                 throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
@@ -144,17 +158,24 @@ public class ProductController {
 
     }
 
-    // Provider
+    // Provider-i
     @PostMapping(value = "/delete-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
+            ArrayList<String> listRoles = new ArrayList<>(Arrays.asList("PROVIDER","PROVIDER1", "PROVIDER2", "PROVIDER3", "PROVIDER4","PROVIDER5"));
             if(roles != null) {
-                if (roles.contains("PROVIDER")|| roles.contains("ADMIN")) {
-                    return productService.deleteProduct(deleteProductRequestBaseDetail, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                for(int i =0; i<listRoles.size();i++) {
+                    String role = listRoles.get(i);
+                    if (!roles.contains(role)) {
+                        if(i == listRoles.size()-1) {
+                            throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                        }
+                    }else{
+                        break;
+                    }
                 }
+                return productService.deleteProduct(deleteProductRequestBaseDetail, request, responseSelvet);
             }else {
                 throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
@@ -195,17 +216,24 @@ public class ProductController {
     }
 
 
-    //Provider
+    //Provider-i
     @RequestMapping(value = "/get-product")
     public ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest> queryProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
+            ArrayList<String> listRoles = new ArrayList<>(Arrays.asList("PROVIDER","PROVIDER1", "PROVIDER2", "PROVIDER3", "PROVIDER4","PROVIDER5"));
             if(roles != null) {
-                if (roles.contains("PROVIDER")) {
-                    return productService.getProduct(queryProductRequestBaseDetail, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+                for(int i =0; i<listRoles.size();i++) {
+                    String role = listRoles.get(i);
+                    if (!roles.contains(role)) {
+                        if(i == listRoles.size()-1) {
+                            throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+                        }
+                    }else{
+                        break;
+                    }
                 }
+                return productService.getProduct(queryProductRequestBaseDetail, request, responseSelvet);
             }else {
                 throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
             }
