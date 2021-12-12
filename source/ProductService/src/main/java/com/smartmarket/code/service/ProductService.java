@@ -13,31 +13,31 @@ import java.text.ParseException;
 
 public interface ProductService {
 
-    //Admin(kltn)+ Provider
+    //Provider
     ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws JsonProcessingException, APIAccessException, ParseException;
 
-    //Admin(kltn)+ Provider
+    //Provider
     ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws Exception;
 
-    //Admin(kltn)+ Provider
+    //Provider
     ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws Exception;
 
-    //Admin + Provider
+    //Provider
     ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest> queryProductRequestBaseDetail,
                                  HttpServletRequest request, HttpServletResponse responseSelvet)
                                  throws JsonProcessingException;
 
-    //Admin + Provider
-    ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
-                                               HttpServletRequest request,
-                                               HttpServletResponse responseSelvet)
-                                               throws JsonProcessingException, APIAccessException;
+    //Provider+adminProvider
+//    ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
+//                                               HttpServletRequest request,
+//                                               HttpServletResponse responseSelvet)
+//                                               throws JsonProcessingException, APIAccessException;
 
     //Admin
     ResponseEntity<?> getListProduct(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail ,

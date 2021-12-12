@@ -82,7 +82,6 @@ public class UserController {
     public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -232,7 +231,7 @@ public class UserController {
     }
 
 
-    //user
+    //consumer
     @PostMapping(value = "/register-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
         try{
@@ -273,13 +272,13 @@ public class UserController {
 
     }
 
-    //user
+    //consumer+admin
     @PostMapping(value = "/update-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
-                if (roles.contains("CUSTOMER")|| roles.contains("ADMIN")) {
+                if (roles.contains("CUSTOMER")||roles.contains("ADMIN")) {
                     return userService.updateUser(updateUserRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -328,7 +327,7 @@ public class UserController {
 
     //admin
     @PostMapping(value = "/delete-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
@@ -376,13 +375,13 @@ public class UserController {
 
     }
 
-    //user + admin
+    //consumer+admin
     @RequestMapping(value = "/get-user")
-    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest> getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
-                if (roles.contains("CUSTOMER")|| roles.contains("ADMIN")) {
+                if (roles.contains("CUSTOMER")||roles.contains("ADMIN")) {
                     return userService.getDetailUser(getDetailUserRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, getDetailUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -426,7 +425,7 @@ public class UserController {
 
     }
 
-    //user
+    //consumer+admin
     @PostMapping(value = "/change-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
@@ -476,7 +475,7 @@ public class UserController {
 
     }
 
-    //user
+    //consumer
     @PostMapping(value = "/forgot-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> forgotpassword(@Valid @RequestBody BaseDetail<ForgotPasswordRequest> forgotPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
@@ -518,7 +517,7 @@ public class UserController {
 
     }
 
-    //user
+    //consumer
     @PostMapping(value = "/reset-password", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> resetpassword(@Valid @RequestBody BaseDetail<ResetPasswordRequest> resetPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{

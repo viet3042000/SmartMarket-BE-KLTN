@@ -41,13 +41,13 @@ public class ProductController {
     AuthorizationService authorizationService;
 
 
-    //Admin(kltn)+ Provider
+    //Provider
     @PostMapping(value = "/create-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
-                if (roles.contains("PROVIDER")|| roles.contains("ADMIN")) {
+                if (roles.contains("PROVIDER")) {
                     return productService.createProduct(createProductRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -91,13 +91,13 @@ public class ProductController {
 
     }
 
-    //Admin(kltn)+ Provider
+    //Provider
     @PostMapping(value = "/update-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
-                if (roles.contains("PROVIDER")|| roles.contains("ADMIN")) {
+                if (roles.contains("PROVIDER")) {
                     return productService.updateProduct(updateProductRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -144,7 +144,7 @@ public class ProductController {
 
     }
 
-    //Admin(kltn)+ Provider
+    // Provider
     @PostMapping(value = "/delete-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
@@ -195,13 +195,13 @@ public class ProductController {
     }
 
 
-    //Admin + Provider
+    //Provider
     @RequestMapping(value = "/get-product")
     public ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest> queryProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
-                if (roles.contains("ADMIN")||roles.contains("PROVIDER")) {
+                if (roles.contains("PROVIDER")) {
                     return productService.getProduct(queryProductRequestBaseDetail, request, responseSelvet);
                 }else {
                     throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -245,56 +245,56 @@ public class ProductController {
     }
 
 
-    //Admin + Provider
-    @PostMapping(value = "/get-list-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
-                                                      HttpServletRequest request,
-                                                      HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
-        try{
-            ArrayList<String> roles = authorizationService.getRoles();
-            if(roles != null) {
-                if (roles.contains("ADMIN")||roles.contains("PROVIDER")) {
-                    return productService.getListProductOfProvider(queryAllProductOfProviderRequestBaseDetail, request, responseSelvet);
-                }else {
-                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-                }
-            }else {
-                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-            }
-        }catch (Exception ex) {
-            //catch truong hop chua goi dc sang BIC
-            if (ex instanceof ResourceAccessException) {
-                ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
-                if (resourceAccessException.getCause() instanceof ConnectException) {
-                    throw new APIAccessException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
-                } else {
-                    throw new APIAccessException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
-                }
-            }
-
-            //catch truong hop goi dc sang BIC nhưng loi
-            else if (ex instanceof HttpClientErrorException) {
-                HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
-                throw new APIResponseException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
-            }
-
-            //catch invalid input exception
-            else if (ex instanceof InvalidInputException) {
-                throw new InvalidInputException(ex.getMessage(), queryAllProductOfProviderRequestBaseDetail.getRequestId());
-            }
-
-            //catch truong hop loi kết nối database
-            else if (ex.getCause() instanceof JDBCConnectionException) {
-                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            } else if (ex instanceof CustomException) {
-                CustomException customException = (CustomException) ex;
-                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryAllProductOfProviderRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
-            } else {
-                throw ex;
-            }
-        }
-
-    }
+    //Provider
+//    @PostMapping(value = "/get-list-product", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+//    public ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
+//                                                      HttpServletRequest request,
+//                                                      HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
+//        try{
+//            ArrayList<String> roles = authorizationService.getRoles();
+//            if(roles != null) {
+//                if (roles.contains("ADMIN")||roles.contains("PROVIDER")) {
+//                    return productService.getListProductOfProvider(queryAllProductOfProviderRequestBaseDetail, request, responseSelvet);
+//                }else {
+//                    throw new CustomException("Roles of this user is not accepted", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//                }
+//            }else {
+//                throw new CustomException("Roles is Null", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//            }
+//        }catch (Exception ex) {
+//            //catch truong hop chua goi dc sang BIC
+//            if (ex instanceof ResourceAccessException) {
+//                ResourceAccessException resourceAccessException = (ResourceAccessException) ex;
+//                if (resourceAccessException.getCause() instanceof ConnectException) {
+//                    throw new APIAccessException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.SOA_TIMEOUT_BACKEND, ResponseCode.MSG.SOA_TIMEOUT_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+//                } else {
+//                    throw new APIAccessException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, resourceAccessException.getMessage(), Throwables.getStackTraceAsString(resourceAccessException));
+//                }
+//            }
+//
+//            //catch truong hop goi dc sang BIC nhưng loi
+//            else if (ex instanceof HttpClientErrorException) {
+//                HttpClientErrorException httpClientErrorException = (HttpClientErrorException) ex;
+//                throw new APIResponseException(queryAllProductOfProviderRequestBaseDetail.getRequestId(), ResponseCode.CODE.ERROR_WHEN_CALL_TO_BACKEND, ResponseCode.MSG.ERROR_WHEN_CALL_TO_BACKEND_MSG, httpClientErrorException.getStatusCode(), httpClientErrorException.getResponseBodyAsString());
+//            }
+//
+//            //catch invalid input exception
+//            else if (ex instanceof InvalidInputException) {
+//                throw new InvalidInputException(ex.getMessage(), queryAllProductOfProviderRequestBaseDetail.getRequestId());
+//            }
+//
+//            //catch truong hop loi kết nối database
+//            else if (ex.getCause() instanceof JDBCConnectionException) {
+//                throw new ConnectDataBaseException(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            } else if (ex instanceof CustomException) {
+//                CustomException customException = (CustomException) ex;
+//                throw new CustomException(customException.getDetailErrorMessage(), customException.getHttpStatusDetailCode(), queryAllProductOfProviderRequestBaseDetail.getRequestId(), customException.getResponseBIC(), customException.getHttpStatusCode(), customException.getErrorMessage(), customException.getHttpStatusHeader());
+//            } else {
+//                throw ex;
+//            }
+//        }
+//
+//    }
 
 
     //Admin

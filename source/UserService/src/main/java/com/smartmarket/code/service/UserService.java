@@ -18,30 +18,30 @@ public interface UserService {
     //provider_admin
     ResponseEntity<?> createProviderUser(@Valid @RequestBody BaseDetail<CreateProviderUserRequest> createProviderAdminUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 
-    //user
+    //consumer
     ResponseEntity<?> registerUser(@Valid @RequestBody BaseDetail<CreateUserRequest> createUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 
-    //user
+    //consumer+admin
     ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
     //admin
-    ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
+    ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
     //admin
     ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 
-    //user + admin
-    ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest>  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException;
+    //consumer + admin
+    ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException;
 
-    //user
+    //consumer+admin
     ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
-    //user
+    //consumer
     ResponseEntity<?> forgotpassword(@Valid @RequestBody BaseDetail<ForgotPasswordRequest> forgotPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
-    //user
+    //consumer
     ResponseEntity<?> resetpassword(@Valid @RequestBody BaseDetail<ResetPasswordRequest> resetPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
 }

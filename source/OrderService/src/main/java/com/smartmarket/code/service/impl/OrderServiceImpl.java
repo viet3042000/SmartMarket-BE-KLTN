@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     LogServiceImpl logService;
 
-    //user
+    //consumer
     public ResponseEntity<?> createOrder(BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
         //get user token
@@ -173,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //user
+    //consumer
     @Transactional
     public ResponseEntity<?> cancelOrder(BaseDetail<CancelOrderRequest> cancelOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException {
@@ -288,7 +288,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //user + admin
+    //consumer + admin
     @Override
     public ResponseEntity<?> getOrder(BaseDetail<QueryOrderRequest> queryOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         String userName = queryOrderRequest.getDetail().getUserName();
@@ -329,95 +329,95 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //user + admin
-    @Override
-    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
-        String userName = queryAllOrdersOfUserRequest.getDetail().getUserName();
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrdersOfUserRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
-
-        BaseResponseGetAll response = new BaseResponseGetAll();
-        ObjectMapper mapper = new ObjectMapper();
-        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
-        String hostName = request.getRemoteHost();
-
-        int page =  queryAllOrdersOfUserRequest.getDetail().getPage()  ;
-        int size =  queryAllOrdersOfUserRequest.getDetail().getSize()   ;
-        Pageable pageable = PageRequest.of(page-1, size);
-
-        //find by user name
+    //consumer + admin
+//    @Override
+//    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+//        String userName = queryAllOrdersOfUserRequest.getDetail().getUserName();
+//        User user = userRepository.findByUsername(userName).orElse(null);
+//        if(user == null){
+//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrdersOfUserRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        BaseResponseGetAll response = new BaseResponseGetAll();
+//        ObjectMapper mapper = new ObjectMapper();
+//        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+//        String hostName = request.getRemoteHost();
+//
+//        int page =  queryAllOrdersOfUserRequest.getDetail().getPage()  ;
+//        int size =  queryAllOrdersOfUserRequest.getDetail().getSize()   ;
+//        Pageable pageable = PageRequest.of(page-1, size);
+//
+//        //find by user name
+////        Page<Orders> allOrders =
+////                orderRepository.findByUserName(userName,pageable);
+//
+//        //find by user name and type
+////        Page<Orders> allOrders =
+////                orderRepository.findByUserNameAndType(userName,queryAllOrdersOfUserRequest.getType(),pageable);
 //        Page<Orders> allOrders =
-//                orderRepository.findByUserName(userName,pageable);
-
-        //find by user name and type
-//        Page<Orders> allOrders =
-//                orderRepository.findByUserNameAndType(userName,queryAllOrdersOfUserRequest.getType(),pageable);
-        Page<Orders> allOrders =
-                orderRepository.findByUserNameAndType(userName,"comment",pageable);
-
-        if(!allOrders.isEmpty()) {
-            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
-
-            //set response data to client
-            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
-            response.setDetail(allOrders.getContent());
-            response.setPage(page);
-            response.setTotalPage(totalPage);
-            response.setTotal(allOrders.getTotalElements());
-
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-            //get time log
-            String logTimestamp = DateTimeUtils.getCurrentDate();
-            String messageTimestamp = logTimestamp;
-
-            //calculate time duration
-            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-
-            int status = responseSelvet.getStatus();
-            String responseStatus = Integer.toString(status);
-
-            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "orderservice", "1", timeDurationResponse,
-                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-            logService.createSOALog2(soaObject);
-
-        }else{
-            //set response data to client
-            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage("User has no orders");
-
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
-            //get time log
-            String logTimestamp = DateTimeUtils.getCurrentDate();
-            String messageTimestamp = logTimestamp;
-
-            int status = responseSelvet.getStatus();
-            String responseStatus = Integer.toString(status);
-
-            //calculate time duration
-            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-
-            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "orderservice", "1", timeDurationResponse,
-                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-            logService.createSOALog2(soaObject);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//                orderRepository.findByUserNameAndType(userName,"comment",pageable);
+//
+//        if(!allOrders.isEmpty()) {
+//            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
+//
+//            //set response data to client
+//            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
+//            response.setDetail(allOrders.getContent());
+//            response.setPage(page);
+//            response.setTotalPage(totalPage);
+//            response.setTotal(allOrders.getTotalElements());
+//
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+//
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//            //get time log
+//            String logTimestamp = DateTimeUtils.getCurrentDate();
+//            String messageTimestamp = logTimestamp;
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            int status = responseSelvet.getStatus();
+//            String responseStatus = Integer.toString(status);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "orderservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
+//
+//        }else{
+//            //set response data to client
+//            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage("User has no orders");
+//
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//            //get time log
+//            String logTimestamp = DateTimeUtils.getCurrentDate();
+//            String messageTimestamp = logTimestamp;
+//
+//            int status = responseSelvet.getStatus();
+//            String responseStatus = Integer.toString(status);
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "orderservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
+//        }
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
 
     //admin

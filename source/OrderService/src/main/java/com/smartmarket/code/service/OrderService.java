@@ -10,29 +10,29 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 
 public interface OrderService {
-    //user
+    //consumer
     //1 order = 1 type product
     public ResponseEntity<?> createOrder(BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
-    //user
+    //consumer
     //hủy order đã được BIC tạo thành công
     public ResponseEntity<?> cancelOrder(BaseDetail<CancelOrderRequest> cancelOrderRequest,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
-    //user + admin
+    //consumer + admin
     public ResponseEntity<?> getOrder(BaseDetail<QueryOrderRequest> queryOrderRequest,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet)
             throws JsonProcessingException, APIAccessException, ParseException;
 
 
-    //user + admin
-    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
-                                                HttpServletRequest request,
-                                                HttpServletResponse responseSelvet) throws JsonProcessingException;
+//    //consumer + admin
+//    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
+//                                                HttpServletRequest request,
+//                                                HttpServletResponse responseSelvet) throws JsonProcessingException;
 
     //admin
     public ResponseEntity<?> getAllOrders(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,

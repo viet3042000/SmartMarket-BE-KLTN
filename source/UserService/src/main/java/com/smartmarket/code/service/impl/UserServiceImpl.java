@@ -263,10 +263,12 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    //consumer+admin
     public ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
-
-        String userName = updateUserRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
         User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
         if(userUpdate == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -327,15 +329,18 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail<DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    //admin
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        String userName = deleteUserRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
         User userDelete = userRepository.findByUsername(userName).orElse(null) ;
         if(userDelete == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -388,7 +393,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    //admin
     public ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,
                                          HttpServletRequest request,
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException {
@@ -472,15 +477,18 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail<GetDetailUserRequest>  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    //consumer+ admin
+    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        String userName = getDetailUserRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
         User user = userRepository.findByUsername(userName).orElse(null);
         if(user == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, null,null,null, null, HttpStatus.BAD_REQUEST);
@@ -534,21 +542,13 @@ public class UserServiceImpl implements UserService {
 
 
     //front end check 2 password is difference before
+    //consumer+admin
     public ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         //get user token
-        Map<String, Object> claims = null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String nameOfAuthentication = authentication.getClass().getName();
-        if(nameOfAuthentication.contains("KeycloakAuthenticationToken")) {
-            claims = JwtUtils.getClaimsMapFromKeycloakAuthenticationToken(authentication);
-        }else {
-            claims = JwtUtils.getClaimsMap(authentication);
-        }
-
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
         String userName = (String) claims.get("user_name");
-
         User userUpdate = userRepository.findByUsername(userName).orElse(null) ;
-
         if(userUpdate ==null){
             throw new CustomException("User is not exist", HttpStatus.BAD_REQUEST, updatePasswordRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
@@ -576,7 +576,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    //consumer
     public ResponseEntity<?> forgotpassword(@Valid @RequestBody BaseDetail<ForgotPasswordRequest> forgotPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         Optional<User> user = userRepository.findByEmailAndProvider(forgotPasswordRequestBaseDetail.getDetail().getEmail());
         if(!user.isPresent()) {
@@ -634,7 +634,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
+    //consumer
     public ResponseEntity<?> resetpassword(@Valid @RequestBody BaseDetail<ResetPasswordRequest> resetPasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(resetPasswordRequestBaseDetail.getDetail().getToken()).orElse(null);
         if(passwordResetToken == null){

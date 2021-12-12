@@ -83,9 +83,13 @@ public class ProductServiceImpl implements ProductService {
     EntityManager entityManager;
 
 
-    //Admin(kltn)+ Provider
+    //Provider
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
-        String userName = createProductRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+
         String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
         ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
@@ -174,10 +178,14 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)+ Provider
+    //Provider
 //    @Transactional//begin transaction from begin of function and commit at the end of function by default
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        String userName = updateProductRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
 
 //        productRepository.beginTransaction();//begin transaction from here
@@ -244,9 +252,13 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin(kltn)+ Provider
+    //Provider
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        String userName =deleteProductRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+
         String productName = deleteProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -278,14 +290,18 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Admin + Provider
+    //Provider
     public ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest>  queryProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        String userName =queryProductRequestBaseDetail.getDetail().getUserName();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+        String userName = (String) claims.get("user_name");
+
         String productName = queryProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
         if(product == null){
@@ -340,85 +356,93 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
-    //Admin + Provider
-    public ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
-                                                      HttpServletRequest request,
-                                                      HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
-        String userName = queryAllProductOfProviderRequestBaseDetail.getDetail().getUserName();
-        //check for user Provider
-        UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
-        int totalPage = 0 ;
-        BaseResponseGetAll response = new BaseResponseGetAll();
-        ObjectMapper mapper = new ObjectMapper();
-        String hostName = request.getRemoteHost();
-
-        int page =  queryAllProductOfProviderRequestBaseDetail.getDetail().getPage()  ;
-        int size =  queryAllProductOfProviderRequestBaseDetail.getDetail().getSize()   ;
-        Pageable pageable = PageRequest.of(page-1, size);
-
-        //find by user name and type
-        Page<Product> allOrders =
-                productRepository.findByUserName(userName,pageable);
-
-        //get time log
-        String logTimestamp = DateTimeUtils.getCurrentDate();
-        String messageTimestamp = logTimestamp;
-        int status = responseSelvet.getStatus();
-        String responseStatus = Integer.toString(status);
-        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
-
-        if(!allOrders.isEmpty()) {
-            totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
-
-            //set response data to client
-            response.setResponseId(queryAllProductOfProviderRequestBaseDetail.getRequestId());
-            response.setDetail(allOrders.getContent());
-            response.setPage(page);
-            response.setTotalPage(totalPage);
-            response.setTotal(allOrders.getTotalElements());
-
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
-            //calculate time duration
-            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-
-            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductOfProviderRequestBaseDetail.getRequestId(), queryAllProductOfProviderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "productservice", "1", timeDurationResponse,
-                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-            logService.createSOALog2(soaObject);
-
-        }else{
-            //set response data to client
-            response.setResponseId(queryAllProductOfProviderRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage("This provider has no product");
-
-            String responseBody = mapper.writeValueAsString(response);
-            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-
-            //calculate time duration
-            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-
-            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductOfProviderRequestBaseDetail.getRequestId(), queryAllProductOfProviderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
-                    messageTimestamp, "productservice", "1", timeDurationResponse,
-                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-            logService.createSOALog2(soaObject);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    //Provider
+//    public ResponseEntity<?> getListProductOfProvider(@Valid @RequestBody BaseDetail<QueryAllProductOfProviderRequest> queryAllProductOfProviderRequestBaseDetail ,
+//                                                      HttpServletRequest request,
+//                                                      HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException{
+//        //get user token
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
+//        String userName = (String) claims.get("user_name");
+//        User user = userRepository.findByUsername(userName).orElse(null);
+//        if(user == null){
+//            throw new CustomException("UserName doesn't exist in productService", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        //check for user Provider
+//        UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);
+//        if(userProductProvider == null){
+//            throw new CustomException("userName in claim doesn't exist in userProductProvider table", HttpStatus.BAD_REQUEST, queryAllProductOfProviderRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        int totalPage = 0 ;
+//        BaseResponseGetAll response = new BaseResponseGetAll();
+//        ObjectMapper mapper = new ObjectMapper();
+//        String hostName = request.getRemoteHost();
+//
+//        int page =  queryAllProductOfProviderRequestBaseDetail.getDetail().getPage()  ;
+//        int size =  queryAllProductOfProviderRequestBaseDetail.getDetail().getSize()   ;
+//        Pageable pageable = PageRequest.of(page-1, size);
+//
+//        //find by user name and type
+//        Page<Product> allOrders =
+//                productRepository.findByUserName(userName,pageable);
+//
+//        //get time log
+//        String logTimestamp = DateTimeUtils.getCurrentDate();
+//        String messageTimestamp = logTimestamp;
+//        int status = responseSelvet.getStatus();
+//        String responseStatus = Integer.toString(status);
+//        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
+//
+//        if(!allOrders.isEmpty()) {
+//            totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
+//
+//            //set response data to client
+//            response.setResponseId(queryAllProductOfProviderRequestBaseDetail.getRequestId());
+//            response.setDetail(allOrders.getContent());
+//            response.setPage(page);
+//            response.setTotalPage(totalPage);
+//            response.setTotal(allOrders.getTotalElements());
+//
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
+//
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductOfProviderRequestBaseDetail.getRequestId(), queryAllProductOfProviderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "productservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
+//
+//        }else{
+//            //set response data to client
+//            response.setResponseId(queryAllProductOfProviderRequestBaseDetail.getRequestId());
+//            response.setResponseTime(DateTimeUtils.getCurrentDate());
+//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+//            response.setResultMessage("This provider has no product");
+//
+//            String responseBody = mapper.writeValueAsString(response);
+//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+//
+//            //calculate time duration
+//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+//
+//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllProductOfProviderRequestBaseDetail.getRequestId(), queryAllProductOfProviderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+//                    messageTimestamp, "productservice", "1", timeDurationResponse,
+//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+//            logService.createSOALog2(soaObject);
+//        }
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
 
     //Admin
@@ -500,10 +524,6 @@ public class ProductServiceImpl implements ProductService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
         String userName = (String) claims.get("user_name");
-        User user = userRepository.findByUsername(userName).orElse(null);
-        if(user == null){
-            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, approvePendingProductRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
 
         Long productId = approvePendingProductRequest.getDetail().getProductId();
         Product product = productRepository.findByProductId(productId).orElse(null);
@@ -572,10 +592,6 @@ public class ProductServiceImpl implements ProductService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
         String userName = (String) claims.get("user_name");
-//        User user = userRepository.findByUsername(userName).orElse(null);
-//        if(user == null){
-//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryPendingProductRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-//        }
 
         //check for user Provider
         UserProductProvider userProductProvider = userProductProviderRepository.findByUserName(userName).orElse(null);

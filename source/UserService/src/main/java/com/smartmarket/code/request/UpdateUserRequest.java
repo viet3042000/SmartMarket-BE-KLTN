@@ -11,9 +11,9 @@ import java.io.Serializable;
 @Setter
 public class UpdateUserRequest implements Serializable {
 
-    @NotBlank(message = "userName is require")
-    @Size(max = 30, message = "userName should be less than or equal to 30 characters")
-    private String userName;
+//    @NotBlank(message = "userName is require")
+//    @Size(max = 30, message = "userName should be less than or equal to 30 characters")
+//    private String userName;
 
     @Size(max =50, message = "email should be less than or equal to 50 characters")
     @Email
