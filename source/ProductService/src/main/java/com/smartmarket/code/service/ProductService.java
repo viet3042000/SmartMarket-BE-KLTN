@@ -13,22 +13,22 @@ import java.text.ParseException;
 
 public interface ProductService {
 
-    //Provider
+    //Provider-i
     ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws JsonProcessingException, APIAccessException, ParseException;
 
-    //Provider
+    //Provider-i
     ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws Exception;
 
-    //Provider
+    //Provider-i
     ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail,
                                     HttpServletRequest request, HttpServletResponse responseSelvet)
                                     throws Exception;
 
-    //Provider
+    //Provider-i
     ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest> queryProductRequestBaseDetail,
                                  HttpServletRequest request, HttpServletResponse responseSelvet)
                                  throws JsonProcessingException;

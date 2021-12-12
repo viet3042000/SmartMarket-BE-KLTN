@@ -8,6 +8,7 @@ import com.smartmarket.code.exception.*;
 import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.request.*;
+import com.smartmarket.code.request.entity.DeleteUserRequest;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.UserCreateResponse;
 //import com.smartmarket.code.service.KeycloakAdminClientService;
@@ -330,17 +331,14 @@ public class UserServiceImpl implements UserService {
     }
 
     //admin
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail <DeleteUserRequest>  deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
 
-        //get user token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-        String userName = (String) claims.get("user_name");
+        String userName = deleteUserRequestBaseDetail.getDetail().getUserName();
         User userDelete = userRepository.findByUsername(userName).orElse(null) ;
         if(userDelete == null){
             throw new CustomException("User does not exist", HttpStatus.BAD_REQUEST, deleteUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
@@ -477,7 +475,7 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //consumer+ admin
+    //consumer + admin
     public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         // declare value for log
         //get time log

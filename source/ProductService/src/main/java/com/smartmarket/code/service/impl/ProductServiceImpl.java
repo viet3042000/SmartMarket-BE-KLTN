@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
     EntityManager entityManager;
 
 
-    //Provider
+    //Provider-i
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         //get user token
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -178,7 +178,7 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider
+    //Provider-i
 //    @Transactional//begin transaction from begin of function and commit at the end of function by default
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         //get user token
@@ -252,7 +252,7 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider
+    //Provider-i
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
         //get user token
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -290,7 +290,7 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider
+    //Provider-i
     public ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest>  queryProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();

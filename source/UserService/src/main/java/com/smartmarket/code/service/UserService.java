@@ -3,6 +3,7 @@ package com.smartmarket.code.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.smartmarket.code.exception.APIAccessException;
 import com.smartmarket.code.request.*;
+import com.smartmarket.code.request.entity.DeleteUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -25,7 +26,7 @@ public interface UserService {
     ResponseEntity<?> updateUser(@Valid @RequestBody BaseDetail<UpdateUserRequest> updateUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
     //admin
-    ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
+    ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail <DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;
 
     //admin
     ResponseEntity<?> getListUser(@Valid @RequestBody BaseDetail<QueryAllUserRequest> getListUserRequestBaseDetail ,

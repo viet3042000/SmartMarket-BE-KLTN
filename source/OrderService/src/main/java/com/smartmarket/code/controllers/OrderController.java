@@ -34,7 +34,7 @@ public class OrderController {
     @Autowired
     AuthorizationService authorizationService;
 
-    //user
+    //consumer
     @PostMapping(value = "/create-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> createOrder(@Valid @RequestBody BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{
@@ -82,7 +82,7 @@ public class OrderController {
         }
     }
 
-    //user
+    //consumer
     @PostMapping(value = "/cancel-order", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<?> cancelOrder(@Valid @RequestBody BaseDetail<CancelOrderRequest> cancelOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
         try{

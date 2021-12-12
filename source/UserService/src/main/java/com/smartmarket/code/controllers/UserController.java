@@ -8,6 +8,7 @@ import com.smartmarket.code.dao.UserRepository;
 import com.smartmarket.code.dao.UserRoleRepository;
 import com.smartmarket.code.exception.*;
 import com.smartmarket.code.request.*;
+import com.smartmarket.code.request.entity.DeleteUserRequest;
 import com.smartmarket.code.service.AuthorizationService;
 import com.smartmarket.code.service.UserProfileService;
 import com.smartmarket.code.service.UserRoleService;
@@ -327,7 +328,7 @@ public class UserController {
 
     //admin
     @PostMapping(value = "/delete-user", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody BaseDetail <DeleteUserRequest> deleteUserRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
