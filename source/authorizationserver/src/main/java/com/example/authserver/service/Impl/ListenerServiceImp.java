@@ -44,21 +44,17 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     RoleService roleService;
 
-//    @Value("${kafka.topic.users}")
-//    String topicUsers;
-    String topicUsers ="userservice.public.users";
+    @Value("${kafka.topic.users}")
+    String topicUsers;
 
-//    @Value("${kafka.topic.user_role}")
-//    String topicUserRole;
-    String topicUserRole ="userservice.public.user_role";
+    @Value("${kafka.topic.user_role}")
+    String topicUserRole;
 
-//    @Value("${kafka.topic.roles}")
-//    String topicRole;
-    String topicRole = "userservice.public.roles";
+    @Value("${kafka.topic.roles}")
+    String topicRole;
 
 
-//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
-    @KafkaListener(id = "group_id_author_server_users",topics = "userservice.public.users")
+    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
@@ -150,8 +146,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
-    @KafkaListener(id = "group_id_author_server_user_role",topics = "userservice.public.user_role")
+    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
@@ -243,8 +238,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-//    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
-    @KafkaListener(id = "group_id_author_server_roles", topics = "userservice.public.roles")
+    @KafkaListener(id = "${kafka.groupID.roles}",topics = "${kafka.topic.roles}")
     public void listenRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op = "";
         try {
