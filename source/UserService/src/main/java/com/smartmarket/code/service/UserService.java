@@ -34,7 +34,7 @@ public interface UserService {
                                          HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException;
 
     //consumer + admin
-    ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException;
+    ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseRequest  getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException;
 
     //consumer+admin
     ResponseEntity<?> changePassword(@Valid @RequestBody BaseDetail<UpdatePasswordRequest> updatePasswordRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception;

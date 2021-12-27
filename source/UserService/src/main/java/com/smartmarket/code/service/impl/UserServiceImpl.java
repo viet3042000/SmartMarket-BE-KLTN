@@ -476,7 +476,7 @@ public class UserServiceImpl implements UserService {
     }
 
     //consumer + admin
-    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseRequest getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         // declare value for log
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();

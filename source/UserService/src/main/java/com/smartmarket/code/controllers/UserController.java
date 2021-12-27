@@ -378,7 +378,7 @@ public class UserController {
 
     //consumer+admin
     @RequestMapping(value = "/get-user")
-    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseDetail getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
+    public ResponseEntity<?> getDetailUser(@Valid @RequestBody BaseRequest getDetailUserRequestBaseDetail,HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
         try{
             ArrayList<String> roles = authorizationService.getRoles();
             if(roles != null) {
