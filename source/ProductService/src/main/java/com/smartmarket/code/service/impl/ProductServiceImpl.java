@@ -629,7 +629,7 @@ public class ProductServiceImpl implements ProductService {
 
             List allPendingProduct = PagingUtil.getPageLimit(productList, page, size);
             if(allPendingProduct!=null) {
-                response.setTotal(allPendingProduct.stream().count());
+                response.setTotal(productList.stream().count());
                 response.setDetail(allPendingProduct);
                 response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
                 response.setResponseTime(DateTimeUtils.getCurrentDate());
