@@ -601,6 +601,14 @@ public class ProductServiceImpl implements ProductService {
 
         ProductProvider productProvider = productProviderRepository.findByProductProviderId(userProductProvider.getProductProviderId()).orElse(null);
         List<Product> productList = productRepository.findPendingProduct(productProvider.getProductProviderName());
+        BaseResponseGetAll response = new BaseResponseGetAll();
+        if(productList.isEmpty()){
+            response.setResponseId(queryPendingProductRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("No pending approval product with this username");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
 
         ArrayList<String> roles = authorizationService.getRoles();
         ObjectMapper mapper = new ObjectMapper();
@@ -621,7 +629,6 @@ public class ProductServiceImpl implements ProductService {
 
         int page =  queryPendingProductRequestBaseDetail.getDetail().getPage()  ;
         int size =  queryPendingProductRequestBaseDetail.getDetail().getSize()   ;
-        BaseResponseGetAll response = new BaseResponseGetAll();
         if(!productList.isEmpty()) {
             int totalPage = (int) Math.ceil((double) productList.size() / size);
             response.setPage(page);

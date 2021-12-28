@@ -5,23 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.smartmarket.code.constants.*;
 import com.smartmarket.code.dao.*;
-import com.smartmarket.code.exception.*;
+import com.smartmarket.code.exception.APIAccessException;
+import com.smartmarket.code.exception.CustomException;
 import com.smartmarket.code.model.*;
 import com.smartmarket.code.model.entitylog.ServiceObject;
 import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.*;
-import com.smartmarket.code.request.entity.ItemDetailCreateRequest;
 import com.smartmarket.code.request.entity.ItemDetailCancelRequest;
+import com.smartmarket.code.request.entity.ItemDetailCreateRequest;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.service.OrderService;
 import com.smartmarket.code.util.*;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,6 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
@@ -59,17 +59,15 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     ProductRepository productRepository;
 
-    @Autowired
-    ConfigurableEnvironment environment;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
-    MapperUtils mapperUtils;
-
-    @Autowired
-    SetResponseUtils setResponseUtils;
+    GetKeyPairUtil getKeyPairUtil;
 
     @Autowired
     LogServiceImpl logService;
+
 
     //consumer
     public ResponseEntity<?> createOrder(BaseDetail<CreateOrderRequest> createOrderRequest, HttpServletRequest request, HttpServletResponse responseSelvet)
@@ -329,115 +327,69 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    //consumer + admin
-//    @Override
-//    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
-//        String userName = queryAllOrdersOfUserRequest.getDetail().getUserName();
-//        User user = userRepository.findByUsername(userName).orElse(null);
-//        if(user == null){
-//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrdersOfUserRequest.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        BaseResponseGetAll response = new BaseResponseGetAll();
-//        ObjectMapper mapper = new ObjectMapper();
-//        Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
-//        String hostName = request.getRemoteHost();
-//
-//        int page =  queryAllOrdersOfUserRequest.getDetail().getPage()  ;
-//        int size =  queryAllOrdersOfUserRequest.getDetail().getSize()   ;
-//        Pageable pageable = PageRequest.of(page-1, size);
-//
-//        //find by user name
-////        Page<Orders> allOrders =
-////                orderRepository.findByUserName(userName,pageable);
-//
-//        //find by user name and type
-////        Page<Orders> allOrders =
-////                orderRepository.findByUserNameAndType(userName,queryAllOrdersOfUserRequest.getType(),pageable);
-//        Page<Orders> allOrders =
-//                orderRepository.findByUserNameAndType(userName,"comment",pageable);
-//
-//        if(!allOrders.isEmpty()) {
-//            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
-//
-//            //set response data to client
-//            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
-//            response.setDetail(allOrders.getContent());
-//            response.setPage(page);
-//            response.setTotalPage(totalPage);
-//            response.setTotal(allOrders.getTotalElements());
-//
-//            response.setResponseTime(DateTimeUtils.getCurrentDate());
-//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-//            response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
-//
-//            String responseBody = mapper.writeValueAsString(response);
-//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-//            //get time log
-//            String logTimestamp = DateTimeUtils.getCurrentDate();
-//            String messageTimestamp = logTimestamp;
-//
-//            //calculate time duration
-//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-//
-//            int status = responseSelvet.getStatus();
-//            String responseStatus = Integer.toString(status);
-//
-//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-//                    messageTimestamp, "orderservice", "1", timeDurationResponse,
-//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-//            logService.createSOALog2(soaObject);
-//
-//        }else{
-//            //set response data to client
-//            response.setResponseId(queryAllOrdersOfUserRequest.getRequestId());
-//            response.setResponseTime(DateTimeUtils.getCurrentDate());
-//            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-//            response.setResultMessage("User has no orders");
-//
-//            String responseBody = mapper.writeValueAsString(response);
-//            JSONObject transactionDetailResponse = new JSONObject(responseBody);
-//
-//            //get time log
-//            String logTimestamp = DateTimeUtils.getCurrentDate();
-//            String messageTimestamp = logTimestamp;
-//
-//            int status = responseSelvet.getStatus();
-//            String responseStatus = Integer.toString(status);
-//
-//            //calculate time duration
-//            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
-//
-//            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrdersOfUserRequest.getRequestId(), queryAllOrdersOfUserRequest.getRequestTime(), null, "smartMarket", "client",
-//                    messageTimestamp, "orderservice", "1", timeDurationResponse,
-//                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
-//                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
-//            logService.createSOALog2(soaObject);
-//        }
-//
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
-
-
-    //admin
+    //customer + admin
     @Override
     public ResponseEntity<?> getAllOrders(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException {
-        BaseResponseGetAll response = new BaseResponseGetAll();
-        ObjectMapper mapper = new ObjectMapper();
+        //get user token
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);
+
+        String userName = (String) claims.get("user_name");
+        UserRole userRole = userRoleRepository.findByUserName(userName).orElse(null);
+        if(userRole == null){
+            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+        }
+//        User user = userRepository.findByUsername(userName).orElse(null);
+//        if(user == null){
+//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//        }
+
+        //eliminate null value from conditions
+        JSONObject detailCondition = new JSONObject(queryAllOrderRequestBaseDetail.getDetail().getConditions());
+        if(!"ADMIN".equals(userRole.getRoleName())){
+            detailCondition.remove("userName");
+        }
+        Map<String, Object> keyPairs = new HashMap<>();
+        getKeyPairUtil.getKeyPair(detailCondition, keyPairs);
+
+        String querySql = "FROM Orders o order by o.createdLogtimestamp DESC";
+        Query query =entityManager.createQuery(querySql);
+        String whereSql =" where";
+        if(keyPairs.size()>0){
+            int count =0;
+            for (String k : keyPairs.keySet()) {
+                if(count ==0){
+                    whereSql = whereSql.concat(" o."+k+"=:"+k);
+                }else if(1<= count && count <= keyPairs.size() - 1){
+                    whereSql = whereSql.concat(" and o." + k + "=:" + k);
+                }
+                count++;
+//                querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);//exception when concat string
+//                query =entityManager.createQuery(querySql);
+//                query.setParameter(k,(String) keyPairs.get(k));
+            }
+            querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);
+            query =entityManager.createQuery(querySql);
+            for (String k : keyPairs.keySet()) {
+//                query =entityManager.createQuery(querySql,Orders.class);
+                query.setParameter(k,(String) keyPairs.get(k));
+            }
+        }
 
         int page =  queryAllOrderRequestBaseDetail.getDetail().getPage()  ;
         int size =  queryAllOrderRequestBaseDetail.getDetail().getSize()   ;
-        Pageable pageable = PageRequest.of(page-1, size);
+        List<Orders> allOrders = query.getResultList();
+        BaseResponseGetAll response = new BaseResponseGetAll();
+        if(allOrders.isEmpty()){
+            response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("No orders satisfy the condition");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        List listOrders = PagingUtil.getPageLimit(allOrders, page, size);
 
-//        All orders
-        Page<Orders> allOrders =
-                orderRepository.getAll(pageable);
-
-//        All orders by type
-//        Page<Orders> allOrders =
-//                orderRepository.getAllByType(pageable,queryAllOrdersOfUserRequest.getType());
-
+        ObjectMapper mapper = new ObjectMapper();
         //get time log
         String hostName = request.getRemoteHost();
         Long startTime = DateTimeUtils.getStartTimeFromRequest(request);
@@ -445,16 +397,15 @@ public class OrderServiceImpl implements OrderService {
         String messageTimestamp = logTimestamp;
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
-
         if(!allOrders.isEmpty()) {
-            int totalPage = (int) Math.ceil((double) allOrders.getTotalElements()/size);
+            int totalPage = (int) Math.ceil((double) allOrders.size() / size);
 
             //set response data to client
             response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
-            response.setDetail(allOrders.getContent());
+            response.setDetail(listOrders);
             response.setPage(page);
             response.setTotalPage(totalPage);
-            response.setTotal(allOrders.getTotalElements());
+            response.setTotal(allOrders.stream().count());
 
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
@@ -477,7 +428,7 @@ public class OrderServiceImpl implements OrderService {
             response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage("User has no orders");
+            response.setResultMessage("No orders satisfy the condition");
 
             String responseBody = mapper.writeValueAsString(response);
             JSONObject transactionDetailResponse = new JSONObject(responseBody);

@@ -29,12 +29,7 @@ public interface OrderService {
             throws JsonProcessingException, APIAccessException, ParseException;
 
 
-//    //consumer + admin
-//    public ResponseEntity<?> getListOrderOfUser(BaseDetail<QueryAllOrdersOfUserRequest> queryAllOrdersOfUserRequest,
-//                                                HttpServletRequest request,
-//                                                HttpServletResponse responseSelvet) throws JsonProcessingException;
-
-    //admin
+    //admin + customer
     public ResponseEntity<?> getAllOrders(BaseDetail<QueryAllOrderRequest> queryAllOrderRequestBaseDetail,
                                           HttpServletRequest request,
                                           HttpServletResponse responseSelvet) throws JsonProcessingException;
