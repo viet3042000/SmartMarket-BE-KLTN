@@ -13,6 +13,7 @@ import com.smartmarket.code.model.entitylog.TargetObject;
 import com.smartmarket.code.request.*;
 import com.smartmarket.code.request.entity.ItemDetailCancelRequest;
 import com.smartmarket.code.request.entity.ItemDetailCreateRequest;
+import com.smartmarket.code.request.entity.QueryConditions;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.BaseResponseGetAll;
 import com.smartmarket.code.service.OrderService;
@@ -349,36 +350,39 @@ public class OrderServiceImpl implements OrderService {
         if(!"ADMIN".equals(userRole.getRoleName())){
             detailCondition.remove("userName");
         }
-        Map<String, Object> keyPairs = new HashMap<>();
-        getKeyPairUtil.getKeyPair(detailCondition, keyPairs);
 
-        String querySql = "FROM Orders o order by o.createdLogtimestamp DESC";
-        Query query =entityManager.createQuery(querySql);
-        String whereSql =" where";
-        if(keyPairs.size()>0){
-            int count =0;
-            for (String k : keyPairs.keySet()) {
-                if(count ==0){
-                    whereSql = whereSql.concat(" o."+k+"=:"+k);
-                }else if(1<= count && count <= keyPairs.size() - 1){
-                    whereSql = whereSql.concat(" and o." + k + "=:" + k);
-                }
-                count++;
-//                querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);//exception when concat string
-//                query =entityManager.createQuery(querySql);
+//        Map<String, Object> keyPairs = new HashMap<>();
+//        getKeyPairUtil.getKeyPair(detailCondition, keyPairs);
+//        String querySql = "FROM Orders o order by o.createdLogtimestamp DESC";
+//        Query query = entityManager.createQuery(querySql);
+//        String whereSql =" where";
+//        if(keyPairs.size()>0){
+//            int count =0;
+//            for (String k : keyPairs.keySet()) {
+//                if(count ==0){
+//                    whereSql = whereSql.concat(" o."+k+"=:"+k);
+//                }else if(1<= count && count <= keyPairs.size() - 1){
+//                    whereSql = whereSql.concat(" and o." + k + "=:" + k);
+//                }
+//                count++;
+//            }
+//            querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);
+//            query =entityManager.createQuery(querySql);
+//            for (String k : keyPairs.keySet()) {
 //                query.setParameter(k,(String) keyPairs.get(k));
-            }
-            querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);
-            query =entityManager.createQuery(querySql);
-            for (String k : keyPairs.keySet()) {
-//                query =entityManager.createQuery(querySql,Orders.class);
-                query.setParameter(k,(String) keyPairs.get(k));
-            }
-        }
+//            }
+//        }
 
         int page =  queryAllOrderRequestBaseDetail.getDetail().getPage()  ;
         int size =  queryAllOrderRequestBaseDetail.getDetail().getSize()   ;
-        List<Orders> allOrders = query.getResultList();
+//        List<Orders> allOrders = query.getResultList();
+
+        String userNameCondition = "";
+        String state = "";
+        state = CheckExistUtils.hasValue(detailCondition,"state") ? detailCondition.getString("state") : null;
+        userNameCondition = CheckExistUtils.hasValue(detailCondition,"userName") ? detailCondition.getString("userName") : null;
+
+        List<Orders> allOrders = orderRepository.findListOrder(userNameCondition,state);
         BaseResponseGetAll response = new BaseResponseGetAll();
         if(allOrders.isEmpty()){
             response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
