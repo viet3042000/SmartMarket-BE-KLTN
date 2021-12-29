@@ -340,59 +340,22 @@ public class OrderServiceImpl implements OrderService {
         if(userRole == null){
             throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
         }
-//        User user = userRepository.findByUsername(userName).orElse(null);
-//        if(user == null){
-//            throw new CustomException("UserName doesn't exist in orderService", HttpStatus.BAD_REQUEST, queryAllOrderRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-//        }
 
         //eliminate null value from conditions
         JSONObject detailCondition = new JSONObject(queryAllOrderRequestBaseDetail.getDetail().getConditions());
         if(!"ADMIN".equals(userRole.getRoleName())){
-            detailCondition.remove("userName");
+            detailCondition.put("userName",userName);
         }
-
-//        Map<String, Object> keyPairs = new HashMap<>();
-//        getKeyPairUtil.getKeyPair(detailCondition, keyPairs);
-//        String querySql = "FROM Orders o order by o.createdLogtimestamp DESC";
-//        Query query = entityManager.createQuery(querySql);
-//        String whereSql =" where";
-//        if(keyPairs.size()>0){
-//            int count =0;
-//            for (String k : keyPairs.keySet()) {
-//                if(count ==0){
-//                    whereSql = whereSql.concat(" o."+k+"=:"+k);
-//                }else if(1<= count && count <= keyPairs.size() - 1){
-//                    whereSql = whereSql.concat(" and o." + k + "=:" + k);
-//                }
-//                count++;
-//            }
-//            querySql = querySql.substring(0, 13) + whereSql + querySql.substring(13);
-//            query =entityManager.createQuery(querySql);
-//            for (String k : keyPairs.keySet()) {
-//                query.setParameter(k,(String) keyPairs.get(k));
-//            }
-//        }
-
         int page =  queryAllOrderRequestBaseDetail.getDetail().getPage()  ;
         int size =  queryAllOrderRequestBaseDetail.getDetail().getSize()   ;
-//        List<Orders> allOrders = query.getResultList();
 
         String userNameCondition = "";
-        String state = "";
-        state = CheckExistUtils.hasValue(detailCondition,"state") ? detailCondition.getString("state") : null;
+        String stateCondition = "";
+        stateCondition = CheckExistUtils.hasValue(detailCondition,"state") ? detailCondition.getString("state") : null;
         userNameCondition = CheckExistUtils.hasValue(detailCondition,"userName") ? detailCondition.getString("userName") : null;
 
-        List<Orders> allOrders = orderRepository.findListOrder(userNameCondition,state);
+        List<Orders> allOrders = orderRepository.findListOrder(userNameCondition,stateCondition);
         BaseResponseGetAll response = new BaseResponseGetAll();
-        if(allOrders.isEmpty()){
-            response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
-            response.setResponseTime(DateTimeUtils.getCurrentDate());
-            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
-            response.setResultMessage("No orders satisfy the condition");
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        List listOrders = PagingUtil.getPageLimit(allOrders, page, size);
-
         ObjectMapper mapper = new ObjectMapper();
         //get time log
         String hostName = request.getRemoteHost();
@@ -401,6 +364,28 @@ public class OrderServiceImpl implements OrderService {
         String messageTimestamp = logTimestamp;
         int status = responseSelvet.getStatus();
         String responseStatus = Integer.toString(status);
+        if(allOrders.isEmpty()){
+            response.setResponseId(queryAllOrderRequestBaseDetail.getRequestId());
+            response.setResponseTime(DateTimeUtils.getCurrentDate());
+            response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
+            response.setResultMessage("No orders satisfy the condition");
+
+            String responseBody = mapper.writeValueAsString(response);
+            JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
+            //calculate time duration
+            String timeDurationResponse = DateTimeUtils.getElapsedTimeStr(startTime);
+
+            ServiceObject soaObject = new ServiceObject("serviceLog", queryAllOrderRequestBaseDetail.getRequestId(), queryAllOrderRequestBaseDetail.getRequestTime(), null, "smartMarket", "client",
+                    messageTimestamp, "orderservice", "1", timeDurationResponse,
+                    "response", transactionDetailResponse, responseStatus, response.getResultCode(),
+                    response.getResultMessage(), logTimestamp, hostName, Utils.getClientIp(request),"getAllOrder");
+            logService.createSOALog2(soaObject);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        List listOrders = PagingUtil.getPageLimit(allOrders, page, size);
+
         if(!allOrders.isEmpty()) {
             int totalPage = (int) Math.ceil((double) allOrders.size() / size);
 
@@ -410,7 +395,6 @@ public class OrderServiceImpl implements OrderService {
             response.setPage(page);
             response.setTotalPage(totalPage);
             response.setTotal(allOrders.stream().count());
-
             response.setResponseTime(DateTimeUtils.getCurrentDate());
             response.setResultCode(ResponseCode.CODE.TRANSACTION_SUCCESSFUL);
             response.setResultMessage(ResponseCode.MSG.TRANSACTION_SUCCESSFUL_MSG);
