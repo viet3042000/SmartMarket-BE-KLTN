@@ -433,7 +433,6 @@ public class UserServiceImpl implements UserService {
 
                     userCreateResponse.setRole(role);
                 }
-
                 return userCreateResponse;
             }
         });
@@ -444,9 +443,11 @@ public class UserServiceImpl implements UserService {
         //set response data to client
         BaseResponse response = new BaseResponse();
         response.setDetail(userCreateResponsePage.getContent());
-//        response.setDetail(pageResult.getContent());
         response.setPage(page);
         response.setTotalPage(totalPage);
+        if(pageResult.isEmpty()){
+            response.setTotalPage(1);
+        }
         response.setTotal(pageResult.getTotalElements());
 
         response.setResponseTime(DateTimeUtils.getCurrentDate());

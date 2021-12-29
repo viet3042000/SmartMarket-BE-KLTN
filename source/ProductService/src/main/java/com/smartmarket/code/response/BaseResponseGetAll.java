@@ -18,8 +18,8 @@ public class BaseResponseGetAll implements Serializable {
     private String detailErrorCode;
     private String detailErrorMessage;
     private Object detail;
-    private int page;
-    private int totalPage;
+    private int page=1;
+    private int totalPage=1;
     private Long total;
 
 }

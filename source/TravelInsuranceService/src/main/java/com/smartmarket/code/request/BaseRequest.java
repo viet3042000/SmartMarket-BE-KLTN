@@ -22,7 +22,7 @@ public class BaseRequest implements Serializable {
     private String requestTime ;
 
     @NotBlank(message = "targetId is require")
-    @Size(max =10, message = "targetId should be less than or equal to 14 characters")
+    @Size(max =30, message = "targetId should be less than or equal to 14 characters")
     private String targetId ;
 
 
