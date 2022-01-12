@@ -37,12 +37,12 @@ public class KafkaConsumerConfig{
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
-//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getRequiredProperty("kafka.bootrapServer"));
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+//        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, environment.getRequiredProperty("kafka.bootrapServer"));
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
-//        The maximum number of records returned in a single call to poll()
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,100);
+//        The maximum number of records returned in a single call to poll(). Default= 500
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,10);
 
 //        The maximum delay between each call of poll()
         props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,900000);
@@ -69,9 +69,14 @@ public class KafkaConsumerConfig{
         ConcurrentKafkaListenerContainerFactory<String, String>
                 factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+
+//        enable batch listening
         factory.setBatchListener(true);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 //        factory.getContainerProperties().setCommitRetries(2);
+
+//        Set consumer.commitSync() or commitAsync(). Default true.
+//        factory.getContainerProperties().setSyncCommits(true);
 
 //        factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
         factory.getContainerProperties().setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
@@ -87,7 +92,7 @@ public class KafkaConsumerConfig{
             //Auto triggered after rebalancing stop but before consumer starts consuming messages
             @Override
             public void onPartitionsAssigned(Consumer<?, ?> consumer,Collection<TopicPartition> partitions) {
-
+                //seek offset
             }
         });
 

@@ -419,8 +419,7 @@ public class RestControllerHandleException {
 
         //set response to client
         ResponseError response = new ResponseError();
-        String responseBody = mapper.writeValueAsString(response);
-        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+        JSONObject transactionDetailResponse = new JSONObject();
 
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
@@ -428,6 +427,7 @@ public class RestControllerHandleException {
         if(ex.getCause() instanceof InvalidFormatException){
             InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
             response = setResponseUtils.setResponseInvalidFormatJsonException(response, invalidFormatException);
+            transactionDetailResponse = new JSONObject(mapper.writeValueAsString(response));
 
             //add BICTransaction
             try {
@@ -456,6 +456,7 @@ public class RestControllerHandleException {
 
         }else {
             response = setResponseUtils.setResponseHttpMessageNotReadableException(response, ex);
+            transactionDetailResponse = new JSONObject(mapper.writeValueAsString(response));
 
             //add BICTransaction
             try {
@@ -482,8 +483,6 @@ public class RestControllerHandleException {
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         }
-
-
 
         //logException
         ServiceExceptionObject soaExceptionObject =

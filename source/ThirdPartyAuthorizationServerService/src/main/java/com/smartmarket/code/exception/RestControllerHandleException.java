@@ -383,16 +383,23 @@ public class RestControllerHandleException {
 
         //set response to client
         ResponseError response = new ResponseError();
-        String responseBody = mapper.writeValueAsString(response);
-        JSONObject transactionDetailResponse = new JSONObject(responseBody);
 
         String requestURL = request.getRequestURL().toString();
         String operationName = requestURL.substring(requestURL.indexOf(environment.getRequiredProperty("version") + "/") + 3, requestURL.length());
 
+        if(ex.getCause() instanceof InvalidFormatException){
+            InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
+            response = setResponseUtils.setResponseInvalidFormatJsonException(response, invalidFormatException);
+        }else {
+            response = setResponseUtils.setResponseHttpMessageNotReadableException(response, ex);
+        }
+        String responseBody = mapper.writeValueAsString(response);
+        JSONObject transactionDetailResponse = new JSONObject(responseBody);
+
         //logException
         ServiceExceptionObject soaExceptionObject =
                 new ServiceExceptionObject(Constant.EXCEPTION_LOG, "response", null, null, null,
-                        messageTimestamp, "travelinsuranceservice", request.getRequestURI(), "1",
+                        messageTimestamp, "travelinsuranceservice", operationName, "1",
                         request.getRemoteHost(), response.getResultMessage(), response.getResultCode(),
                         Throwables.getStackTraceAsString(ex), Utils.getClientIp(request));
         logService.createSOALogException(soaExceptionObject);
