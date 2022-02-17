@@ -50,7 +50,7 @@ public class ListenerServiceImp implements ListenerService {
 //    }
 
 
-    @KafkaListener(id = "${kafka.groupID.product_provider}",topics = "${kafka.topic.product_provider}")
+//    @KafkaListener(id = "${kafka.groupID.product_provider}",topics = "${kafka.topic.product_provider}")
     public void listenProductProvider(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
