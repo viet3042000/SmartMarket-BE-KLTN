@@ -1,7 +1,6 @@
 package com.smartmarket.code.service.impl;
 
 import com.smartmarket.code.dao.*;
-import com.smartmarket.code.model.ProductProvider;
 import com.smartmarket.code.model.UserProductProvider;
 import com.smartmarket.code.service.ProductProviderService;
 import org.springframework.beans.factory.annotation.Autowired;

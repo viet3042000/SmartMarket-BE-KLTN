@@ -45,16 +45,6 @@ public interface ProductService {
                                      HttpServletResponse responseSelvet)
                                      throws JsonProcessingException, APIAccessException;
 
-    //Provider-i
-    ResponseEntity<?> approvePendingProduct(@Valid @RequestBody BaseDetail<ApprovePendingProductRequest> approvePendingProductRequest,
-                                            HttpServletRequest request, HttpServletResponse responseSelvet)
-                                            throws JsonProcessingException, APIAccessException;
-
-    //Provider-i
-    ResponseEntity<?> getListPendingProduct(@Valid @RequestBody BaseDetail<QueryPendingProductRequest> queryPendingProductRequestBaseDetail,
-                                            HttpServletRequest request, HttpServletResponse responseSelvet)
-            throws JsonProcessingException, APIAccessException;
-
     //Admin
 //    ResponseEntity<?> getListByState(@Valid @RequestBody BaseDetail<QueryAllProductRequest> queryAllProductRequestBaseDetail,
 //                                     HttpServletRequest request, HttpServletResponse responseSelvet)
