@@ -86,9 +86,6 @@ public class UserServiceImpl implements UserService {
     UserProductProviderRepository userProductProviderRepository;
 
     @Autowired
-    ProductProviderRepository productProviderRepository;
-
-    @Autowired
     GetKeyPairUtil getKeyPairUtil;
 
     @Autowired
