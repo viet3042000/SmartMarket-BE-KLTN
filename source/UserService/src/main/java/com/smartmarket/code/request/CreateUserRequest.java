@@ -32,6 +32,8 @@ public class CreateUserRequest implements Serializable {
     private String address;
 
 //    @NotNull(message = "gender is require")
+    @Min(value = 0, message = "Min value is 0")
+    @Max(value = 1, message = "Min value is 1")
     private Integer gender;
 
     private String identifyNumber;

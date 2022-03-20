@@ -26,6 +26,8 @@ public class UpdateUserRequest implements Serializable {
     @Size(max = 255, message = "address should be less than or equal to 255 characters")
     private String address;
 
+    @Min(value = 0, message = "Min value is 0")
+    @Max(value = 1, message = "Min value is 1")
     private Integer gender;
 
     private String identifyNumber;
