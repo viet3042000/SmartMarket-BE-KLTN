@@ -1,6 +1,6 @@
 package com.example.authserver.service.Impl;
 
-import com.example.authserver.entities.ClientEntity;
+import com.example.authserver.model.ClientEntity;
 import com.example.authserver.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.ClientDetails;

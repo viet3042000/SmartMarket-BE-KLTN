@@ -38,6 +38,6 @@ public class UpdateUserRequest implements Serializable {
 
     private Integer enabled;
 
-    private String newRole;
+//    private String newRole;
 
 }

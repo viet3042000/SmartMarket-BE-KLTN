@@ -33,7 +33,7 @@ public class OrderProduct implements Serializable {
     @Column(name = "index")
     private Integer index;
 
-    //Succeeded/Canceling/Canceled/Aborted/Aborting/Error
+    //Pending/Succeeded/Canceling/Canceled/Aborted/Aborting/Error
     @Column(name = "state")
     private String state;
 

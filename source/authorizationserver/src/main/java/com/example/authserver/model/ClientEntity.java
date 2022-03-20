@@ -1,4 +1,4 @@
-package com.example.authserver.entities;
+package com.example.authserver.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

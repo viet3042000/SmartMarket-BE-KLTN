@@ -1,6 +1,6 @@
 package com.example.authserver.service.Impl;
 
-import com.example.authserver.entities.UserRole;
+import com.example.authserver.model.UserRole;
 import com.example.authserver.repository.UserRoleRepository;
 import com.example.authserver.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;

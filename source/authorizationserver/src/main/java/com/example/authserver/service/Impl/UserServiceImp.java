@@ -1,6 +1,6 @@
 package com.example.authserver.service.Impl;
 
-import com.example.authserver.entities.User;
+import com.example.authserver.model.User;
 import com.example.authserver.repository.UserRepository;
 import com.example.authserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

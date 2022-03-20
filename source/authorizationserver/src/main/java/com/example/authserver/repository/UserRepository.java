@@ -2,7 +2,7 @@ package com.example.authserver.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.authserver.entities.User;
+import com.example.authserver.model.User;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

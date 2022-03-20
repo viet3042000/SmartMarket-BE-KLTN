@@ -88,8 +88,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     GetKeyPairUtil getKeyPairUtil;
 
-    @Autowired
-    RoleRepository roleRepository;
+//    @Autowired
+//    RoleRepository roleRepository;
 
 //    @Autowired
 //    KeycloakAdminClientService keycloakAdminClientService;
@@ -113,10 +113,10 @@ public class UserServiceImpl implements UserService {
         }
 
         //check role
-        Role role = roleRepository.findByRoleName(createUserRequestBaseDetail.getDetail().getRole()).orElse(null);
-        if(role==null){
-            throw new CustomException("Role doesn't exist", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-        }
+//        Role role = roleRepository.findByRoleName(createUserRequestBaseDetail.getDetail().getRole()).orElse(null);
+//        if(role==null){
+//            throw new CustomException("Role doesn't exist", HttpStatus.BAD_REQUEST, createUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//        }
 
         User userCreate = new User();
         userCreate.setUserName(username);
@@ -177,14 +177,14 @@ public class UserServiceImpl implements UserService {
         getKeyPairUtil.getKeyPair(detail, keyPairs);
 
         for (String k : keyPairs.keySet()) {
-            if (k.equals("newRole")) {
-                //check role existed
-                Role role= roleRepository.findByRoleName((String) keyPairs.get(k)).orElse(null);
-                if(role ==null){
-                    throw new CustomException("newRole doesn't exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
-                }
-                userRoleUpdate.setRoleName((String) keyPairs.get(k));
-            }
+//            if (k.equals("newRole")) {
+//                //check role existed
+//                Role role= roleRepository.findByRoleName((String) keyPairs.get(k)).orElse(null);
+//                if(role ==null){
+//                    throw new CustomException("newRole doesn't exist", HttpStatus.BAD_REQUEST, updateUserRequestBaseDetail.getRequestId(),null,null, null, HttpStatus.BAD_REQUEST);
+//                }
+//                userRoleUpdate.setRoleName((String) keyPairs.get(k));
+//            }
             if (k.equals("email")) {
                 userUpdate.setEmail((String) keyPairs.get(k));
             }

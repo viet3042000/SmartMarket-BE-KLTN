@@ -1,16 +1,12 @@
 package com.smartmarket.code.service.impl;
 
-import com.smartmarket.code.dao.RoleRepository;
 import com.smartmarket.code.dao.UserRoleRepository;
-import com.smartmarket.code.exception.CustomException;
-import com.smartmarket.code.model.Role;
 import com.smartmarket.code.model.UserRole;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateProviderUserRequest;
 import com.smartmarket.code.request.CreateUserRequest;
 import com.smartmarket.code.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,9 +17,6 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Autowired
     UserRoleRepository userRoleRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
 
     @Override
     public UserRole create(BaseDetail<CreateUserRequest> createUserRequestBaseDetail) {

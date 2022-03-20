@@ -1,6 +1,6 @@
 package com.example.authserver.repository;
 
-import com.example.authserver.entities.UserRole;
+import com.example.authserver.model.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

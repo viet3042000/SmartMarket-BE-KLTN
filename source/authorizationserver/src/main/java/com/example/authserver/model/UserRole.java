@@ -1,4 +1,4 @@
-package com.example.authserver.entities;
+package com.example.authserver.model;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -101,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
 
         JSONObject j = new JSONObject(createOrderRequest);
 
-        List<Product> listProducts = new ArrayList<>();
+//        List<Product> listProducts = new ArrayList<>();
         ArrayList<ItemDetailCreateRequest> orderItems = createOrderRequest.getDetail().getOrderItems();
         for(ItemDetailCreateRequest itemDetailCreateRequest : orderItems) {
             //find product by productName and set AggregateType = productType
@@ -115,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
             }
             itemDetailCreateRequest.setProductProvider(product.getProductProvider());
             itemDetailCreateRequest.setProductType(product.getType());
-            listProducts.add(product);//to get product without find again in DB
+//            listProducts.add(product);//to get product without find again in DB
         }
         createOrderRequest.getDetail().setOrderItems(orderItems);
 
