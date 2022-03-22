@@ -5,10 +5,12 @@ import com.smartmarket.code.request.ProductDetailCreateRequest;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
@@ -30,6 +32,11 @@ public class ItemDetailCreateRequest implements Serializable {
     @NotBlank(message = "productType is require")
     @Size(max = 100, message = "productType should be less than or equal to 100 characters")
     private String productType;
+
+    //price
+    @NotNull(message = "itemPrice is require")
+    @Min(value = 0)
+    private BigDecimal itemPrice;
 
     @NotNull(message = "productDetailCreateRequest is require")
     private ProductDetailCreateRequest productDetailCreateRequest;

@@ -155,6 +155,7 @@ public class OrderServiceImpl implements OrderService {
         outBox.setCreatedLogtimestamp(createAt);
         if(itemDetailCreateRequest.getProductProvider().equals("BIC") && itemDetailCreateRequest.getProductType().equals("bảo hiểm du lịch")){
             outBox.setAggregateType(AggregateType.TRAVEL_INSURANCE);//target services
+            itemDetailJsonObject.put("orderReference", UUID.randomUUID().toString());
         }
         outBox.setAggregateId(orderId.toString());
         outBox.setType(OutboxType.CREATE_ORDER);

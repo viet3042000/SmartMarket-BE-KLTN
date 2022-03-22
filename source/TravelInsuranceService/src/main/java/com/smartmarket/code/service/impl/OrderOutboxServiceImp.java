@@ -70,8 +70,9 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 String clientId = jsonPayload.getString("clientId");
                 String hostName = jsonPayload.getString("hostName");
                 Long startTime = jsonPayload.getLong("startTime");
+                orderReference = jsonPayload.getString("orderReference");
 
-                orderReference = UUID.randomUUID().toString();
+//                orderReference = UUID.randomUUID().toString();
                 productDetail.getJSONObject("orders").put("orderReference",orderReference);
 
                 TravelInsurance travelInsurance = new TravelInsurance();
@@ -79,7 +80,6 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 travelInsurance.setState(TravelInsuranceState.CREATING);
                 travelInsurance.setProductName(productName);
                 travelInsurance.setCreatedLogtimestamp(createAt);
-//                travelInsurance.setProductDetail(productDetail.toString());
                 travelInsuranceRepository.save(travelInsurance);
 
                 CreateTravelInsuranceBICRequest createTravelInsuranceBICRequest = g.fromJson(productDetail.toString(), CreateTravelInsuranceBICRequest.class);
