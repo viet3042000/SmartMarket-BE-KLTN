@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public interface AuthorizationService {
     boolean AuthorUserAccess(Long userId) ;
     String getTokenOncePerRequest() throws JsonProcessingException, APIAccessException;
-    String getToken() throws JsonProcessingException, APIAccessException;
+//    String getToken() throws JsonProcessingException, APIAccessException;
     public boolean validActuator(String[] paths , String urlRequest) ;
     public ArrayList<String> getRoles();
 }

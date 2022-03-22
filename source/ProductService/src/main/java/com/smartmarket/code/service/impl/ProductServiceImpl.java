@@ -59,9 +59,6 @@ public class ProductServiceImpl implements ProductService {
     ConfigurableEnvironment environment;
 
     @Autowired
-    UserProductProviderRepository userProductProviderRepository;
-
-    @Autowired
     GetKeyPairUtil getKeyPairUtil;
 
     @Autowired
@@ -71,24 +68,13 @@ public class ProductServiceImpl implements ProductService {
     EntityManager entityManager;
 
 
-    //Provider-i
+    //Admin
     public ResponseEntity<?> createProduct(@Valid @RequestBody BaseDetail<CreateProductRequest> createProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException, APIAccessException, ParseException {
-        //get user token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-        String userName = (String) claims.get("user_name");
 
         String productProviderName = createProductRequestBaseDetail.getDetail().getProductProvider();
         ProductProvider productProvider = productProviderRepository.findByProductProviderName(productProviderName).orElse(null);
         if(productProvider == null){
             throw new CustomException("productProviderName doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
-
-        Long productProviderId = productProvider.getId();
-        //check for user Provider
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, createProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
         }
 
         String productName = createProductRequestBaseDetail.getDetail().getProductName();
@@ -117,13 +103,9 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider-i
+    //Admin
 //    @Transactional//begin transaction from begin of function and commit at the end of function by default
     public ResponseEntity<?> updateProduct(@Valid @RequestBody BaseDetail<UpdateProductRequest> updateProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        //get user token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-        String userName = (String) claims.get("user_name");
 
         String productName = updateProductRequestBaseDetail.getDetail().getProductName();
 
@@ -136,12 +118,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        Long productProviderId = productProviderRepository.getId(productProviderName);
-        //check for user Provider
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, updateProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
 
         //eliminate null value from request body
         JSONObject detail = new JSONObject(updateProductRequestBaseDetail.getDetail());
@@ -184,12 +160,8 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider-i
+    //Admin
     public ResponseEntity<?> deleteProduct(@Valid @RequestBody BaseDetail<DeleteProductRequest> deleteProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws Exception{
-        //get user token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-        String userName = (String) claims.get("user_name");
 
         String productName = deleteProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
@@ -198,12 +170,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        Long productProviderId = productProviderRepository.getId(productProviderName);
-        //check for user Provider
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, deleteProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
 
         productRepository.delete(product);
 
@@ -217,17 +183,12 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //Provider-i
+    //Admin
     public ResponseEntity<?> getProduct(@Valid @RequestBody BaseDetail<QueryProductRequest>  queryProductRequestBaseDetail, HttpServletRequest request, HttpServletResponse responseSelvet) throws JsonProcessingException{
         //get time log
         String logTimestamp = DateTimeUtils.getCurrentDate();
         String messageTimestamp = logTimestamp;
         ObjectMapper mapper = new ObjectMapper();
-
-        //get user token
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = JwtUtils.getClaimsMap(authentication);//claims != null because request passed through CustomAuthorizeRequestFilter
-        String userName = (String) claims.get("user_name");
 
         String productName = queryProductRequestBaseDetail.getDetail().getProductName();
         Product product = productRepository.findByProductName(productName).orElse(null);
@@ -236,12 +197,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         String productProviderName = product.getProductProvider();
-        Long productProviderId = productProviderRepository.getId(productProviderName);
-        //check for user Provider
-        UserProductProvider userProductProvider = userProductProviderRepository.findUser(userName,productProviderId).orElse(null);
-        if(userProductProvider == null){
-            throw new CustomException("userProductProvider of username in claim doesn't exist", HttpStatus.BAD_REQUEST, queryProductRequestBaseDetail.getRequestId(), null, null, null, HttpStatus.BAD_REQUEST);
-        }
 
         DetailProductResponse detailProductResponse = new DetailProductResponse() ;
         detailProductResponse.setId(product.getId());

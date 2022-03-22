@@ -27,15 +27,6 @@ import java.util.Optional;
 public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Autowired
-    AccessTokenService accessTokenService;
-
-    @Autowired
-    AccesUserService accesUserService;
-
-    @Autowired
-    UrlService urlService;
-
-    @Autowired
     APIUtils apiUtils;
 
     @Autowired
@@ -43,12 +34,6 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Autowired
     CachingServiceImpl cachingService ;
-
-    @Autowired
-    ClientService clientService;
-
-    @Autowired
-    ClientDetailService clientDetailService;
 
 
 //    @Override

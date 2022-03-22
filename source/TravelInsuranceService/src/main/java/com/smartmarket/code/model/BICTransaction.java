@@ -39,8 +39,8 @@ public class BICTransaction implements Serializable {
 	@Column(name = "ord_paid_money")
 	private String ordPaidMoney;
 
-	@Column(name = "consumer_id")
-	private String consumerId;
+//	@Column(name = "consumer_id")
+//	private String consumerId;
 
 	@Column(name = "from_date")
 	private String fromDate;

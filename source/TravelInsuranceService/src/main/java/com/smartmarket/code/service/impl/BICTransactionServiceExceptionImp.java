@@ -8,16 +8,13 @@ import com.smartmarket.code.constants.Constant;
 import com.smartmarket.code.constants.HostConstants;
 import com.smartmarket.code.dao.BICTransactionRepository;
 import com.smartmarket.code.model.BICTransaction;
-import com.smartmarket.code.model.Client;
 import com.smartmarket.code.model.PendingBICTransaction;
 import com.smartmarket.code.request.BaseDetail;
 import com.smartmarket.code.request.CreateTravelInsuranceBICRequest;
 import com.smartmarket.code.request.UpdateTravelInsuranceBICRequest;
 import com.smartmarket.code.service.BICTransactionExceptionService;
 import com.smartmarket.code.service.BICTransactionService;
-import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.util.EJson;
-import com.smartmarket.code.util.JwtUtils;
 import com.smartmarket.code.util.MapperUtils;
 import com.smartmarket.code.util.Utils;
 import org.json.JSONObject;
@@ -49,9 +46,6 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
     private BICTransactionRepository bicTransactionRepository;
 
     @Autowired
-    ClientService clientService ;
-
-    @Autowired
     MapperUtils mapperUtils;
 
     @Override
@@ -59,8 +53,6 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         //add BICTransaction
         BICTransaction bicTransaction = null ;
 
-        String clientId = JwtUtils.getClientId() ;
-        Optional<Client> client = clientService.findByclientName(clientId);
         String jsonString = null;
         try {
             request = new RequestWrapper(request);
@@ -76,7 +68,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         String phoneNumber =null;
         String email = null;
         String ordPaidMoney = null;
-        String consumerId = client.get().getConsumerId();
+//        String consumerId = client.get().getConsumerId();
         String fromDate = null;
         String toDate = null;
         String ordDate = null;
@@ -114,7 +106,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                 }catch (JsonSyntaxException ex){
                     clientIp = Utils.getClientIp(request) ;
                     bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
-                            phoneNumber, email, ordPaidMoney, consumerId,
+                            phoneNumber, email, ordPaidMoney,
                             fromDate, toDate, new Date(), resultCode, bicResultCode,
                             ordDate, productId, customerAddress,clientIp,type,destroy);
                     return bicTransaction ;
@@ -164,7 +156,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
                     clientIp = Utils.getClientIp(request) ;
 
                     bicTransaction = bicTransactionService.createBICTransactionParameter(messasgeId, orderReference, orderId, customerName,
-                            phoneNumber, email, ordPaidMoney, consumerId,
+                            phoneNumber, email, ordPaidMoney,
                             fromDate, toDate, new Date(), resultCode, bicResultCode,
                             ordDate, productId, customerAddress,clientIp,type,destroy);
                 }
@@ -199,7 +191,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         }else {
             clientIp = Utils.getClientIp(request) ;
             bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
-                    phoneNumber, email, ordPaidMoney, consumerId,
+                    phoneNumber, email, ordPaidMoney,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
                     ordDate, productId, customerAddress,clientIp,type,destroy);
         }
@@ -265,7 +257,6 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
     public BICTransaction createBICTransactionFromRequestCreate(BaseDetail<CreateTravelInsuranceBICRequest> requestCreateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId){
         //add BICTransaction
         BICTransaction bicTransaction = null ;
-        Optional<Client> client = clientService.findByclientName(clientId);
 
         String messasgeId = "no requestId" ;
         String orderReference =null ;
@@ -274,7 +265,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         String phoneNumber =null;
         String email = null;
         String ordPaidMoney = null;
-        String consumerId = client.get().getConsumerId();
+//        String consumerId = client.get().getConsumerId();
         String fromDate = null;
         String toDate = null;
         String ordDate = null;
@@ -300,7 +291,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
         }catch (JsonSyntaxException ex){
             bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
-                    phoneNumber, email, ordPaidMoney, consumerId,
+                    phoneNumber, email, ordPaidMoney,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
                     ordDate, productId, customerAddress,clientIp,type,destroy);
             return bicTransaction ;
@@ -347,7 +338,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "no address" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
 
             bicTransaction = bicTransactionService.createBICTransactionParameterOutbox(messasgeId, orderReference, orderId, customerName,
-                    phoneNumber, email, ordPaidMoney, consumerId,
+                    phoneNumber, email, ordPaidMoney,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
                     ordDate, productId, customerAddress,clientIp,type,destroy,clientId);
         }
@@ -396,7 +387,6 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
     public BICTransaction createBICTransactionFromRequestUpdate(BaseDetail<UpdateTravelInsuranceBICRequest> requestUpdateTravelInsuranceBICRequest, String resultCode, String bicResultCode, String clientId){
         //add BICTransaction
         BICTransaction bicTransaction = null ;
-        Optional<Client> client = clientService.findByclientName(clientId);
 
         String messasgeId = "no requestId" ;
         String orderReference =null ;
@@ -405,7 +395,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
         String phoneNumber =null;
         String email = null;
         String ordPaidMoney = null;
-        String consumerId = client.get().getConsumerId();
+//        String consumerId = client.get().getConsumerId();
         String fromDate = null;
         String toDate = null;
         String ordDate = null;
@@ -431,7 +421,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             createTravelInsuranceBICRequest = gson.fromJson(detail.toString(), CreateTravelInsuranceBICRequest.class);
         }catch (JsonSyntaxException ex){
             bicTransaction = bicTransactionService.createBICTransactionParameter("Format not True", orderReference, orderId, customerName,
-                    phoneNumber, email, ordPaidMoney, consumerId,
+                    phoneNumber, email, ordPaidMoney,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
                     ordDate, productId, customerAddress,clientIp,type,destroy);
             return bicTransaction ;
@@ -478,7 +468,7 @@ public class BICTransactionServiceExceptionImp implements BICTransactionExceptio
             customerAddress = (createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1() == null || createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1().equals("") == true) ? "no address" : createTravelInsuranceBICRequest.getOrders().getOrdBillStreet1();
 
             bicTransaction = bicTransactionService.createBICTransactionParameterOutbox(messasgeId, orderReference, orderId, customerName,
-                    phoneNumber, email, ordPaidMoney, consumerId,
+                    phoneNumber, email, ordPaidMoney,
                     fromDate, toDate, new Date(), resultCode, bicResultCode,
                     ordDate, productId, customerAddress,clientIp,type,destroy,clientId);
         }

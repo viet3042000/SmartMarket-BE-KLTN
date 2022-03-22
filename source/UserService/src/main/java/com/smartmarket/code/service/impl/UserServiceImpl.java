@@ -80,12 +80,6 @@ public class UserServiceImpl implements UserService {
     UserProfileRepository userProfileRepository;
 
     @Autowired
-    UserProductProviderService userProductProviderService;
-
-    @Autowired
-    UserProductProviderRepository userProductProviderRepository;
-
-    @Autowired
     GetKeyPairUtil getKeyPairUtil;
 
 //    @Autowired
@@ -235,7 +229,7 @@ public class UserServiceImpl implements UserService {
         }
         userRoleRepository.delete(userRoleDelete);
 
-        userProductProviderRepository.deleteByUserName(userName);
+//        userProductProviderRepository.deleteByUserName(userName);
 
 //            keycloakAdminClientService.deleteUser(userDelete.getUserName());
 

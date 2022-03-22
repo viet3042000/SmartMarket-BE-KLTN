@@ -43,9 +43,6 @@ public class ListenerServiceImp implements ListenerService {
     UserRoleService userRoleService;
 
     @Autowired
-    RoleService roleService;
-
-    @Autowired
     ProductService productService;
 
     @Value("${kafka.topic.travelinsuranceoutbox}")

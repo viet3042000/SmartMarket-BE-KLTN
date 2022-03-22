@@ -35,17 +35,17 @@ import java.util.Set;
 @Service
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-    @Autowired
-    AccessTokenService accessTokenService;
-
-    @Autowired
-    AccesUserService accesUserService;
+//    @Autowired
+//    AccessTokenService accessTokenService;
+//
+//    @Autowired
+//    AccesUserService accesUserService;
 
     @Autowired
     UserService userService;
 
-    @Autowired
-    UrlService urlService;
+//    @Autowired
+//    UrlService urlService;
 
     @Autowired
     APIUtils apiUtils;
@@ -56,11 +56,11 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     @Autowired
     CachingServiceImpl cachingService ;
 
-    @Autowired
-    ClientService clientService;
+//    @Autowired
+//    ClientService clientService;
 
-    @Autowired
-    ClientDetailService clientDetailService;
+//    @Autowired
+//    ClientDetailService clientDetailService;
 
     @Autowired
     UserRepository userRepository;
@@ -92,34 +92,34 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
             //get url request
             AntPathMatcher matcher = new AntPathMatcher();
-            Set<Url> urlSet = urlService.findUrlByUserIdActive(userToken.getId());
+//            Set<Url> urlSet = urlService.findUrlByUserIdActive(userToken.getId());
             Url urlMatched = null;
-            if (urlSet != null) {
-                for (Url url1 : urlSet) {
-
-                    //check url matched yet
-                    String path = url1.getPath();
-                    if (matcher.match(path, uriRequest)) {
-                        urlMatched = url1;
-                        break;
-
-                    }
-                }
-            } else {
-                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
-            }
+//            if (urlSet != null) {
+//                for (Url url1 : urlSet) {
+//
+//                    //check url matched yet
+//                    String path = url1.getPath();
+//                    if (matcher.match(path, uriRequest)) {
+//                        urlMatched = url1;
+//                        break;
+//
+//                    }
+//                }
+//            } else {
+//                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
+//            }
 
             // get list accessUser
-            Set<AccessUser> accessUserSetCheck = null;
-            if (urlMatched != null && userToken != null && userId != null ) {
-                accessUserSetCheck = accesUserService.checkAccessUser(userToken.getId(), urlMatched.getId(),userId);
-            } else {
-                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
-            }
-
-            if(accessUserSetCheck != null && accessUserSetCheck.size() > 0){
-                return true ;
-            }
+//            Set<AccessUser> accessUserSetCheck = null;
+//            if (urlMatched != null && userToken != null && userId != null ) {
+//                accessUserSetCheck = accesUserService.checkAccessUser(userToken.getId(), urlMatched.getId(),userId);
+//            } else {
+//                throw new CustomException("Please check the request again" , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
+//            }
+//
+//            if(accessUserSetCheck != null && accessUserSetCheck.size() > 0){
+//                return true ;
+//            }
 
         }catch (Exception ex){
             throw new CustomException(ex.getMessage() , HttpStatus.BAD_REQUEST,null,null,null,null, HttpStatus.BAD_REQUEST) ;
@@ -202,115 +202,115 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 //    }
 
 
-    public String getToken() throws JsonProcessingException {
-        String token = "" ;
-        if (Integer.parseInt(environment.getRequiredProperty("getTokenBIC.mode")) == 1){
-            token = getTokenFromCache() ;
-        }else {
-            token = getTokenOncePerRequest() ;
-        }
-        return token ;
-    }
+//    public String getToken() throws JsonProcessingException {
+//        String token = "" ;
+//        if (Integer.parseInt(environment.getRequiredProperty("getTokenBIC.mode")) == 1){
+//            token = getTokenFromCache() ;
+//        }else {
+//            token = getTokenOncePerRequest() ;
+//        }
+//        return token ;
+//    }
 
 
-        //load token from cache
-    public String getTokenFromCache() throws JsonProcessingException {
-
-        //SET TIMEOUT
-        //set Time out get token api BIC
-        SimpleClientHttpRequestFactory clientHttpRequestFactoryGetToken = new SimpleClientHttpRequestFactory();
-        //Connect timeout
-        clientHttpRequestFactoryGetToken.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
-        //Read timeout
-        clientHttpRequestFactoryGetToken.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Map<String, Object> claims = null;
-        claims = JwtUtils.getClaimsMap(authentication);
-        String clientId = null;
-
-        //get clientid from claims
-        if (claims != null) {
-            clientId = (String) claims.get("client_id");
-        }
-
-        Optional<ClientDetail> clientDetail = clientDetailService.findByclientIdName(clientId);
-
-        Object obAccessToken = null ;
-        if (clientDetail.isPresent() == true) {
-            obAccessToken = cachingService.getFromCacheString("accesstoken", clientDetail.get().getUserNameBic());
-        }
-
-        AccessToken accessToken = null;
-        if (obAccessToken != null) {
-            accessToken = (AccessToken) obAccessToken;
-        }
-
-        String token = "" ;
-        if(accessToken != null ){
-            token = accessToken.getToken() ;
-            long timeRemain = 0L ;
-            if(     accessToken.getToken() != null
-                    && accessToken.getExpireTime() != null
-                    && accessToken.getIssueTime() != null ){
-
-                //timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
-                Long expireTime = accessToken.getExpireTime() ;
-                Long currentTimeSystem = DateTimeUtils.getCurrenTime() ;
-                timeRemain =  expireTime -  currentTimeSystem;
-
-            }
-            //check time expire access token
-            if (timeRemain < (1000*60*3)) {
-
-                //post get token
-                UserLoginBIC userLoginBIC = new UserLoginBIC();
-                userLoginBIC.setUsername(clientDetail.get().getUserNameBic());
-                userLoginBIC.setPassword(clientDetail.get().getPasswordBic());
-                userLoginBIC.setDomainname(clientDetail.get().getDomainNameBic());
-
-                ObjectMapper mapper = new ObjectMapper();
-
-                String requestToken = mapper.writeValueAsString(userLoginBIC);
-                ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null,clientHttpRequestFactoryGetToken);
-                if(jsonResultGetToken.getBody() != null){
-                    //get token from response
-                    String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
-                    Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
-                    Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
-
-                    //update token in database
-                    AccessToken accessTokenCreate = accessTokenService.updateCache(clientDetail.get().getUserNameBic(), tokenUpdate,timeIssue,timeExpire);
-                    return tokenUpdate;
-                }
-            }else {
-                return accessToken.getToken();
-            }
-
-        }else {
-            //post get token
-            UserLoginBIC userLoginBIC = new UserLoginBIC();
-            userLoginBIC.setUsername(clientDetail.get().getUserNameBic());
-            userLoginBIC.setPassword(clientDetail.get().getPasswordBic());
-            userLoginBIC.setDomainname(clientDetail.get().getDomainNameBic());
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            String requestToken = mapper.writeValueAsString(userLoginBIC);
-            ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null,clientHttpRequestFactoryGetToken);
-            if(jsonResultGetToken.getBody() != null){
-                //get token from response
-                String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
-                Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
-                Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
-
-                //update token in database
-                AccessToken accessTokenCreate = accessTokenService.createCache(clientDetail.get().getUserNameBic(), tokenUpdate,timeIssue,timeExpire);
-                return tokenUpdate;
-            }
-        }
-        return token ;
-    }
+    //load token from cache
+//    public String getTokenFromCache() throws JsonProcessingException {
+//
+//        //SET TIMEOUT
+//        //set Time out get token api BIC
+//        SimpleClientHttpRequestFactory clientHttpRequestFactoryGetToken = new SimpleClientHttpRequestFactory();
+//        //Connect timeout
+//        clientHttpRequestFactoryGetToken.setConnectTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
+//        //Read timeout
+//        clientHttpRequestFactoryGetToken.setReadTimeout(Integer.parseInt(environment.getRequiredProperty("timeout.api.loginTravelBIC")));
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Map<String, Object> claims = null;
+//        claims = JwtUtils.getClaimsMap(authentication);
+//        String clientId = null;
+//
+//        //get clientid from claims
+//        if (claims != null) {
+//            clientId = (String) claims.get("client_id");
+//        }
+//
+//        Optional<ClientDetail> clientDetail = clientDetailService.findByclientIdName(clientId);
+//
+//        Object obAccessToken = null ;
+//        if (clientDetail.isPresent() == true) {
+//            obAccessToken = cachingService.getFromCacheString("accesstoken", clientDetail.get().getUserNameBic());
+//        }
+//
+//        AccessToken accessToken = null;
+//        if (obAccessToken != null) {
+//            accessToken = (AccessToken) obAccessToken;
+//        }
+//
+//        String token = "" ;
+//        if(accessToken != null ){
+//            token = accessToken.getToken() ;
+//            long timeRemain = 0L ;
+//            if(     accessToken.getToken() != null
+//                    && accessToken.getExpireTime() != null
+//                    && accessToken.getIssueTime() != null ){
+//
+//                //timeRemain =  accessToken.getExpireTime() -  DateTimeUtils.getCurrenTime();
+//                Long expireTime = accessToken.getExpireTime() ;
+//                Long currentTimeSystem = DateTimeUtils.getCurrenTime() ;
+//                timeRemain =  expireTime -  currentTimeSystem;
+//
+//            }
+//            //check time expire access token
+//            if (timeRemain < (1000*60*3)) {
+//
+//                //post get token
+//                UserLoginBIC userLoginBIC = new UserLoginBIC();
+//                userLoginBIC.setUsername(clientDetail.get().getUserNameBic());
+//                userLoginBIC.setPassword(clientDetail.get().getPasswordBic());
+//                userLoginBIC.setDomainname(clientDetail.get().getDomainNameBic());
+//
+//                ObjectMapper mapper = new ObjectMapper();
+//
+//                String requestToken = mapper.writeValueAsString(userLoginBIC);
+//                ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null,clientHttpRequestFactoryGetToken);
+//                if(jsonResultGetToken.getBody() != null){
+//                    //get token from response
+//                    String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
+//                    Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
+//                    Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
+//
+//                    //update token in database
+//                    AccessToken accessTokenCreate = accessTokenService.updateCache(clientDetail.get().getUserNameBic(), tokenUpdate,timeIssue,timeExpire);
+//                    return tokenUpdate;
+//                }
+//            }else {
+//                return accessToken.getToken();
+//            }
+//
+//        }else {
+//            //post get token
+//            UserLoginBIC userLoginBIC = new UserLoginBIC();
+//            userLoginBIC.setUsername(clientDetail.get().getUserNameBic());
+//            userLoginBIC.setPassword(clientDetail.get().getPasswordBic());
+//            userLoginBIC.setDomainname(clientDetail.get().getDomainNameBic());
+//
+//            ObjectMapper mapper = new ObjectMapper();
+//
+//            String requestToken = mapper.writeValueAsString(userLoginBIC);
+//            ResponseEntity<String> jsonResultGetToken = apiUtils.postDataByApiBody(environment.getRequiredProperty("api.loginTravelBIC"), null, requestToken, null, null,clientHttpRequestFactoryGetToken);
+//            if(jsonResultGetToken.getBody() != null){
+//                //get token from response
+//                String tokenUpdate = JwtUtils.getTokenFromResponse(new JSONObject(jsonResultGetToken.getBody()));
+//                Long timeIssue = JwtUtils.getDateIssuetoLong(new JSONObject(jsonResultGetToken.getBody()));
+//                Long timeExpire = JwtUtils.getDateExpiretoLong(new JSONObject(jsonResultGetToken.getBody()));
+//
+//                //update token in database
+//                AccessToken accessTokenCreate = accessTokenService.createCache(clientDetail.get().getUserNameBic(), tokenUpdate,timeIssue,timeExpire);
+//                return tokenUpdate;
+//            }
+//        }
+//        return token ;
+//    }
 
     // load token from BIC
     public String getTokenOncePerRequest() throws JsonProcessingException, APIAccessException {

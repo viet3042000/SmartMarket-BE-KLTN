@@ -13,10 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 public interface BICTransactionService extends BaseService<BICTransaction> {
-    public BICTransaction createBICTransactionFromCreateTravel(BaseDetail<CreateTravelInsuranceBICRequest> object,
-                                                               EJson jsonObjectReponseCreate,
-                                                               String resultCode , String bicResultCode,
-                                                               String clientIp, String typeTransaction) ;
     public BICTransaction createBICTransactionFromCreateTravelOutbox(BaseDetail<CreateTravelInsuranceBICRequest> object,
                                                                EJson jsonObjectReponseCreate,
                                                                String resultCode , String bicResultCode,
@@ -24,7 +20,7 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
 
     public BICTransaction createBICTransactionParameter(String requestId, String orderReference, String orderId,
                                                         String customerName, String phoneNumber, String email,
-                                                        String ordPaidMoney, String consumerId, String fromDate,
+                                                        String ordPaidMoney, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy) ;
@@ -35,7 +31,7 @@ public interface BICTransactionService extends BaseService<BICTransaction> {
 
     public BICTransaction createBICTransactionParameterOutbox(String requestId, String orderReference, String orderId,
                                                         String customerName, String phoneNumber, String email,
-                                                        String ordPaidMoney, String consumerId, String fromDate,
+                                                        String ordPaidMoney, String fromDate,
                                                         String toDate, Date logTimestamp, String resultCode,
                                                         String bicResultCode, String ordDate, String productId,
                                                         String customerAddress , String clientIp,String type,Long destroy,String clientId) ;

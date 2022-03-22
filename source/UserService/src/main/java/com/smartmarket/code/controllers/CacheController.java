@@ -5,10 +5,10 @@ import com.smartmarket.code.exception.ConnectDataBaseException;
 import com.smartmarket.code.request.entity.User;
 import com.smartmarket.code.response.BaseResponse;
 import com.smartmarket.code.response.Response;
-import com.smartmarket.code.service.ClientService;
+//import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.ServiceConfigService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
-import com.smartmarket.code.service.impl.ClientServiceImpl;
+//import com.smartmarket.code.service.impl.ClientServiceImpl;
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -37,8 +37,8 @@ public class CacheController {
     @Autowired
     CachingServiceImpl cachingService ;
 
-    @Autowired
-    ClientService clientService ;
+//    @Autowired
+//    ClientService clientService ;
 
     @Autowired
     ServiceConfigService serviceConfigService;

@@ -3,7 +3,6 @@ package com.smartmarket.code.controllers;
 import com.smartmarket.code.constants.ResponseCode;
 import com.smartmarket.code.exception.ConnectDataBaseException;
 import com.smartmarket.code.response.BaseResponse;
-import com.smartmarket.code.service.ClientService;
 import com.smartmarket.code.service.ServiceConfigService;
 import com.smartmarket.code.service.impl.CachingServiceImpl;
 import org.hibernate.exception.JDBCConnectionException;
@@ -28,9 +27,6 @@ public class CacheController {
 
     @Autowired
     CachingServiceImpl cachingService ;
-
-    @Autowired
-    ClientService clientService ;
 
     @Autowired
     ServiceConfigService serviceConfigService;
