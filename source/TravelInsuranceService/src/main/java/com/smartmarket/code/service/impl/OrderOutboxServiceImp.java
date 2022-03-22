@@ -70,9 +70,8 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 String clientId = jsonPayload.getString("clientId");
                 String hostName = jsonPayload.getString("hostName");
                 Long startTime = jsonPayload.getLong("startTime");
-                orderReference = jsonPayload.getString("orderReference");
 
-//                orderReference = UUID.randomUUID().toString();
+                orderReference = UUID.randomUUID().toString();
                 productDetail.getJSONObject("orders").put("orderReference",orderReference);
 
                 TravelInsurance travelInsurance = new TravelInsurance();
