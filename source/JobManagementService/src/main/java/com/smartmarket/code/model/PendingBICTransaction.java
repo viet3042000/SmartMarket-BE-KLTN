@@ -27,4 +27,7 @@ public class PendingBICTransaction {
     @Column(name = "count")
     private Long count;
 
+    @Column(name = "type")
+    private String type;
+
 }

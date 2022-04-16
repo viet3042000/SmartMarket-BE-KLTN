@@ -45,7 +45,8 @@ public class JobManagementServiceImp implements JobManagementService {
     IntervalHistoryRepository intervalHistoryRepository;
 
 
-    @Scheduled(fixedRate = 40000)
+//    @Scheduled(cron = "0 */10 * * * *") //every 10 minute
+    @Scheduled(fixedRate = 100000)
     public void manage(){
         Long startTime = DateTimeUtils.getCurrenTime();
         try {
@@ -92,13 +93,19 @@ public class JobManagementServiceImp implements JobManagementService {
 
                         Outbox jobManagementOutbox = new Outbox();
                         //insert information of PendingBICTransaction into outbox
-                        jobManagementOutbox.setPendingId(pendingBICTransaction.getId());
-                        jobManagementOutbox.setStartTime(startTime);
-                        jobManagementOutbox.setRequestId(pendingBICTransaction.getRequestId());
-                        jobManagementOutbox.setOrderId(pendingBICTransaction.getOrderId());
-                        jobManagementOutbox.setOrderReference(pendingBICTransaction.getOrderReference());
-                        jobManagementOutbox.setIntervalId(intervalId.toString());
-                        jobManagementOutbox.setStep(i);
+                        jobManagementOutbox.setAggregateId(pendingBICTransaction.getRequestId());
+                        jobManagementOutbox.setAggregateType("TravelInsurance");
+//                        jobManagementOutbox.setType();
+
+                        JSONObject payload = new JSONObject();
+                        payload.put("pendingId",pendingBICTransaction.getId());
+                        payload.put("startTime",startTime);
+                        payload.put("orderId",pendingBICTransaction.getOrderId());
+                        payload.put("orderReference",pendingBICTransaction.getOrderReference());
+                        payload.put("intervalId",intervalId.toString());
+                        payload.put("step",i);
+                        payload.put("type",pendingBICTransaction.getType());
+                        jobManagementOutbox.setPayload(payload.toString());
 
                         Date dateOutbox = new Date();
                         String stringCreateAtOutbox = formatter.format(dateOutbox);

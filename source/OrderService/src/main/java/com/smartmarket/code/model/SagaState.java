@@ -55,6 +55,6 @@ public class SagaState implements Serializable {
     private int version;
 
     //order_id
-    @Column(name = "aggregateid")
-    private String aggregateId;
+//    @Column(name = "aggregateid")
+//    private String aggregateId;
 }

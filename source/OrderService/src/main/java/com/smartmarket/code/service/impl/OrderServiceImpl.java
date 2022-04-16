@@ -101,7 +101,6 @@ public class OrderServiceImpl implements OrderService {
 
         JSONObject j = new JSONObject(createOrderRequest);
 
-//        List<Product> listProducts = new ArrayList<>();
         ArrayList<ItemDetailCreateRequest> orderItems = createOrderRequest.getDetail().getOrderItems();
         for(ItemDetailCreateRequest itemDetailCreateRequest : orderItems) {
             //find product by productName and set AggregateType = productType
@@ -115,7 +114,6 @@ public class OrderServiceImpl implements OrderService {
             }
             itemDetailCreateRequest.setProductProvider(product.getProductProvider());
             itemDetailCreateRequest.setProductType(product.getType());
-//            listProducts.add(product);//to get product without find again in DB
         }
         createOrderRequest.getDetail().setOrderItems(orderItems);
 
@@ -140,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
         sagaState.setStatus(SagaStatus.STARTED);
         sagaState.setType(SagaType.CREATE_ORDER);
         sagaState.setPayload(j.toString());
-        sagaState.setAggregateId(orderId.toString());
+//        sagaState.setAggregateId(orderId.toString());
         sagaStateRepository.save(sagaState);
 
         ItemDetailCreateRequest itemDetailCreateRequest = orderItems.get(0);
@@ -254,7 +252,7 @@ public class OrderServiceImpl implements OrderService {
         sagaState.setType(SagaType.CANCEL_ORDER);
         sagaState.setPayload(payload);
         sagaState.setStatus(SagaStatus.STARTED);
-        sagaState.setAggregateId(orderIdString);
+//        sagaState.setAggregateId(orderIdString);
         sagaStateRepository.save(sagaState);
 
         ItemDetailCancelRequest itemDetailCancelRequest = orderItems.get(0);

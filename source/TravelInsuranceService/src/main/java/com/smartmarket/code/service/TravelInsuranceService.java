@@ -14,7 +14,6 @@ public interface TravelInsuranceService {
                                                Long startTime, String hostName)
             throws JsonProcessingException, APIAccessException, Exception;
 
-
     public ResponseEntity<?> updateOrderOutbox(BaseDetail<UpdateTravelInsuranceBICRequest> updateTravelInsuranceBICRequest, String clientIp, String clientId,
                                                Long startTime, String hostName)
             throws JsonProcessingException, APIAccessException;

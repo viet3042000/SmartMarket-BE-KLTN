@@ -35,26 +35,14 @@ public class ListenerServiceImp implements ListenerService {
     @Autowired
     UserRoleService userRoleService;
 
-    @Value("${kafka.topic.productoutbox}")
-    String topicProductOutbox;
-
     @Value("${kafka.topic.users}")
     String topicUsers;
 
     @Value("${kafka.topic.user_role}")
     String topicUserRole;
 
-    @Value("${kafka.topic.roles}")
-    String topicRole;
 
-    @Value("${kafka.topic.user_product_provider}")
-    String topicUserProductProvider;
-
-    @Value("${kafka.topic.approval_flow}")
-    String topicApprovalFlow;
-
-
-//    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
+    @KafkaListener(id = "${kafka.groupID.users}",topics = "${kafka.topic.users}")
     public void listenUser(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {
@@ -147,7 +135,7 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-//    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
+    @KafkaListener(id = "${kafka.groupID.user_role}",topics = "${kafka.topic.user_role}")
     public void listenUserRole(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws JSONException {
         String op ="";
         try {

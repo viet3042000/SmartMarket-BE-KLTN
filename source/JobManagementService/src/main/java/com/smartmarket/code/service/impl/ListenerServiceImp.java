@@ -42,9 +42,6 @@ public class ListenerServiceImp implements ListenerService {
     LogServiceImpl logService;
 
     @Autowired
-    TravelInsuranceServiceImpl travelInsuranceService;
-
-    @Autowired
     PendingBICTransactionRepository pendingBICTransactionRepository;
 
     @Value("${kafka.topic.travelinsurance.pendingBictransaction}")
@@ -60,7 +57,7 @@ public class ListenerServiceImp implements ListenerService {
     IntervalHistoryRepository intervalHistoryRepository;
 
 
-//    @KafkaListener(id = "${kafka.groupID.travelinsurance.pendingBictransaction}",topics = "${kafka.topic.travelinsurance.pendingBictransaction}")
+    @KafkaListener(id = "${kafka.groupID.travelinsurance.pendingBictransaction}",topics = "${kafka.topic.travelinsurance.pendingBictransaction}")
     public void listenPendingBicTransaction(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) throws Exception {
         String op ="";
 
@@ -68,6 +65,7 @@ public class ListenerServiceImp implements ListenerService {
         String orderReference ="";
         Long id = 0L;
         String requestId = "";
+        String type = "";
         Long count =0L;
 
         try {
@@ -101,6 +99,9 @@ public class ListenerServiceImp implements ListenerService {
                                 if (k.equals("request_id")) {
                                     requestId =(String) keyPairs.get(k);
                                 }
+                                if (k.equals("type")) {
+                                    type =(String) keyPairs.get(k);
+                                }
                                 if (k.equals("count")) {
                                     count = ((Number)keyPairs.get(k)).longValue();
                                 }
@@ -115,6 +116,7 @@ public class ListenerServiceImp implements ListenerService {
                                     pendingBICTransaction.setOrderId(orderId);
                                     pendingBICTransaction.setOrderReference(orderReference);
                                     pendingBICTransaction.setCount(count);
+                                    pendingBICTransaction.setType(type);
 
                                     pendingBICTransactionRepository.save(pendingBICTransaction);
                                 }
@@ -199,15 +201,15 @@ public class ListenerServiceImp implements ListenerService {
     }
 
 
-//    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
+    @KafkaListener(id = "${kafka.groupID.travelinsuranceoutbox}",topics = "${kafka.topic.travelinsuranceoutbox}")
     public void listenTravelServiceOutbox(@Payload(required = false) ConsumerRecords<String, String> records, Acknowledgment acknowledgment) {
         String op = "";
-//        UUID orderId = UUID.randomUUID();
-        String orderId ="";
-        String orderReference ="";
         String aggregateId = "";
         String aggregateType = "";
         String payload = "";
+
+        String orderId ="";
+        String orderReference ="";
         String status = "";
         String intervalId = "";
         int step = 0;
@@ -231,87 +233,78 @@ public class ListenerServiceImp implements ListenerService {
                             getKeyPairUtil.getKeyPair(afterObj, keyPairs);
 
                             for (String k : keyPairs.keySet()) {
-                                if (k.equals("order_id")) {
-                                    orderId = (String) keyPairs.get(k);
-                                }
-                                if (k.equals("order_reference")) {
-                                    orderReference= (String) keyPairs.get(k);
-                                }
                                 if (k.equals("aggregateid")) {
                                     aggregateId = (String) keyPairs.get(k);
-                                }
-                                if (k.equals("aggregatetype")) {
-                                    aggregateType = (String) keyPairs.get(k);
                                 }
                                 if (k.equals("payload")) {
                                     payload = (String) keyPairs.get(k);
                                 }
-                                if (k.equals("status")) {
-                                    status = (String) keyPairs.get(k);
-                                }
-                                if (k.equals("interval_id")) {
-                                    intervalId= (String) keyPairs.get(k);
-                                }
-                                if (k.equals("step")) {
-                                    step = ((Number)keyPairs.get(k)).intValue();
+                                if (k.equals("aggregatetype")) {
+                                    aggregateType = (String) keyPairs.get(k);
                                 }
                             }
 
-                            if (op.equals("c")) {
-                                JSONObject pendingOrderDetail = new JSONObject();
-                                pendingOrderDetail.put("requestId",aggregateId);
-                                pendingOrderDetail.put("orderId",orderId);
-                                pendingOrderDetail.put("orderReference",orderReference);
+                            if (aggregateType.equals("Job")) {
+                                JSONObject j = new JSONObject(payload);
+                                orderId = j.getString("orderId");
+                                orderReference = j.getString("orderReference");
+                                intervalId = j.getString("intervalId");
+                                status = j.getString("status");
+                                step = j.getInt("step");
 
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                                Date date = new Date();
-                                String finishedAt = formatter.format(date);
+                                if (op.equals("c")) {
+                                    JSONObject pendingOrderDetail = new JSONObject();
+                                    pendingOrderDetail.put("requestId", aggregateId);
+                                    pendingOrderDetail.put("orderId", orderId);
+                                    pendingOrderDetail.put("orderReference", orderReference);
 
-                                JobHistory jobHistory =jobHistoryRepository.findByIntervalId(intervalId).orElse(null);
-                                if(jobHistory != null) {
-                                    //insert to outbox
-                                    if (status.equals("success")) {
-                                        jobHistory.setFinishedAt(finishedAt);
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                                    Date date = new Date();
+                                    String finishedAt = formatter.format(date);
 
-                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
-                                        jobHistory.setCurrentStep(currentStep);
+                                    JobHistory jobHistory = jobHistoryRepository.findByIntervalId(intervalId).orElse(null);
+                                    if (jobHistory != null) {
+                                        //insert to outbox
+                                        if (status.equals("success")) {
+                                            jobHistory.setFinishedAt(finishedAt);
 
-                                        if (step == jobHistory.getAmountStep() && !jobHistory.getState().equals("error")) {
-                                            jobHistory.setState("succeeded");
-                                        }
-                                        jobHistoryRepository.save(jobHistory);
+                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
+                                            jobHistory.setCurrentStep(currentStep);
 
-                                        IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
-                                        if (intervalHistory != null) {
-                                            intervalHistory.setFinishedAt(finishedAt);
-                                            intervalHistory.setState("succeeded");
-                                            intervalHistoryRepository.save(intervalHistory);
-                                        }
-                                    }else {
-                                        jobHistory.setFinishedAt(finishedAt);
+                                            if (step == jobHistory.getAmountStep() && !jobHistory.getState().equals("error")) {
+                                                jobHistory.setState("succeeded");
+                                            }
+                                            jobHistoryRepository.save(jobHistory);
 
-                                        String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
-                                        jobHistory.setCurrentStep(currentStep);
-
-                                        if (step < jobHistory.getAmountStep()) {
-                                            jobHistory.setState("error");
+                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                            if (intervalHistory != null) {
+                                                intervalHistory.setFinishedAt(finishedAt);
+                                                intervalHistory.setState("succeeded");
+                                                intervalHistoryRepository.save(intervalHistory);
+                                            }
                                         } else {
-                                            jobHistory.setState("failed");
-                                        }
-                                        jobHistoryRepository.save(jobHistory);
+                                            jobHistory.setFinishedAt(finishedAt);
 
-                                        IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
-                                        if (intervalHistory != null) {
-                                            intervalHistory.setFinishedAt(finishedAt);
-                                            intervalHistory.setState("failed");
-                                            intervalHistoryRepository.save(intervalHistory);
+                                            String currentStep = String.valueOf(step) + "/" + String.valueOf(jobHistory.getAmountStep());
+                                            jobHistory.setCurrentStep(currentStep);
+
+                                            if (step < jobHistory.getAmountStep()) {
+                                                jobHistory.setState("error");
+                                            } else {
+                                                jobHistory.setState("failed");
+                                            }
+                                            jobHistoryRepository.save(jobHistory);
+
+                                            IntervalHistory intervalHistory = intervalHistoryRepository.findIntervalHistory(intervalId, step);
+                                            if (intervalHistory != null) {
+                                                intervalHistory.setFinishedAt(finishedAt);
+                                                intervalHistory.setState("failed");
+                                                intervalHistoryRepository.save(intervalHistory);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            if (op.equals("r")) {
-                                //countReadOutBox ++;
-
+                                if (op.equals("r")) {}
                             }
 
                         } else {
