@@ -24,8 +24,8 @@ public class TravelInsurance implements Serializable {
     @JsonIgnore
     private String state;
 
-    @Column(name = "product_name")
-    private String productName;
+//    @Column(name = "product_name")
+//    private String productName;
 
     @Column(name = "created_logtimestamp", columnDefinition= "TIMESTAMP WITH TIME ZONE")
     @Temporal(TemporalType.TIMESTAMP)

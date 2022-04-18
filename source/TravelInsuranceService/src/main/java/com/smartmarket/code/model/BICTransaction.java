@@ -61,8 +61,8 @@ public class BICTransaction implements Serializable {
 	@Column(name = "ord_date")
 	private String ordDate;
 
-	@Column(name = "product_id")
-	private String productId;
+//	@Column(name = "product_id")
+//	private String productId;
 
 	@Column(name = "customer_address")
 	private String customerAddress;

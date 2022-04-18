@@ -91,7 +91,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
             bicTransaction.setOrdDate(object.getDetail().getOrders().getOrdDate());
             bicTransaction.setType(typeTransaction);
             bicTransaction.setClientIp(clientIp);
-            bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
+//            bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
             bicTransaction.setDestroy(0L);
         }
 
@@ -127,7 +127,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setOrdDate(ordDate);
         bicTransaction.setClientIp(clientIp);
         bicTransaction.setType(type);
-        bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
+//        bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
         bicTransaction.setDestroy(destroy);
 
         return bicTransactionRepository.save(bicTransaction);
@@ -186,7 +186,7 @@ public class BICTransactionServiceImp implements BICTransactionService {
         bicTransaction.setOrdDate(ordDate);
         bicTransaction.setClientIp(clientIp);
         bicTransaction.setType(type);
-        bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
+//        bicTransaction.setProductId(environment.getRequiredProperty("createTravelBIC.DSVN.order.productId"));
         bicTransaction.setDestroy(destroy);
 
         return bicTransactionRepository.save(bicTransaction);

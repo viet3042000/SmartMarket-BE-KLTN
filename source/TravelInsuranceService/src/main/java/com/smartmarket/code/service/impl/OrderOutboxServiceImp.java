@@ -77,7 +77,7 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 TravelInsurance travelInsurance = new TravelInsurance();
                 travelInsurance.setId(orderReference);
                 travelInsurance.setState(TravelInsuranceState.CREATING);
-                travelInsurance.setProductName(productName);
+//                travelInsurance.setProductName(productName);
                 travelInsurance.setCreatedLogtimestamp(createAt);
                 travelInsuranceRepository.save(travelInsurance);
 
