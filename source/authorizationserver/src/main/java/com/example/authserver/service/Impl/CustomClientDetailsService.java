@@ -26,7 +26,7 @@ public class CustomClientDetailsService implements ClientDetailsService {
 	    baseClientDetails.setClientId(client.getClientId());                           
 	    baseClientDetails.setClientSecret(client.getClientSecret());                       
 	    baseClientDetails.setAuthorizedGrantTypes(List.of(client.getAuthorizedGrantTypes().split("##")));
-	    baseClientDetails.setRegisteredRedirectUri(Set.of(client.getRedirectUri()));
+//	    baseClientDetails.setRegisteredRedirectUri(Set.of(client.getRedirectUri()));
 	    baseClientDetails.setScope(List.of("read"));
 	    baseClientDetails.setAccessTokenValiditySeconds(client.getExpirationTime());
 	    return baseClientDetails;
