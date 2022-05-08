@@ -207,16 +207,20 @@ public class OrderOutboxServiceImp implements OrderOutboxService {
                 trv.setTrvId(trvQuery.getLong("trvId"));
                 trv.setOrderId(bicTransaction.getOrderId());
 
-                TRVDetail trvDetails = trvDetailsList.get(0);
-                TRVDetailUpdate trvDetailUpdate = new TRVDetailUpdate();
-                trvDetailUpdate.setTrvId(trvDetails.getTrvId());
-                trvDetailUpdate.setFullName(trvDetails.getFullName());
-                trvDetailUpdate.setGender(trvDetails.getGender());
-                trvDetailUpdate.setDateOfBirth(trvDetails.getDateOfBirth());
-                trvDetailUpdate.setPassportCard(trvDetails.getPassportCard());
-
                 ArrayList<TRVDetailUpdate> trvDetailUpdates = new ArrayList<>();
-                trvDetailUpdates.add(trvDetailUpdate);
+                for (int i =0 ; i<trvDetailsList.size(); i++) {
+//                    TRVDetail trvDetails = trvDetailsList.get(0);
+                    TRVDetail trvDetails = trvDetailsList.get(i);
+                    TRVDetailUpdate trvDetailUpdate = new TRVDetailUpdate();
+                    trvDetailUpdate.setTrvId(trvDetails.getTrvId());
+                    trvDetailUpdate.setFullName(trvDetails.getFullName());
+                    trvDetailUpdate.setGender(trvDetails.getGender());
+                    trvDetailUpdate.setDateOfBirth(trvDetails.getDateOfBirth());
+                    trvDetailUpdate.setPassportCard(trvDetails.getPassportCard());
+
+//                ArrayList<TRVDetailUpdate> trvDetailUpdates = new ArrayList<>();
+                    trvDetailUpdates.add(trvDetailUpdate);
+                }
 
                 UpdateTravelInsuranceBICRequest updateTravelInsuranceBICRequest = new UpdateTravelInsuranceBICRequest();
                 updateTravelInsuranceBICRequest.setOrders(orders);
