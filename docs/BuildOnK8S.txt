@@ -1,0 +1,53 @@
+
+mvnw package && java -jar target/myapp.jar
+
+docker build --no-cache -t dev/authorization-server:0.1 .
+docker build --no-cache -t dev/travel-insurance-service:0.1 .
+docker build --no-cache -t dev/order-service:0.1 .
+docker build --no-cache -t dev/user-service:0.1 .
+docker build --no-cache -t dev/product-service:0.1 .
+docker build --no-cache -t dev/third-party-service:0.1 .
+
+
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-order-service.yaml -n sv
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-product-service.yaml -n sv
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-travel-insurance-service.yaml -n sv
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-user-service.yaml -n sv
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-authorization-server.yaml -n sv
+kubectl apply -f D:\Work\FPT\Smartmarket-Project\dev-third-party-service.yaml -n sv
+
+
+kubectl apply -f D:\Work\FPT\Kafka\K8S\dev-orderservice-connector.yaml -n kafka
+kubectl apply -f D:\Work\FPT\Kafka\K8S\dev-userservice-connector.yaml -n kafka
+kubectl apply -f D:\Work\FPT\Kafka\K8S\dev-productservice-connector.yaml -n kafka
+kubectl apply -f D:\Work\FPT\Kafka\K8S\dev-travelinsuranceservice-connector.yaml -n kafka
+
+
+kubectl create -f https://bit.ly/k4k8s
+
+kubectl apply -f D:\Work\FPT\KongGW\kong\allservice_ingress.yml
+
+
+kubectl apply -f D:\Work\FPT\Logging\EFK\EFK-k8s.yaml -n efk
+
+
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @orderservice.txt
+
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d @travelInsuranceservice.txt
+
+Succeeded
+
+
+kubectl delete pvc --all
+
+kubectl delete pv --all
+
+kubectl get pv
+
+kubectl get pvc
+
+
+kong --> kafka --> efk --> sv --> kong service
+
+http://localhost:30000/app/kibana
+http://localhost:9000/ (kafdrop)
